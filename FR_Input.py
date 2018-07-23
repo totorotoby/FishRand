@@ -9,9 +9,9 @@ def convert_to_lists(filename):
     zoo_data = []  # clean zoo array
     phyto_data = []  # clean phyto array
     f_len = 11  # number of inputs per fish
-    zo_len = 9  # number of inputs per zoo
+    zo_len = 10  # number of inputs per zoo
     ph_len = 4  # number of inputs per phyto
-    reg_chem_len = [9,7] # number of inputs per region
+    reg_chem_len = [10,7] # number of inputs per region
 
     # getting columns #
     all_sheets = xlrd.open_workbook(filename)
@@ -45,6 +45,9 @@ def convert_to_lists(filename):
         data.append(new_reg)
         chem_reg_data.append(data)
 
+
+#!!!!!!!!!!! might need to change so we can have multiple phyto !!!!!!!!!!!
+
     # getting phyto and zoop data #
     for i in range (zo_len+1):
         if i > 0:
@@ -52,6 +55,9 @@ def convert_to_lists(filename):
     for i in range (ph_len+1):
         if i > 0:
             phyto_data.append(phy_column[i].value)
+
+
+# !!!!!!!!!!! might need to change so we can have multiple phyto !!!!!!!!!!!
 
     # getting fish_data #
 

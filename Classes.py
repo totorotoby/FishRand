@@ -50,36 +50,38 @@ class Fish:
         self.Kg = kg
         self.flag = flag
 
-        # quick calc #
-        self.Mo = (1 - self.Mp)
 
     # this could be improved...
     def set_vnb(self,vnb):
         self.Vnb = vnb
     def set_gd(self,gd):
         self.Gd = gd
-    def set_el(self,el):
+    def set_el_en_ew(self,el,en,ew):
         self.e_l = el
-    def set_en(self, en):
         self.e_n = en
-    def set_ew(self, ew):
         self.e_w = ew
+
     def set_kg(self,kg):
         self.Kg = kg
-    def set_vwb(self):
+
+    def calc_vwb(self):
         self.Vwb = (1 - (self.Vlb + self.Vnb))
+
+    def calc_mo(self):
+        self.Mo = (1 - self.Mp)
 
     ## Real calculations ##
 
     # sets the Gill ventilation rate of fish
-    def calc_gv(self, region_cox):
-        self.Gv = 1400 * (math.pow(self.Wb, .65)/region_cox)
+    def calc_gv(self, region):
+        region_cox = region.Cox
+        self.Gv = 1400 * (math.pow(self.Wb, .65) / region_cox)
 
     # sets G_d for this fish
-    def calc_gd(self, t, css, flag, sigma=1):
-        if flag == 1:
+    def calc_gd(self, t, css,sigma=1):
+        if self.flag == 1:
             self.Gd = self.Gv * css * sigma
-        if flag == 0:
+        if self.flag == 0:
             self.Gd = .022 * math.pow(self.Wb, .85) * math.exp((.06 * t))
 
     def calc_kg(self, T):
@@ -116,12 +118,13 @@ class Fish:
                 # finding right fish
                 if fishlog[i].name == self.diet_frac[j][0]:
 
+
                     l_toadd = self.diet_frac[j][1] * (fishlog[i].Vlb * fishlog[i].Wb)
                     nl_toadd = self.diet_frac[j][1] * (fishlog[i].Vnb * fishlog[i].Wb)
 
                     total_nonlip += nl_toadd
                     total_lip += l_toadd
-                    total_nonlip += fishlog[i].Wb
+                    total_all += (self.diet_frac[j][1] * fishlog[i].Wb)
 
         self.Vld = total_lip/total_all
         self.Vnd = total_nonlip/total_all
@@ -147,6 +150,28 @@ class Fish:
         k_e = self.Gf * chem_ed * (k_gb/self.Wb)
         return k_e
 
+    def init_check(self):
+
+        checks = 0
+
+        # check 1
+        atts = self.__dict__
+        count = 0
+        for entry in atts.values():
+            if entry != None:
+                count += 1
+
+        if count == len(atts.values()):
+            checks += 1
+
+        #check 2
+        if len(self.k_1) == len(self.k_2):
+            checks += 1
+
+        if checks == 2:
+            return True
+
+        return False
 
 class Zooplank:
 
@@ -156,7 +181,7 @@ class Zooplank:
     Vlb = None  # Percent Lipid Content
     Vnb = None  # percent Nonlipid organic matter
     Mp = None  # Percent Pore Water Ventilated
-    diet_frac = [[]]  # List of fractions of diet. The sum of entries must add up to 1
+    diet_frac = None  # List of fractions of diet. The sum of entries must add up to 1
     e_l = None  # Dietary absorption efficiency of lipids
     e_n = None  # Dietary absorption efficiency of nonlipid organic matter
     e_w = None  # Dietary absorption efficiency of water
@@ -195,16 +220,37 @@ class Zooplank:
         self.e_n = e_n
         self.e_w = e_w
 
-        # quick calc #
-        self.Mo = (1 - self.Mp)
+
+    def set_el_en_ew(self, el, en, ew):
+        self.e_l = el
+        self.e_n = en
+        self.e_w = ew
+
+    def set_mp(self,mp):
+        self.Mp = mp
+
+    def set_gd(self,gd):
+        self.Gd = gd
+
+    def set_kg(self, kg):
+        self.Kg = kg
+
+    def set_vnb(self,vnb):
+        self.Vnb = vnb
+
+    def calc_vwb(self):
         self.Vwb = (1 - (self.Vlb + self.Vnb))
 
+    def calc_mo(self):
+        self.Mo = (1 - self.Mp)
+
     # sets the Gill ventilation rate of zooplank
-    def calc_gv(self, region_cox):
+    def calc_gv(self, region):
+        region_cox = region.Cox
         self.Gv = 1400 * (math.pow(self.Wb, .65) / region_cox)
 
     # sets G_d for this zooplank
-    def calc_gd(self, t, css, sigma, flag):
+    def calc_gd(self, t, css, flag,sigma=1):
         if flag == 1:
             self.Gd = self.Gv * css * sigma
         if flag == 0:
@@ -231,10 +277,10 @@ class Zooplank:
         return chem_ed * (self.Gd / self.Wb)
 
     # sets the percentages of zooplank diet that are lipid, non-lipid and water
-    def calc_diet_per(self, phytolog):
+    def calc_diet_per(self, phyto):
 
-        self.Vld = phytolog.Vlb
-        self.Vnd = phytolog.Vnb
+        self.Vld = phyto.Vlp
+        self.Vnd = phyto.Vnp
         self.Vwd = 1 - (self.Vld + self.Vnd)
 
     # sets the percentages of the gut
@@ -257,6 +303,28 @@ class Zooplank:
         k_e = self.Gf * chem_ed * (k_gb / self.Wb)
         return k_e
 
+    def init_check(self):
+
+        checks = 0
+
+        # check 1
+        atts = self.__dict__
+        count = 0
+        for entry in atts.values():
+            if entry != None:
+                count += 1
+
+        if count == len(atts.values()):
+            checks += 1
+
+        #check 2
+        if len(self.k_1) == len(self.k_2):
+            checks += 1
+
+        if checks == 2:
+            return True
+
+        return False
 
 class Pplank:
 
@@ -273,16 +341,26 @@ class Pplank:
     k_1 = []  # List of k_1 (clearance rate constant) for each chemical. List should be number of chemicals long
     k_2 = []  # Same as k_1 but for k_2 (rate constant chemical elem via respiratory)
 
-    def __init__(self, name, wc, kg, a=.00006, b=5.5, vlp=.005, vnp=.065):
+    def __init__(self, name, kg, a=.00006, b=5.5, vlp=.005, vnp=.065):
         self.name = name
         self.Vlp = vlp
         self.Vnp = vnp
-        self.Vwp = wc
         self.Kg = kg
         self.A = a
         self.B = b
 
-        # quick calc #
+
+    def set_a_b(self,a,b):
+        self.A = a
+        self.B = b
+
+    def set_vlp(self,vlp):
+        self.Vlp = vlp
+
+    def set_vnp(self,vnp):
+        self.Vnp = vnp
+
+    def calc_vwp(self):
         self.Vwp = 1 - (self.Vlp - self.Vnp)
 
     # returns k_1 of chemical for this pplank dependent on chem kow
@@ -294,6 +372,30 @@ class Pplank:
     def calc_k2(self, chem_kow, k_1):
         k_pw = (self.Vlp * chem_kow) + (self.Vnp * .35 * chem_kow) + self.Vwp
         return k_1 / k_pw
+
+
+    def init_check(self):
+
+        checks = 0
+
+        # check 1
+        atts = self.__dict__
+        count = 0
+        for entry in atts.values():
+            if entry != None:
+                count += 1
+
+        if count == len(atts.values()):
+            checks += 1
+
+        #check 2
+        if len(self.k_1) == len(self.k_2):
+            checks += 1
+
+        if checks == 2:
+            return True
+
+        return False
 
 
 class Chemical:
@@ -323,6 +425,14 @@ class Chemical:
         self.calc_ew()
         self.calc_ed()
 
+    def set_cwto_cwdo(self,cwto,cwdo):
+        self.Cwto = cwto
+        self.Cwdo = cwdo
+
+    def set_ddoc_dpoc(self,ddoc,dpoc):
+        self.Ddoc = ddoc
+        self.Dpoc = dpoc
+
 
     def calc_ew(self):
         self.Ew = (1.85 + math.pow((155/self.Kow), -1))
@@ -332,7 +442,7 @@ class Chemical:
 
     def calc_phi(self, region):
 
-        if self.Cwto != 0:
+        if self.Cwto != None:
             self.phi = self.Cwdo/self.Cwto
         else:
             adoc = region.adoc
@@ -341,6 +451,18 @@ class Chemical:
             xpoc = region.Xpoc
 
             self.phi = 1/((1+xpoc*self.Dpoc*apoc*self.Kow)+(xdoc*self.Ddoc*adoc*self.Kow))
+
+    def init_check(self):
+        atts = self.__dict__
+        count = 0
+        for entry in atts.values():
+            if entry != None:
+                count += 1
+
+        if count + 2 == len(atts.values()):
+            return True
+
+        return False
 
 class Region:
 
@@ -358,12 +480,12 @@ class Region:
     # parameter or calc #
     Cox = None  # Dissolved Oxygen Content
 
-    def __init__(self, name, t, xdoc, poc, css, ocs, s, cox=None, adoc=.08, apoc=.35):
+    def __init__(self, name, t, xdoc, xpoc, css, ocs, s, cox=None, adoc=.08, apoc=.35):
 
         self.T = t
         self.name = name
         self.Xdoc = xdoc
-        self.Xpoc = poc
+        self.Xpoc = xpoc
         self.Css = css
         self.Ocs = ocs
         self.S = s
@@ -371,10 +493,26 @@ class Region:
         self.adoc = adoc
         self.apoc = apoc
 
-        if self.Cox == None:
-            self.calc_cox()
+    def set_adoc_apoc(self,apoc,adoc):
+        self.adoc = adoc
+        self.apoc = apoc
+
+    def set_cox(self,cox):
+        self.Cox = cox
 
     def calc_cox(self):
         self.Cox = (-.024 * self.T + 14.04) * self.S
+
+    def init_check(self):
+        atts = self.__dict__
+        count = 0
+        for entry in atts.values():
+            if entry != None:
+                count += 1
+
+        if count == len(atts.values()):
+            return True
+
+        return False
 
 
