@@ -49,6 +49,7 @@ class Fish:
         self.e_w = e_w
         self.Kg = kg
         self.flag = flag
+        self.Cb = []
 
 
     # this could be improved...
@@ -172,6 +173,25 @@ class Fish:
             return True
 
         return False
+
+
+    #Where log is the dictonary of chemical concentrations
+    def solve_steady_state(self, phi, i, Cwto, Cwds, log):
+
+        denom = self.k_2[i] + self.k_e[i] + self.Kg
+        f_num = self.k_1[i] * (self.Mo * phi * Cwto + self.Mp * Cwds)
+
+        l_num = 0
+
+        for j in range (len(self.diet_frac)):
+
+            concentration = log[self.diet_frac[j][0]]
+            l_num += (self.diet_frac[j][1]*concentration)
+
+        l_num = l_num * self.k_d[i]
+
+        return (f_num+l_num)/denom
+
 
 class Zooplank:
 
@@ -425,7 +445,7 @@ class Chemical:
         self.calc_ew()
         self.calc_ed()
 
-    def set_cwto_cwdo(self,cwto,cwdo):
+    def set_cwto_cwdo(self,cwto, cwdo):
         self.Cwto = cwto
         self.Cwdo = cwdo
 

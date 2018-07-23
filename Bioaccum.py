@@ -32,6 +32,7 @@ def init_region(reg_data):
 
     return regions
 
+
 # initiates chemicals for a specific single region
 def init_chems(chem_data, region):
 
@@ -154,7 +155,6 @@ def init_zoop(zoo_data, region, phyto, chemicals):
     return zoops
 
 
-
 def init_fish(fish_data, diet_data, region, chemicals, phyto, zoop):
 
     tempfishs = []
@@ -233,6 +233,12 @@ def init_fish(fish_data, diet_data, region, chemicals, phyto, zoop):
         exit(0)
 
 
+
+
+def solve(regions, chemcicals, phytos, zoops, fishs):
+
+    # nested dictonary where can look up first by chemical then animal to find concentration
+    conc_log = {{}}
 
 
 
