@@ -42,15 +42,17 @@ def init_chems(chem_data, region):
         toadd = obj.Chemical(chemical[0],chemical[1],chemical[2])
 
         # dealing with cwto and cwdo
-        if chemical[3] and chemical[4] != '':
-            toadd.set_cwto_cwdo(chemical[3],chemical[4])
+        if chemical[3] != '':
+            toadd.set_cwto(chemical[3])
+        if chemical[4] != '':
+            toadd.set_cwdo(chemical[4])
 
         # dealing with ddoc and dpoc
         if chemical[5] and chemical[6] != '':
             toadd.set_ddoc_dpoc(chemical[5],chemical[6])
 
         # calculating Phi
-        toadd.calc_phi(region)
+        toadd.calc_phi_and_cwdo(region)
 
         # checking to see if anything is missing
         if toadd.init_check():
@@ -199,33 +201,42 @@ def init_fish(fish_data, diet_data, region, chemicals, phyto, zoop):
         fishs[i].calc_gv(region)
         fishs[i].calc_gf()
 
-    # going back through so that we can now set diets
     count = 0
-    # bugged ! #
-    for i in range(len(fishs)):
+    # going back through so that we can now set diets
+    for i in range (len(fishs)):
+        fish = fishs[i]
+        k_1 = []
+        k_2 = []
+        k_gb = []
+        k_e = []
+        k_d = []
 
-        for chemical in chemicals:
-
-            kow = chemical.Kow
-            ed = chemical.Ed
-            k_1 = fishs[i].calc_k1(kow)
-            fishs[i].k_1.append(k_1)
-            k_2 = fishs[i].calc_k2(kow, k_1)
-            fishs[i].k_2.append(k_2)
-            k_gb = fishs[i].calc_kgb(kow)
-            fishs[i].k_gb.append(k_gb)
-            k_e = fishs[i].calc_ke(ed, k_gb)
-            fishs[i].k_e.append(k_e)
-            k_d = fishs[i].calc_kd(ed)
-            fishs[i].k_d.append(k_d)
-
-    # bugged ! #
+        for j in range (len(chemicals)):
+            kow = chemicals[j].Kow
+            ew = chemicals[j].Ew
+            ed = chemicals[j].Ed
+            k1 =fish.calc_k1(ew)
+            k_1.append(k1)
+            k2 = fish.calc_k2(kow,k1)
+            k_2.append(k2)
+            kgb = fish.calc_kgb(kow)
+            k_gb.append(kgb)
+            ke = fish.calc_ke(ed,kgb)
+            k_e.append(ke)
+            kd = fish.calc_kd(ed)
+            k_d.append(kd)
 
 
-        if fishs[i].init_check():
+        fish.k_1 = k_1
+        fish.k_2 = k_2
+        fish.k_gb = k_gb
+        fish.k_e = k_e
+        fish.k_d = k_d
+
+
+        if fish.init_check():
             count += 1
 
-    print(len(fishs[0].k_1))
     if count == len(fishs):
         return fishs
     else:
@@ -233,12 +244,146 @@ def init_fish(fish_data, diet_data, region, chemicals, phyto, zoop):
         exit(0)
 
 
+def reorder_fish(fishs):
+
+    new_order = []
+    below = []
+    # find the root fish
+    while True:
+        fish = find_base_fish(fishs)
+        if type(fish) == obj.Fish:
+            new_order.append(fish)
+            below.append(fish.name)
+            fishs.remove(fish)
+        if fish == None:
+            break
+
+        below.append('Phytoplankton')
+        below.append('Zooplankton')
+
+    while True:
+        nextfish = find_next_fish(fishs, new_order, below)
+        if type(nextfish) == obj.Fish:
+            new_order.append(nextfish)
+            below.append(nextfish.name)
+            fishs.remove(nextfish)
+        if nextfish == None:
+            break
 
 
-def solve(regions, chemcicals, phytos, zoops, fishs):
+    return new_order
 
-    # nested dictonary where can look up first by chemical then animal to find concentration
-    conc_log = {{}}
+
+def find_base_fish(fishs):
+
+    basefish = None
+
+    for fish in fishs:
+        # counter for non 0 non phyto zoop diet
+        count = 0
+        for entry in fish.diet_frac:
+
+            if (entry[0] != 'Phytoplankton' and entry[0] != 'Zooplankton') and entry[1] > 0:
+                count += 1
+
+        if count == 0:
+            basefish = fish
+
+    return basefish
+
+
+def find_next_fish(possible_fish, current_fish, below):
+
+    nextfish = None
+
+    for fish in possible_fish:
+        count = 0
+        for entry in fish.diet_frac:
+            #print(entry, below)
+            if (entry[0] not in below) and entry[1] > 0:
+
+                count += 1
+
+        if count == 0:
+            nextfish = fish
+
+
+    return nextfish
+
+
+def solve(regions, chemicals, phytos, zoops, fishs):
+
+    # nested dictonary where can look up first by region then chemical then animal to find concentration
+    #assuming one region for now
+    conc_log = {}
+    conc_log[regions[0].name] = {}
+
+    conc_log = solve_phyto(chemicals,phytos,conc_log, regions[0])
+    conc_log = solve_zoop(chemicals,zoops, conc_log, regions[0])
+    conc_log = solve_fish(chemicals,fishs,conc_log,regions[0])
+
+    return conc_log
+
+
+
+def solve_phyto(chemicals,phytos, conc_log, region):
+
+    phytolog = conc_log[region.name]
+    #assuming one phyto
+    phyto = phytos[0]
+    phytolog[phyto.name] = {}
+    for i in range (len(chemicals)):
+        cwd = chemicals[i].Cwdo
+        conc_in_phyto = phyto.solve_steady_state(cwd, i)
+        phytolog[phyto.name][chemicals[i].name] = conc_in_phyto
+
+    return conc_log
+
+
+def solve_zoop(chemicals, zoops, conc_log, region):
+
+    zooplog = conc_log[region.name]
+    #assuming one zoop
+    zoops = zoops[0]
+    zooplog[zoops.name] = {}
+    for i in range (len(chemicals)):
+
+        phi = chemicals[i].phi
+        Cwto = chemicals[i].Cwto
+        Cwds = chemicals[i].Cwdo
+        phyto_con = conc_log[region.name]['Phytoplankton'][chemicals[i].name]
+
+        conc_in_zoops = zoops.solve_steady_state(phi, i, Cwto, Cwds, phyto_con)
+        zooplog[zoops.name][chemicals[i].name] = conc_in_zoops
+
+    return conc_log
+
+
+
+def solve_fish(chemicals, fishs, conc_log, region):
+
+    fishlog = conc_log[region.name]
+
+    for i in range (len(fishs)):
+        fishlog[fishs[i].name] = {}
+        for j in range (len(chemicals)):
+            phi = chemicals[j].phi
+            Cwto = chemicals[j].Cwto
+            Cwds = chemicals[j].Cwdo
+            con_in_i = fishs[i].solve_steady_state(phi, j, Cwto, Cwds, fishlog, chemicals[j])
+            fishlog[fishs[i].name][chemicals[j].name] = con_in_i
+
+    return conc_log
+
+
+def pretty(d, indent=0):
+   for key, value in d.items():
+      print('\t' * indent + str(key))
+      if isinstance(value, dict):
+         pretty(value, indent+1)
+      else:
+         print('\t' * (indent+1) + str(value))
+
 
 
 
@@ -254,6 +399,12 @@ def main():
     zoops = init_zoop(zoo_data,regions[0],phytos[0],chemicals)
 
     fishs = init_fish(fish_data, diet_data, regions[0],chemicals,phytos[0],zoops[0])
+
+    fishs = reorder_fish(fishs)
+
+    conc_log = solve(regions,chemicals,phytos,zoops,fishs)
+
+    pretty(conc_log)
 
 
 main()

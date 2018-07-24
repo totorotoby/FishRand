@@ -22,11 +22,11 @@ class Fish:
     # calc #
     Vwb = None  # Percent of water content (1 - (Vlb + Vnb))
     Mo = None  # Percent Over Water Ventilated
-    k_1 = []  # List of k_1 (clearance rate constant via resp) for each chemical.List should be number of chemicals long
-    k_2 = []  # Same as k_1 but for k_2 (rate constant chemical elem via respiratory)
-    k_d = []  # Same but for k_d (clearance rate constant via ingestion of food)
-    k_e = []  # (rate constant via excretion into egested feces)
-    k_gb = []  # Gut–biota partition coefficient
+    k_1 = None  # List of k_1 (clearance rate constant via resp) for each chemical.List should be number of chemicals long
+    k_2 = None  # Same as k_1 but for k_2 (rate constant chemical elem via respiratory)
+    k_d = None  # Same but for k_d (clearance rate constant via ingestion of food)
+    k_e = None  # (rate constant via excretion into egested feces)
+    k_gb = None  # Gut–biota partition coefficient
     Gv = None  # Gill ventilation rate
     Gf = None  # fecal egestion rate
     Vld = None  # lipid fraction of diet
@@ -175,8 +175,8 @@ class Fish:
         return False
 
 
-    #Where log is the dictonary of chemical concentrations
-    def solve_steady_state(self, phi, i, Cwto, Cwds, log):
+    #Where log is the dictonary of chemical concentrations for region
+    def solve_steady_state(self, phi, i, Cwto, Cwds, log, chemical):
 
         denom = self.k_2[i] + self.k_e[i] + self.Kg
         f_num = self.k_1[i] * (self.Mo * phi * Cwto + self.Mp * Cwds)
@@ -184,9 +184,9 @@ class Fish:
         l_num = 0
 
         for j in range (len(self.diet_frac)):
-
-            concentration = log[self.diet_frac[j][0]]
-            l_num += (self.diet_frac[j][1]*concentration)
+            if self.diet_frac[j][1] > 0:
+                concentration = log[self.diet_frac[j][0]][chemical.name]
+                l_num += (self.diet_frac[j][1]*concentration)
 
         l_num = l_num * self.k_d[i]
 
@@ -346,6 +346,18 @@ class Zooplank:
 
         return False
 
+    # Where log is the dictonary of chemical concentrations
+    def solve_steady_state(self, phi, i, Cwto, Cwds, phyto_con):
+
+
+        denom = self.k_2[i] + self.k_e[i] + self.Kg
+        f_num = self.k_1[i] * (self.Mo * phi * Cwto + self.Mp * Cwds)
+
+        l_num = phyto_con * self.k_d[i]
+
+        return (f_num + l_num) / denom
+
+
 class Pplank:
 
     # parameter #
@@ -417,6 +429,10 @@ class Pplank:
 
         return False
 
+    def solve_steady_state(self, Cwd, i):
+
+        return (self.k_1[i] * Cwd) / (self.k_2[i] + self.Kg)
+
 
 class Chemical:
 
@@ -445,9 +461,12 @@ class Chemical:
         self.calc_ew()
         self.calc_ed()
 
-    def set_cwto_cwdo(self,cwto, cwdo):
+    def set_cwto(self,cwto):
         self.Cwto = cwto
+
+    def set_cwdo(self,cwdo):
         self.Cwdo = cwdo
+
 
     def set_ddoc_dpoc(self,ddoc,dpoc):
         self.Ddoc = ddoc
@@ -460,9 +479,9 @@ class Chemical:
     def calc_ed(self):
         self.Ed = math.pow((0.0000003*self.Kow + 2), -1)
 
-    def calc_phi(self, region):
+    def calc_phi_and_cwdo(self, region):
 
-        if self.Cwto != None:
+        if self.Cwto and self.Cwdo != None:
             self.phi = self.Cwdo/self.Cwto
         else:
             adoc = region.adoc
@@ -472,6 +491,10 @@ class Chemical:
 
             self.phi = 1/((1+xpoc*self.Dpoc*apoc*self.Kow)+(xdoc*self.Ddoc*adoc*self.Kow))
 
+        if self.Cwdo == None:
+
+            self.Cwdo = self.Cwto * self.phi
+
     def init_check(self):
         atts = self.__dict__
         count = 0
@@ -479,7 +502,7 @@ class Chemical:
             if entry != None:
                 count += 1
 
-        if count + 2 == len(atts.values()):
+        if count + 2 >= len(atts.values()):
             return True
 
         return False
