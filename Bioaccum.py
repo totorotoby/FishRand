@@ -38,6 +38,7 @@ def init_chems(chem_data, region):
 
     chemicals = []
     for i in range(len(chem_data)):
+
         chemical = chem_data[i]
         toadd = obj.Chemical(chemical[0],chemical[1],chemical[2])
 
@@ -53,6 +54,7 @@ def init_chems(chem_data, region):
 
         # calculating Phi
         toadd.calc_phi_and_cwdo(region)
+        toadd.calc_pore_water(region)
 
         # checking to see if anything is missing
         if toadd.init_check():
@@ -105,7 +107,7 @@ def init_zoop(zoo_data, region, phyto, chemicals):
 
     # Potential loop in the future
 
-    toadd = obj.Zooplank(zoop[0],zoop[1],zoop[2])
+    toadd = obj.Zooplank(zoop[0],zoop[1],zoop[2], zoop[10])
 
     # inital set
     if zoop[3] != '':
@@ -136,7 +138,8 @@ def init_zoop(zoo_data, region, phyto, chemicals):
 
         kow = chemical.Kow
         ed = chemical.Ed
-        k_1 = toadd.calc_k1(kow)
+        ew = chemical.Ew
+        k_1 = toadd.calc_k1(ew)
         toadd.k_1.append(k_1)
         k_2 = toadd.calc_k2(kow, k_1)
         toadd.k_2.append(k_2)
@@ -161,11 +164,11 @@ def init_fish(fish_data, diet_data, region, chemicals, phyto, zoop):
 
     tempfishs = []
     tempfishs.append(zoop)
+    tempfishs.append(phyto)
     fishs = []
 
 
     for fish in fish_data:
-
         diet = diet_data[fish[0]]
 
         toadd = obj.Fish(fish[0],fish[1],fish[2],fish[4], diet, fish[10])
@@ -188,17 +191,16 @@ def init_fish(fish_data, diet_data, region, chemicals, phyto, zoop):
         # second variables
         toadd.calc_mo()
         toadd.calc_vwb()
-
+        toadd.calc_gv(region)
         if toadd.Gd == None:
-            toadd.calc_gd(region.T, region.Css)
+            toadd.calc_gd(region.T, region.Css, toadd.flag)
         if toadd.Kg == None:
             toadd.calc_kg(region.T)
         fishs.append(toadd)
 
     for i in range(len(fishs)):
-        fishs[i].calc_diet_per(tempfishs)
+        fishs[i].calc_diet_per(tempfishs,region)
         fishs[i].calc_gut_per()
-        fishs[i].calc_gv(region)
         fishs[i].calc_gf()
 
     count = 0
@@ -260,6 +262,7 @@ def reorder_fish(fishs):
 
         below.append('Phytoplankton')
         below.append('Zooplankton')
+        below.append('Sediment/Detritus')
 
     while True:
         nextfish = find_next_fish(fishs, new_order, below)
@@ -269,7 +272,6 @@ def reorder_fish(fishs):
             fishs.remove(nextfish)
         if nextfish == None:
             break
-
 
     return new_order
 
@@ -283,7 +285,7 @@ def find_base_fish(fishs):
         count = 0
         for entry in fish.diet_frac:
 
-            if (entry[0] != 'Phytoplankton' and entry[0] != 'Zooplankton') and entry[1] > 0:
+            if (entry[0] != 'Sediment/Detritus' and entry[0] != 'Phytoplankton' and entry[0] != 'Zooplankton') and entry[1] > 0:
                 count += 1
 
         if count == 0:
@@ -299,7 +301,6 @@ def find_next_fish(possible_fish, current_fish, below):
     for fish in possible_fish:
         count = 0
         for entry in fish.diet_frac:
-            #print(entry, below)
             if (entry[0] not in below) and entry[1] > 0:
 
                 count += 1
@@ -368,9 +369,9 @@ def solve_fish(chemicals, fishs, conc_log, region):
         fishlog[fishs[i].name] = {}
         for j in range (len(chemicals)):
             phi = chemicals[j].phi
-            Cwto = chemicals[j].Cwto
+            Cwp = chemicals[j].Cwp
             Cwds = chemicals[j].Cwdo
-            con_in_i = fishs[i].solve_steady_state(phi, j, Cwto, Cwds, fishlog, chemicals[j])
+            con_in_i = fishs[i].solve_steady_state(phi, j, Cwp, Cwds, fishlog, chemicals[j])
             fishlog[fishs[i].name][chemicals[j].name] = con_in_i
 
     return conc_log
@@ -390,6 +391,8 @@ def pretty(d, indent=0):
 def main():
     reg_data, chem_data, fish_data, zoo_data, phyto_data, diet_data = FR_Input.convert_to_lists("FR_Input.xlsx")
 
+
+
     regions = init_region(reg_data)
 
     chemicals = init_chems(chem_data,regions[0])
@@ -400,11 +403,12 @@ def main():
 
     fishs = init_fish(fish_data, diet_data, regions[0],chemicals,phytos[0],zoops[0])
 
-    fishs = reorder_fish(fishs)
+    #fishs = reorder_fish(fishs)
 
     conc_log = solve(regions,chemicals,phytos,zoops,fishs)
 
     pretty(conc_log)
+
 
 
 main()

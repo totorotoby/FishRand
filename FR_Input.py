@@ -9,7 +9,7 @@ def convert_to_lists(filename):
     zoo_data = []  # clean zoo array
     phyto_data = []  # clean phyto array
     f_len = 11  # number of inputs per fish
-    zo_len = 10  # number of inputs per zoo
+    zo_len = 11  # number of inputs per zoo
     ph_len = 4  # number of inputs per phyto
     reg_chem_len = [10,7] # number of inputs per region
 
@@ -42,9 +42,9 @@ def convert_to_lists(filename):
                 new_reg = []
             else:
                 new_reg.append(data_raw[i])
-        data.append(new_reg)
+        if len(new_reg) != 0:
+            data.append(new_reg)
         chem_reg_data.append(data)
-
 
 #!!!!!!!!!!! might need to change so we can have multiple phyto !!!!!!!!!!!
 
@@ -81,7 +81,7 @@ def convert_to_lists(filename):
     # getting Diet data #
 
     diet_data = {}
-    entrysize = len(fish_data) + 3
+    entrysize = len(fish_data) + 5
     diet_sheet = all_sheets.sheet_by_index(3)
     rows = diet_sheet.nrows
 
