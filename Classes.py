@@ -38,6 +38,11 @@ class Fish:
     Vngm = None
     Vwg = None  # water fraction of gut
 
+    # chemical
+    Mb = None  # mass of chemical for multiple times
+    Cb = None  # concentration for steady state
+
+
     def __init__(self, name, weight, vlb, mp, diet_per, flag,vnb=.2, gd=None, e_l=.75, e_n=.75, e_w=.5, kg=None):
         self.name = name
         self.Wb = weight
@@ -179,7 +184,6 @@ class Fish:
         return k_gb
 
     # returns k_e for certain chemical
-    #TODO hopefully ke will be good if the other two are
     def calc_ke(self, chem_ed, k_gb):
         k_e = (k_gb/self.Wb) * chem_ed * self.Gf
         return k_e
@@ -266,6 +270,10 @@ class Zooplank:
     Vlg = None  # lipid fraction of gut
     Vng = None  # Non-lipid fraction of gut
     Vwg = None  # water fraction of gut
+
+    # chemical
+    Mb = None  # mass of chemical for multiple times
+    Cb = None  # concentration for steady state
 
     def __init__(self, name, weight, lip_con, flag, mp=0, vnb=.2, gd=None, e_l=.72, e_n=.72, e_w=.25, kg=None):
 
@@ -399,7 +407,6 @@ class Zooplank:
         denom = self.k_2[i] + self.k_e[i] + self.Kg
 
         f_num = self.k_1[i] * (self.Mo * phi * Cwto + self.Mp * Cwds)
-        print('k_e', self.k_e[i])
         f_num = f_num/1000
 
         l_num = phyto_con * self.k_d[i]
@@ -421,6 +428,10 @@ class Pplank:
     # calc #
     k_1 = []  # List of k_1 (clearance rate constant) for each chemical. List should be number of chemicals long
     k_2 = []  # Same as k_1 but for k_2 (rate constant chemical elem via respiratory)
+
+    # chemical
+    Mb = None  # mass of chemical for multiple times
+    Cb = None  # concentration for steady state
 
     def __init__(self, name, kg, a=.00006, b=5.5, vlp=.005, vnp=.065):
         self.name = name

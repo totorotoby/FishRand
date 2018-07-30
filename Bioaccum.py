@@ -1,7 +1,7 @@
 # Where we run the bioaccumlation model
 
 import Classes as obj
-import FR_Input
+import FR_Input_Output
 
 
 # initiates all regions
@@ -330,13 +330,16 @@ def solve(regions, chemicals, phytos, zoops, fishs):
 def solve_phyto(chemicals,phytos, conc_log, region):
 
     phytolog = conc_log[region.name]
+    Cb = []
     #assuming one phyto
     phyto = phytos[0]
     phytolog[phyto.name] = {}
     for i in range (len(chemicals)):
         cwd = chemicals[i].Cwdo
         conc_in_phyto = phyto.solve_steady_state(cwd, i)
+        Cb.append(conc_in_phyto)
         phytolog[phyto.name][chemicals[i].name] = conc_in_phyto
+    phyto.Cb = Cb
 
     return conc_log
 
@@ -346,6 +349,7 @@ def solve_zoop(chemicals, zoops, conc_log, region):
     zooplog = conc_log[region.name]
     #assuming one zoop
     zoops = zoops[0]
+    Cb = []
     zooplog[zoops.name] = {}
     for i in range (len(chemicals)):
 
@@ -355,7 +359,10 @@ def solve_zoop(chemicals, zoops, conc_log, region):
         phyto_con = conc_log[region.name]['Phytoplankton'][chemicals[i].name]
 
         conc_in_zoops = zoops.solve_steady_state(phi, i, Cwto, Cwds, phyto_con)
+        Cb.append(conc_in_zoops)
         zooplog[zoops.name][chemicals[i].name] = conc_in_zoops
+
+    zoops.Cb = Cb
 
     return conc_log
 
@@ -367,12 +374,15 @@ def solve_fish(chemicals, fishs, conc_log, region):
 
     for i in range (len(fishs)):
         fishlog[fishs[i].name] = {}
+        Cb = []
         for j in range (len(chemicals)):
             phi = chemicals[j].phi
             Cwp = chemicals[j].Cwp
             Cwds = chemicals[j].Cwdo
             con_in_i = fishs[i].solve_steady_state(phi, j, Cwp, Cwds, fishlog, chemicals[j])
+            Cb.append(con_in_i)
             fishlog[fishs[i].name][chemicals[j].name] = con_in_i
+        fishs[i].Cb = Cb
 
     return conc_log
 
@@ -389,7 +399,7 @@ def pretty(d, indent=0):
 
 
 def main():
-    reg_data, chem_data, fish_data, zoo_data, phyto_data, diet_data = FR_Input.convert_to_lists("FR_Input.xlsx")
+    reg_data, chem_data, fish_data, zoo_data, phyto_data, diet_data = FR_Input_Output.determ_convert_to_lists("FR_Input.xls")
 
 
 
@@ -407,8 +417,10 @@ def main():
 
     conc_log = solve(regions,chemicals,phytos,zoops,fishs)
 
-    pretty(conc_log)
+    #print(phytos[0].Cd)
 
+    #pretty(conc_log)
 
+    FR_Input_Output.deter_write_output(regions,fishs,chemicals,phytos,zoops)
 
 main()

@@ -1,8 +1,14 @@
 import xlrd
+import xlsxwriter
 
 # Reads in all data from spread sheets
 
-def convert_to_lists(filename):
+#def stat_convert_to_lists(filename):
+
+
+
+
+def determ_convert_to_lists(filename):
 
     fish_data_raw = []  # messy output from xlrd
     fish_data = []  # clean fish array
@@ -101,3 +107,55 @@ def convert_to_lists(filename):
     chem_data = chem_reg_data[1]
 
     return reg_data, chem_data, fish_data, zoo_data, phyto_data, diet_data
+
+
+def deter_write_output(regions, fish, chemicals, phyto, zoop):
+
+    workbook = xlsxwriter.Workbook('hello.xlsx')
+    worksheet = workbook.add_worksheet()
+    num_org = len(fish) + len(phyto) + len(zoop)
+
+    for i in range(len(chemicals)):
+        worksheet.write(i+1, 0, chemicals[i].name)
+
+
+
+    for i in range (len(regions)):
+        write_region = (i * (num_org + 1))
+
+        worksheet.write(0, write_region , regions[i].name)
+
+        for j in range (len(phyto)):
+            write_phyto = (write_region + 1) + j
+
+            worksheet.write(0, write_phyto, phyto[j].name)
+
+            for p in range (len(phyto[j].Cb)):
+                chem_write = p + 1
+
+                worksheet.write(chem_write, write_phyto, phyto[j].Cb[p])
+
+
+        for j in range (len(zoop)):
+
+            write_zoop = ((write_region + write_phyto + 1) + j)
+
+            worksheet.write(0, write_zoop, zoop[j].name)
+
+            for p in range(len(zoop[j].Cb)):
+                chem_write = p + 1
+
+                worksheet.write(chem_write, write_zoop, zoop[j].Cb[p])
+
+
+        for j in range (len(fish)):
+            write_fish = ((write_region + write_phyto + write_zoop) + j)
+
+            worksheet.write(0, write_fish, fish[j].name)
+
+            for p in range(len(fish[j].Cb)):
+
+                print('hello')
+                chem_write = p + 1
+
+                worksheet.write(chem_write, write_fish, fish[j].Cb[p])
