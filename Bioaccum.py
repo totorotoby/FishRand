@@ -397,30 +397,34 @@ def pretty(d, indent=0):
 
 
 
+def run_deter():
+
+    reg_data, chem_data, fish_data, zoo_data, phyto_data, diet_data = FR_Input_Output.determ_convert_to_lists("FR_Input_det.xls")
+    regions = init_region(reg_data)
+    chemicals = init_chems(chem_data, regions[0])
+    phytos = init_phyto(phyto_data, chemicals)
+    zoops = init_zoop(zoo_data, regions[0], phytos[0], chemicals)
+    fishs = init_fish(fish_data, diet_data, regions[0], chemicals, phytos[0], zoops[0])
+    fishs = reorder_fish(fishs)
+    conc_log = solve(regions, chemicals, phytos, zoops, fishs)
+    # print(phytos[0].Cd)
+    # pretty(conc_log)
+    FR_Input_Output.deter_write_output(regions, fishs, chemicals, phytos, zoops)
+
+
+def run_st():
+
+
+    FR_Input_Output.stat_convert_to_lists('FR_Input_st.xls')
+
+
+
 
 def main():
-    reg_data, chem_data, fish_data, zoo_data, phyto_data, diet_data = FR_Input_Output.determ_convert_to_lists("FR_Input.xls")
+
+    run_st()
 
 
 
-    regions = init_region(reg_data)
-
-    chemicals = init_chems(chem_data,regions[0])
-
-    phytos = init_phyto(phyto_data,chemicals)
-
-    zoops = init_zoop(zoo_data,regions[0],phytos[0],chemicals)
-
-    fishs = init_fish(fish_data, diet_data, regions[0],chemicals,phytos[0],zoops[0])
-
-    #fishs = reorder_fish(fishs)
-
-    conc_log = solve(regions,chemicals,phytos,zoops,fishs)
-
-    #print(phytos[0].Cd)
-
-    #pretty(conc_log)
-
-    FR_Input_Output.deter_write_output(regions,fishs,chemicals,phytos,zoops)
 
 main()
