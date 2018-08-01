@@ -9,8 +9,7 @@ class Var:
         self.dist = dist   # distribution name
         self.param = param
         self.value = None
-        self.u_lhs = None
-        self.v_lhs = None
+        self.lhs = None
 
     def __str__(self):
 
@@ -100,6 +99,7 @@ class Fish:
         self.Mo = (1 - self.Mp)
 
     # sets the Gill ventilation rate of zooplank
+    # TODO there was a domain error with one of the GV's has to do with negatives?
     def calc_gv(self, region):
         region_cox = region.Cox
         self.Gv = 1400 * ( math.pow(self.Wb, .65) / region_cox)

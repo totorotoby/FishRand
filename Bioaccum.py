@@ -12,13 +12,13 @@ def set_all_hyper(model_para, all_data):
                 if type(item[i]) == obj.Var:
                     prob.set_hyper_cube(model_para, item[i])
 
-def gen_mod_inst_para(all_data, iteration):
+def gen_mod_inst_para(all_data, iteration, iter_type):
 
         for list in all_data:
             for item in list:
                 for i in range (len(item)):
                     if type(item[i]) == obj.Var:
-                        prob.sample_dist(item[0], item[i], iteration)
+                        prob.sample_dist(item[0], item[i], iteration, iter_type)
 
 
 def check_inst_non_st(inst):
@@ -445,13 +445,29 @@ def run_bio(flag):
         dictionares = []
         model_para, all_data  = FR_Input_Output.stat_convert_to_lists('FR_Input_st.xls')
 
+        v_iter = int((model_para[0]//model_para[2])*model_para[2])
+        u_iter = int((model_para[1]//model_para[2])*model_para[2])
+        print(v_iter)
+        print(u_iter)
+
         set_all_hyper(model_para, all_data)
-        gen_mod_inst_para(all_data, 0)
-        log = single_iter(all_data[0],all_data[1],all_data[2],all_data[3],all_data[4],all_data[5],1)
+        gen_mod_inst_para(all_data, 0, 'both')
+        log = single_iter(all_data[0], all_data[1], all_data[2], all_data[3], all_data[4], all_data[5], 1)
         dictionares.append(log)
 
+        v_count = 0
+        while(v_count < v_iter):
+            gen_mod_inst_para(all_data, v_count, 'V')
+            v_count += 1
+            u_count = 0
+            while (u_count < u_iter):
+                log = single_iter(all_data[0], all_data[1], all_data[2], all_data[3], all_data[4], all_data[5], 1)
+                dictionares.append(log)
+                gen_mod_inst_para(all_data, u_count, 'U')
+                u_count += 1
 
-        print(dictionares)
+        for i in dictionares:
+            print(i, '\n')
 
 
 def single_iter(reg_data, chem_data, fish_data, zoo_data, phyto_data, diet_data, flag):
