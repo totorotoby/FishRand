@@ -9,113 +9,119 @@ def stat_convert_to_lists(filename):
 
     all_sheets = xlrd.open_workbook(filename)
 
-    fish_data_raw = []  # messy output from xlrd
-    fish_data = []  # clean fish array
-    zoo_data = []  # clean zoo array
-    phyto_data = []  # clean phyto array
     f_len = 11  # number of inputs per fish
     zo_len = 11  # number of inputs per zoo
     ph_len = 4  # number of inputs per phyto
     reg_len = 10  # number of inputs per region
     chem_len = 7
 
-    region_list = region_data(all_sheets, reg_len)
-    chem_list = chem_data(all_sheets,chem_len)
+    model_para = []
+    model_sheet = all_sheets.sheet_by_index(0)
+    para_col = model_sheet.col(1)
 
+    get_model_para(para_col, model_para)
 
-def region_data(all_sheets, reg_len):
-
-    reg_sheet = all_sheets.sheet_by_index(0)
-
-    entry_col = reg_sheet.col(1)
-    dist_col = reg_sheet.col(2)
-
-    region_data = []
-    new_region = []
-    for i in range (len(entry_col)):
-        if i % (reg_len + 1) == 0:
-            if len(new_region) != 0:
-                print('la')
-                region_data.append(new_region)
-            new_region = []
-        else:
-
-            if i % (reg_len + 1) == 1:
-                new_region.append(entry_col[i].value)
-
-            else:
-
-                entry = entry_col[i].value
-                dist_par = dist_col[i].value
-                if type(dist_par) == str and entry != '':
-                    entry = entry.split(', ')
-                    ty = entry[0]
-                    dist_name = entry[1]
-                    dist_par = dist_par.split(', ')
-                    to_add = cs.Var(ty,dist_name,dist_par)
-                    new_region.append(to_add)
-                else:
-                    new_region.append(dist_par)
-    if len(new_region) != 0:
-        region_data.append(new_region)
-
-    return region_data
-
-
-def chem_data(all_sheets, chem_len):
     reg_sheet = all_sheets.sheet_by_index(1)
 
     entry_col = reg_sheet.col(1)
     dist_col = reg_sheet.col(2)
 
+    region_data = []
+
+    get_data(entry_col,dist_col,reg_len,region_data)
+
+
+    chem_sheet = all_sheets.sheet_by_index(2)
+
+    entry_col = chem_sheet.col(1)
+    dist_col = chem_sheet.col(2)
+
     chem_data = []
-    new_chem = []
-    for i in range(len(entry_col)):
-        if i % (chem_len + 1) == 0:
-            if len(new_chem) != 0:
-                #print('la')
-                chem_data.append(new_chem)
-            new_chem = []
-        else:
 
-            if i % (chem_len + 1) == 1:
-                new_chem.append(entry_col[i].value)
+    get_data(entry_col,dist_col,chem_len,chem_data)
 
-            else:
 
-                new_entry = []
-                entry = entry_col[i].value
-                dist_par = dist_col[i].value
-                if type(dist_par) == str and entry != '':
-                    entry = entry.split(', ')
-                    ty = entry[0]
-                    dist_name = entry[1]
-                    dist_par = dist_par.split(', ')
-                    to_add = cs.Var(ty, dist_name, dist_par)
-                    new_chem.append(to_add)
-                else:
-                    new_chem.append(dist_par)
-    if len(new_chem) != 0:
-        chem_data.append(new_chem)
-
-    print(chem_data)
-    return chem_data
-
-def fish_data(all_sheets,fish_len):
-
-    org_sheet = all_sheets.sheet_by_index(2)
+    org_sheet = all_sheets.sheet_by_index(3)
 
     fish_entry_col = org_sheet.col(1)
     fish_dist_col = org_sheet.col(2)
     zoop_entry_col = org_sheet.col(4)
     zoop_dist_col = org_sheet.col(5)
-    phyto_entry_col = org_sheet.col(7)
-    phyto_dist_col = org_sheet.col(8)
+    phyto_entry_col = org_sheet.col(8)
+    phyto_dist_col = org_sheet.col(9)
+
+    fish_data = []
+    zoop_data = []
+    phyto_data = []
+
+    get_data(fish_entry_col,fish_dist_col,f_len, fish_data)
+    get_data(zoop_entry_col,zoop_dist_col,zo_len,zoop_data)
+    get_data(phyto_entry_col, phyto_dist_col, ph_len, phyto_data)
+
+    diet_data = {}
+    entrysize = len(fish_data) + 5
+    diet_sheet = all_sheets.sheet_by_index(4)
+    get_diet_data(fish_data,diet_sheet,diet_data,entrysize)
+
+    total = [region_data, chem_data, fish_data, zoop_data, phyto_data, diet_data]
+
+    return model_para, total
 
 
+def get_model_para(para_col, model_para):
+
+    for i in range (len(para_col)):
+        model_para.append(para_col[i].value)
+
+def get_data(entry_col, dist_col, instance_len, new_list):
 
 
+    new_entry = []
+    for i in range (len(entry_col)):
+        if i % (instance_len + 1) == 0:
+            entry = entry_col[i].value
+            if len(new_entry) != 0:
+                new_list.append(new_entry)
+            new_entry = []
+            if entry == 'END':
+                break
+        else:
+            if i % (instance_len + 1) == 1:
+                new_entry.append(entry_col[i].value)
 
+            else:
+                entry = entry_col[i].value
+                dist_par = dist_col[i].value
+                if type(entry) == float and dist_par == '':
+                     new_entry.append(entry)
+                elif type(dist_par) == str and entry != '':
+                    entry = entry.split(', ')
+                    ty = entry[0]
+                    dist_name = entry[1]
+                    dist_par = dist_par.split(', ')
+                    dist_par = [float(i) for i in dist_par]
+                    to_add = cs.Var(ty,dist_name,dist_par)
+                    new_entry.append(to_add)
+                else:
+                    new_entry.append(dist_par)
+    if len(new_entry) != 0:
+        new_list.append(new_entry)
+
+
+def get_diet_data(fish_data, diet_sheet, diet_data, entrysize):
+    # getting Diet data #
+    new_name = 0
+    rows = diet_sheet.nrows
+
+    for i in range(rows):
+        if i % entrysize == 0:
+            continue
+        if i % entrysize == 1:
+            new_name = diet_sheet.row(i)[1].value
+            diet_data[new_name] = []
+        else:
+            new_prey_data = [diet_sheet.row(i)[1].value, diet_sheet.row(i)[2].value]
+            diet_data[new_name].append(new_prey_data)
 
 
 def determ_convert_to_lists(filename):
@@ -199,19 +205,7 @@ def determ_convert_to_lists(filename):
     diet_data = {}
     entrysize = len(fish_data) + 5
     diet_sheet = all_sheets.sheet_by_index(3)
-    rows = diet_sheet.nrows
-
-
-    for i in range(rows):
-        if i%entrysize == 0:
-            continue
-        if i%entrysize == 1:
-            new_name = diet_sheet.row(i)[1].value
-            diet_data[new_name] = []
-        else:
-            new_prey_data = [diet_sheet.row(i)[1].value,diet_sheet.row(i)[2].value]
-            diet_data[new_name].append(new_prey_data)
-
+    get_diet_data(fish_data,diet_sheet,diet_data,entrysize)
 
     reg_data = chem_reg_data[0]
     chem_data = chem_reg_data[1]
@@ -246,6 +240,5 @@ def deter_write_output(regions, fish, chemicals, phyto, zoop):
             write_fish = ((write_region + write_phyto + write_zoop) + j)
             worksheet.write(0, write_fish, fish[j].name)
             for p in range(len(fish[j].Cb)):
-                print('hello')
                 chem_write = p + 1
                 worksheet.write(chem_write, write_fish, fish[j].Cb[p])

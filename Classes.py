@@ -8,12 +8,14 @@ class Var:
         self.type = type   # 0 is uncertain , 1 is variable, 2 is both, 3 is point estimate
         self.dist = dist   # distribution name
         self.param = param
+        self.value = None
+        self.u_lhs = None
+        self.v_lhs = None
 
     def __str__(self):
 
         to_print = '\ntype | ' + self.type + '\ndistribution | ' + self.dist +'\nparameters | ' + str(self.param)
         return to_print
-
 
 class Fish:
     # parameter #

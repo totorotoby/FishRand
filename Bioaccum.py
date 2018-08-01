@@ -2,6 +2,35 @@
 
 import Classes as obj
 import FR_Input_Output
+import prob
+
+def set_all_hyper(model_para, all_data):
+
+    for list in all_data:
+        for item in list:
+            for i in range(len(item)):
+                if type(item[i]) == obj.Var:
+                    prob.set_hyper_cube(model_para, item[i])
+
+def gen_mod_inst_para(all_data, iteration):
+
+        for list in all_data:
+            for item in list:
+                for i in range (len(item)):
+                    if type(item[i]) == obj.Var:
+                        prob.sample_dist(item[0], item[i], iteration)
+
+
+def check_inst_non_st(inst):
+
+    new_region = []
+    for j in range (len(inst)):
+        if type(inst[j]) == obj.Var:
+            new_region.append(inst[j].value)
+        else:
+            new_region.append(inst[j])
+
+    return new_region
 
 
 # initiates all regions
@@ -11,6 +40,7 @@ def init_region(reg_data):
 
     for i in range(len(reg_data)):
         region = reg_data[i]
+        region = check_inst_non_st(region)
         toadd = obj.Region(region[0],region[1],region[2],region[3],region[4],region[5],region[6])
 
         # dealing with cox
@@ -40,6 +70,8 @@ def init_chems(chem_data, region):
     for i in range(len(chem_data)):
 
         chemical = chem_data[i]
+        chemical = check_inst_non_st(chemical)
+
         toadd = obj.Chemical(chemical[0],chemical[1],chemical[2])
 
         # dealing with cwto and cwdo
@@ -70,11 +102,14 @@ def init_chems(chem_data, region):
 def init_phyto(phyto_data, chemicals):
 
     phytos = []
-    phyto = phyto_data
+    phyto = phyto_data[0]
+    phyto = check_inst_non_st(phyto)
+    #print(phyto)
 
     # Potential loop in the future
 
     toadd = obj.Pplank(phyto[0],phyto[1])
+
     if phyto[2] != '':
         toadd.set_vlp(phyto[2])
     if phyto[3] != '':
@@ -103,7 +138,8 @@ def init_phyto(phyto_data, chemicals):
 def init_zoop(zoo_data, region, phyto, chemicals):
 
     zoops = []
-    zoop = zoo_data
+    zoop = zoo_data[0]
+    zoop = check_inst_non_st(zoop)
 
     # Potential loop in the future
 
@@ -169,6 +205,9 @@ def init_fish(fish_data, diet_data, region, chemicals, phyto, zoop):
 
 
     for fish in fish_data:
+
+        fish = check_inst_non_st(fish)
+
         diet = diet_data[fish[0]]
 
         toadd = obj.Fish(fish[0],fish[1],fish[2],fish[4], diet, fish[10])
@@ -397,9 +436,26 @@ def pretty(d, indent=0):
 
 
 
-def run_deter():
+def run_bio(flag):
 
-    reg_data, chem_data, fish_data, zoo_data, phyto_data, diet_data = FR_Input_Output.determ_convert_to_lists("FR_Input_det.xls")
+    if flag == 0:
+        reg_data, chem_data, fish_data, zoo_data, phyto_data, diet_data = FR_Input_Output.determ_convert_to_lists("FR_Input_det.xls")
+        single_iter(reg_data, chem_data, fish_data, zoo_data, phyto_data, diet_data, flag)
+    else:
+        dictionares = []
+        model_para, all_data  = FR_Input_Output.stat_convert_to_lists('FR_Input_st.xls')
+
+        set_all_hyper(model_para, all_data)
+        gen_mod_inst_para(all_data, 0)
+        log = single_iter(all_data[0],all_data[1],all_data[2],all_data[3],all_data[4],all_data[5],1)
+        dictionares.append(log)
+
+
+        print(dictionares)
+
+
+def single_iter(reg_data, chem_data, fish_data, zoo_data, phyto_data, diet_data, flag):
+
     regions = init_region(reg_data)
     chemicals = init_chems(chem_data, regions[0])
     phytos = init_phyto(phyto_data, chemicals)
@@ -407,22 +463,16 @@ def run_deter():
     fishs = init_fish(fish_data, diet_data, regions[0], chemicals, phytos[0], zoops[0])
     fishs = reorder_fish(fishs)
     conc_log = solve(regions, chemicals, phytos, zoops, fishs)
-    # print(phytos[0].Cd)
-    # pretty(conc_log)
-    FR_Input_Output.deter_write_output(regions, fishs, chemicals, phytos, zoops)
-
-
-def run_st():
-
-
-    FR_Input_Output.stat_convert_to_lists('FR_Input_st.xls')
-
-
+    if flag == 0:
+        FR_Input_Output.deter_write_output(regions, fishs, chemicals, phytos, zoops)
+        return None
+    else:
+        return conc_log
 
 
 def main():
 
-    run_st()
+    run_bio(1)
 
 
 
