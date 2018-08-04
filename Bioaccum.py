@@ -451,23 +451,29 @@ def run_bio(flag):
         print(u_iter)
 
         set_all_hyper(model_para, all_data)
-        gen_mod_inst_para(all_data, 0, 'both')
-        log = single_iter(all_data[0], all_data[1], all_data[2], all_data[3], all_data[4], all_data[5], 1)
-        dictionares.append(log)
-
+        # TODO figure out why we get duplicate values for one iteration
         v_count = 0
         while(v_count < v_iter):
+            #if v_count == 0:
+             #   gen_mod_inst_para(all_data, 0, 'both')
+            #else:
             gen_mod_inst_para(all_data, v_count, 'V')
             v_count += 1
             u_count = 0
             while (u_count < u_iter):
+                gen_mod_inst_para(all_data, u_count, 'U')
                 log = single_iter(all_data[0], all_data[1], all_data[2], all_data[3], all_data[4], all_data[5], 1)
                 dictionares.append(log)
-                gen_mod_inst_para(all_data, u_count, 'U')
                 u_count += 1
 
-        for i in dictionares:
-            print(i, '\n')
+
+
+        #for i in dictionares:
+            #print(i['The Pond']['Alewife']['Bad Chemical'], '\n')
+
+
+        prob.make_result_dist(dictionares)
+
 
 
 def single_iter(reg_data, chem_data, fish_data, zoo_data, phyto_data, diet_data, flag):
