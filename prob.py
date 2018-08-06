@@ -77,6 +77,8 @@ class ResultDist:
         return hist
 
 
+
+
 def set_hyper_cube(model_para, Var):
 
     v_iter = int(model_para[0])
@@ -145,9 +147,6 @@ def make_result_dist(dicts):
                 values = get_values(region,chemical, animal, dicts)
                 new_dist = ResultDist(values)
                 result_dict[region][animal][chemical] = new_dist
-
-    #print(result_dict['The Pond']['Alewife']['Bad Chemical'])
-    pretty(result_dict)
 
 
 def get_values(region,chem, animal, dicts):
