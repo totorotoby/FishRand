@@ -99,14 +99,17 @@ def get_data(entry_col, dist_col, instance_len, new_list):
                     ty = entry[0]
                     dist_name = entry[1]
                     dist_par = dist_par.split(', ')
-                    dist_par = [float(i) for i in dist_par]
+                    try:
+                        dist_par = [float(i) for i in dist_par]
+                    except ValueError:
+                        print('In ' + new_entry[0] + ', ' + str(dist_par) + ' is missing a space.')
+                        exit(0)
                     to_add = cs.Var(ty,dist_name,dist_par)
                     new_entry.append(to_add)
                 else:
                     new_entry.append(dist_par)
     if len(new_entry) != 0:
         new_list.append(new_entry)
-
 
 def get_diet_data(fish_data, diet_sheet, diet_data, entrysize):
     # getting Diet data #

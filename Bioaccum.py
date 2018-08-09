@@ -12,6 +12,7 @@ def set_all_hyper(model_para, all_data):
                 if type(item[i]) == obj.Var:
                     prob.set_hyper_cube(model_para, item[i])
 
+
 def gen_mod_inst_para(all_data, iteration, iter_type):
 
         for list in all_data:
@@ -61,7 +62,6 @@ def init_region(reg_data):
             exit(0)
 
     return regions
-
 
 # initiates chemicals for a specific single region
 def init_chems(chem_data, region):
@@ -445,18 +445,14 @@ def run_bio(flag):
         dictionares = []
         model_para, all_data  = FR_Input_Output.stat_convert_to_lists('FR_Input_st.xls')
 
-        v_iter = int((model_para[0]//model_para[2])*model_para[2])
-        u_iter = int((model_para[1]//model_para[2])*model_para[2])
+        v_iter = int(model_para[0])
+        u_iter = int(model_para[1])
         print(v_iter)
         print(u_iter)
 
         set_all_hyper(model_para, all_data)
-        # TODO figure out why we get duplicate values for one iteration
         v_count = 0
         while(v_count < v_iter):
-            #if v_count == 0:
-             #   gen_mod_inst_para(all_data, 0, 'both')
-            #else:
             gen_mod_inst_para(all_data, v_count, 'V')
             v_count += 1
             u_count = 0
@@ -466,13 +462,11 @@ def run_bio(flag):
                 dictionares.append(log)
                 u_count += 1
 
-
-
-        #for i in dictionares:
-            #print(i['The Pond']['Alewife']['Bad Chemical'], '\n')
-
-
-        prob.make_result_dist(dictionares)
+        results_dic = prob.make_result_dist(dictionares)
+        for region in results_dic.values():
+            for animal, animals in region.items():
+                for chemical, cont in animals.items():
+                    print(animal, chemical , cont.bestparam())
 
 
 
