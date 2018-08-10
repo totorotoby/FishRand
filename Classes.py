@@ -1,21 +1,6 @@
 # The fish, invert, Pplank, Zooplank, and chemical objects has parameters for input that are from Arnot (2004) right now
 import math
 #
-class Var:
-
-    def __init__(self, type, dist, param):
-
-        self.type = type   # 0 is uncertain , 1 is variable, 2 is both, 3 is point estimate
-        self.dist = dist   # distribution name
-        self.param = param
-        self.value = None
-        self.lhs = None
-
-    def __str__(self):
-
-        to_print = '\ntype | ' + self.type + '\ndistribution | ' + self.dist +'\nparameters | ' + str(self.param)
-        return to_print
-
 class Fish:
     # parameter #
     name = ''
@@ -271,7 +256,7 @@ class Zooplank:
     Wb = None  # wet weight
     Vlb = None  # Percent Lipid Content
     Vnb = None  # percent Nonlipid organic matter
-    Mp = None  # Percent Pore Water Ventilated
+    Mp = None  # Percent Water Ventilated
     diet_frac = None  # List of fractions of diet. The sum of entries must add up to 1
     e_l = None  # Dietary absorption efficiency of lipids
     e_n = None  # Dietary absorption efficiency of nonlipid organic matter

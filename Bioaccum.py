@@ -1,33 +1,27 @@
 # Where we run the bioaccumlation model
-
+import matplotlib.pyplot as plt
 import Classes as obj
 import FR_Input_Output
-import prob
+import prob as pr
 
-def set_all_hyper(model_para, all_data):
+def set_all_h_and_s(model_para, all_data):
 
     for list in all_data:
         for item in list:
             for i in range(len(item)):
-                if type(item[i]) == obj.Var:
-                    prob.set_hyper_cube(model_para, item[i])
+                if type(item[i]) == pr.Var:
+                    pr.set_hyper_cube(model_para, item[i])
+                    item[i].take_samples()
 
-
-def gen_mod_inst_para(all_data, iteration, iter_type):
-
-        for list in all_data:
-            for item in list:
-                for i in range (len(item)):
-                    if type(item[i]) == obj.Var:
-                        prob.sample_dist(item[0], item[i], iteration, iter_type)
-
-
-def check_inst_non_st(inst):
+def check_inst_non_st(inst,u_iter, v_iter):
 
     new_region = []
     for j in range (len(inst)):
-        if type(inst[j]) == obj.Var:
-            new_region.append(inst[j].value)
+        if type(inst[j]) == pr.Var:
+            if inst[j].type == 'U':
+                new_region.append(inst[j].values[u_iter])
+            if inst[j].type == 'V':
+                new_region.append(inst[j].values[v_iter])
         else:
             new_region.append(inst[j])
 
@@ -35,13 +29,13 @@ def check_inst_non_st(inst):
 
 
 # initiates all regions
-def init_region(reg_data):
+def init_region(reg_data,u_iter, v_iter):
 
     regions = []
 
     for i in range(len(reg_data)):
         region = reg_data[i]
-        region = check_inst_non_st(region)
+        region = check_inst_non_st(region,u_iter, v_iter)
         toadd = obj.Region(region[0],region[1],region[2],region[3],region[4],region[5],region[6])
 
         # dealing with cox
@@ -64,13 +58,13 @@ def init_region(reg_data):
     return regions
 
 # initiates chemicals for a specific single region
-def init_chems(chem_data, region):
+def init_chems(chem_data, region,u_iter, v_iter):
 
     chemicals = []
     for i in range(len(chem_data)):
 
         chemical = chem_data[i]
-        chemical = check_inst_non_st(chemical)
+        chemical = check_inst_non_st(chemical,u_iter, v_iter)
 
         toadd = obj.Chemical(chemical[0],chemical[1],chemical[2])
 
@@ -99,11 +93,11 @@ def init_chems(chem_data, region):
     return chemicals
 
 
-def init_phyto(phyto_data, chemicals):
+def init_phyto(phyto_data, chemicals,u_iter, v_iter):
 
     phytos = []
     phyto = phyto_data[0]
-    phyto = check_inst_non_st(phyto)
+    phyto = check_inst_non_st(phyto,u_iter, v_iter)
     #print(phyto)
 
     # Potential loop in the future
@@ -135,11 +129,11 @@ def init_phyto(phyto_data, chemicals):
     return phytos
 
 
-def init_zoop(zoo_data, region, phyto, chemicals):
+def init_zoop(zoo_data, region, phyto, chemicals,u_iter, v_iter):
 
     zoops = []
     zoop = zoo_data[0]
-    zoop = check_inst_non_st(zoop)
+    zoop = check_inst_non_st(zoop,u_iter, v_iter)
 
     # Potential loop in the future
 
@@ -196,7 +190,7 @@ def init_zoop(zoo_data, region, phyto, chemicals):
     return zoops
 
 
-def init_fish(fish_data, diet_data, region, chemicals, phyto, zoop):
+def init_fish(fish_data, diet_data, region, chemicals, phyto, zoop,u_iter, v_iter):
 
     tempfishs = []
     tempfishs.append(zoop)
@@ -206,7 +200,7 @@ def init_fish(fish_data, diet_data, region, chemicals, phyto, zoop):
 
     for fish in fish_data:
 
-        fish = check_inst_non_st(fish)
+        fish = check_inst_non_st(fish,u_iter, v_iter)
 
         diet = diet_data[fish[0]]
 
@@ -443,40 +437,59 @@ def run_bio(flag):
         single_iter(reg_data, chem_data, fish_data, zoo_data, phyto_data, diet_data, flag)
     else:
         dictionares = []
-        model_para, all_data  = FR_Input_Output.stat_convert_to_lists('FR_Input_st.xls')
+        model_para, all_data  = FR_Input_Output.stat_convert_to_lists('FR_Input_st_small_Var.xls')
 
         v_iter = int(model_para[0])
         u_iter = int(model_para[1])
-        print(v_iter)
         print(u_iter)
+        print(v_iter)
 
-        set_all_hyper(model_para, all_data)
-        v_count = 0
-        while(v_count < v_iter):
-            gen_mod_inst_para(all_data, v_count, 'V')
-            v_count += 1
-            u_count = 0
-            while (u_count < u_iter):
-                gen_mod_inst_para(all_data, u_count, 'U')
-                log = single_iter(all_data[0], all_data[1], all_data[2], all_data[3], all_data[4], all_data[5], 1)
+        set_all_h_and_s(model_para, all_data)
+
+        u_count = 0
+        while (u_count < u_iter):
+            u_count += 1
+            v_count = 0
+            while (v_count < v_iter):
+                log = single_iter(all_data[0], all_data[1], all_data[2], all_data[3], all_data[4], all_data[5], u_count, v_count,1)
                 dictionares.append(log)
-                u_count += 1
+                v_count += 1
 
-        results_dic = prob.make_result_dist(dictionares)
+        results_dic = pr.make_result_dist(dictionares)
+
+        print(results_dic)
         for region in results_dic.values():
             for animal, animals in region.items():
                 for chemical, cont in animals.items():
                     print(animal, chemical , cont.bestparam())
+                    cont.plot_info()
 
 
+def plot_small(graph_list):
 
-def single_iter(reg_data, chem_data, fish_data, zoo_data, phyto_data, diet_data, flag):
+    width = 1 / len(graph_list)
+    y = []
+    for i in range(len(graph_list)):
+        y.append(0 + (width * i))
+    print(len(graph_list[0]),len(graph_list))
+    for j in range(len(graph_list[0])):
+        x = []
+        for i in range(len(graph_list)):
+            x.append(graph_list[i][j])
+        x = sorted(x)
+        print(x)
+        plt.plot(x,y,'ro', color='r')
+        plt.xlim(x[0],x[len(x)-1])
+        plt.show()
 
-    regions = init_region(reg_data)
-    chemicals = init_chems(chem_data, regions[0])
-    phytos = init_phyto(phyto_data, chemicals)
-    zoops = init_zoop(zoo_data, regions[0], phytos[0], chemicals)
-    fishs = init_fish(fish_data, diet_data, regions[0], chemicals, phytos[0], zoops[0])
+
+def single_iter(reg_data, chem_data, fish_data, zoo_data, phyto_data, diet_data, u_iter, v_iter,flag):
+
+    regions = init_region(reg_data,u_iter, v_iter)
+    chemicals = init_chems(chem_data, regions[0],u_iter, v_iter)
+    phytos = init_phyto(phyto_data, chemicals,u_iter, v_iter)
+    zoops = init_zoop(zoo_data, regions[0], phytos[0], chemicals,u_iter, v_iter)
+    fishs = init_fish(fish_data, diet_data, regions[0], chemicals, phytos[0], zoops[0],u_iter, v_iter)
     fishs = reorder_fish(fishs)
     conc_log = solve(regions, chemicals, phytos, zoops, fishs)
     if flag == 0:
@@ -489,8 +502,5 @@ def single_iter(reg_data, chem_data, fish_data, zoo_data, phyto_data, diet_data,
 def main():
 
     run_bio(1)
-
-
-
 
 main()
