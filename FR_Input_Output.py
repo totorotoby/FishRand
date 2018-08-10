@@ -1,7 +1,8 @@
 import xlrd
 import xlsxwriter
 import datetime
-import Classes as cs
+#import Classes as cs
+import prob as pr
 
 # Reads in all data from spread sheets
 
@@ -102,9 +103,9 @@ def get_data(entry_col, dist_col, instance_len, new_list):
                     try:
                         dist_par = [float(i) for i in dist_par]
                     except ValueError:
-                        print('In ' + new_entry[0] + ', ' + str(dist_par) + ' is missing a space.')
+                        print('In ' + new_entry[0] + ', ' + str(dist_par) + ' something is wrong with format.')
                         exit(0)
-                    to_add = cs.Var(ty,dist_name,dist_par)
+                    to_add = pr.Var(ty, dist_name, dist_par)
                     new_entry.append(to_add)
                 else:
                     new_entry.append(dist_par)
@@ -245,3 +246,7 @@ def deter_write_output(regions, fish, chemicals, phyto, zoop):
             for p in range(len(fish[j].Cb)):
                 chem_write = p + 1
                 worksheet.write(chem_write, write_fish, fish[j].Cb[p])
+
+
+
+stat_convert_to_lists('FR_Input_st_large_Var.xls')

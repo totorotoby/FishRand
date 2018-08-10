@@ -7,7 +7,56 @@ from scipy import stats
 from numpy import linspace
 from numpy import var
 
-# TODO figure out how to avoid negative numbers when sampling from some distrubtions/ results get messed up in some cases
+class Var:
+
+    def __init__(self, type, dist, param):
+
+        self.type = type   # 0 is uncertain , 1 is variable, 2 is both, 3 is point estimate
+        self.dist = dist   # distribution name
+        self.param = param
+        self.values = None
+        self.lhs = None
+
+    def __str__(self):
+
+        to_print = '\ntype | ' + self.type + '\ndistribution | ' + self.dist +'\nparameters | ' + str(self.param)
+        return to_print
+
+
+    def take_samples(self):
+
+        if self.dist == 'Normal':
+            mean = self.param[0]
+            std = self.param[1]
+            self.values = st.norm(loc=mean, scale=std).ppf(self.lhs)
+
+        elif self.dist == 'Uniform':
+            a = self.param[0]
+            b = self.param[1]
+            self.values = st.uniform(loc=a, scale=b).ppf(self.lhs)
+
+        elif self.dist == 'Triangle':
+            a = self.param[0]
+            b = self.param[1]
+            c = (self.param[2] - a) / b
+            self.values = st.triang(c, loc=a, scale=b).ppf(self.lhs)
+
+        elif self.dist == 'Log-Normal':
+            mu_log = self.param[0]
+            sigma_log = self.param[1]
+            mu, sigma = lognorm_to_norm(mu_log,sigma_log)
+            self.values = st.lognorm(sigma, scale=mu).ppf(self.lhs)
+
+        elif self.dist == 'Log-Uniform':
+            a = self.param[0]
+            b = self.param[1]
+            self.values = loguniform(loc=a, scale=b).ppf(self.lhs)
+
+        else:
+            print(self.dist)
+            print('There is a unknown distribution called ', '\''+ self.dist + '\'')
+            exit(0)
+
 
 class loguniform:
 
@@ -218,50 +267,6 @@ def set_hyper_cube(model_para, Var):
     lhs = pyDOE.lhs(bin_num, samples=hype_sample)
     lhs = lhs.ravel()
     Var.lhs = lhs
-
-
-def sample_dist(name, Var, i, type):
-
-    if Var.type == type or type == 'both':
-        if Var.dist == 'Normal':
-            mean = Var.param[0]
-            std = Var.param[1]
-            point = Var.lhs[i]
-            sample = st.norm(loc=mean, scale=std).ppf(point)
-
-        elif Var.dist == 'Uniform':
-            a = Var.param[0]
-            b = Var.param[1]
-            point = Var.lhs[i]
-            sample = st.uniform(loc=a, scale=b).ppf(point)
-
-        elif Var.dist == 'Triangle':
-            a = Var.param[0]
-            b = Var.param[1]
-            c = (Var.param[2]-a)/b
-            point = Var.lhs[i]
-            sample = st.triang(c, loc=a, scale=b).ppf(point)
-
-        elif Var.dist == 'Log-Normal':
-            mu_log = Var.param[0]
-            sigma_log = Var.param[1]
-            mu, sigma = lognorm_to_norm(mu_log,sigma_log)
-            point = Var.lhs[i]
-            sample = st.lognorm(sigma, scale=mu).ppf(point)
-
-        elif Var.dist == 'Log-Uniform':
-            a = Var.param[0]
-            b = Var.param[1]
-            point  = Var.lhs[i]
-            sample = loguniform(loc=a, scale=b).ppf(point)
-
-        else:
-            print(Var.dist)
-            print('There is a unknown distribution in', '\''+name + '\'')
-            exit(0)
-
-
-        Var.value = float(sample)
 
 
 
