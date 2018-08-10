@@ -271,7 +271,7 @@ class Zooplank:
     Wb = None  # wet weight
     Vlb = None  # Percent Lipid Content
     Vnb = None  # percent Nonlipid organic matter
-    Mp = None  # Percent Pore Water Ventilated
+    Mp = None  # Percent Water Ventilated
     diet_frac = None  # List of fractions of diet. The sum of entries must add up to 1
     e_l = None  # Dietary absorption efficiency of lipids
     e_n = None  # Dietary absorption efficiency of nonlipid organic matter
