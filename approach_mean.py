@@ -54,34 +54,34 @@ def single_round(it, steps):
     reprint(write_work, an_sheet_read, an_sheet_write, 5, zo_len, steps[it])
     reprint(write_work, an_sheet_read, an_sheet_write, 9, ph_len, steps[it])
 
-    single_dic = run_bio(1,'sheets/input/approach_mean_write.xlsx')
+    single_dic = run_bio(1,'sheets/input/approach_mean_write.xlsx', 'approach_mean_write')
 
     return single_dic
 
 def loop():
 
-    iter = 30
-    det_results = run_bio(0,'sheets/input/FR_Input_det1.xls')
-    # print('here')
-    # steps = linspace(.001, .1, iter)
-    # result_dic = {}
-    #
-    # for i in range (iter):
-    #
-    #     single_dic = single_round(i,steps)
-    #     print(single_dic)
-    #
-    #     for reg, values in single_dic.items():
-    #         if i == 0:
-    #             result_dic[reg] = {}
-    #         for animal, values1 in values.items():
-    #             if i == 0:
-    #                 result_dic[reg][animal] = {}
-    #             for chem in values1.keys():
-    #                 conver_dic(result_dic,single_dic,reg,animal,chem, i)
-    #
-    #
-    # print_approach_g(steps,result_dic,det_results)
+    iter = 1
+    det_results = run_bio(0,'sheets/input/FR_Input_det.xls', 'FR_Input_det')
+    print(det_results)
+    print('here')
+    steps = linspace(.001, .1, iter)
+    result_dic = {}
+    print('Fraction done:')
+    for i in range (iter):
+        print('\r' + str(i/iter), end='')
+        single_dic = single_round(i,steps)
+
+        for reg, values in single_dic.items():
+            if i == 0:
+                result_dic[reg] = {}
+            for animal, values1 in values.items():
+                if i == 0:
+                    result_dic[reg][animal] = {}
+                for chem in values1.keys():
+                    conver_dic(result_dic,single_dic,reg,animal,chem, i)
+
+
+    print_approach_g(steps,result_dic,det_results)
 
 
 def print_approach_g(steps,result_dic, det_results):
@@ -93,6 +93,7 @@ def print_approach_g(steps,result_dic, det_results):
                 x_label = 'coefficient of variation'
                 plt.xlabel(x_label)
                 plt.ylabel(y_label)
+                print(det_results[reg][animal][chemical])
                 plt.plot(steps,list, 'ro', color='b')
                 plt.axhline(det_results[reg][animal][chemical], color='r')
                 plt.show()
