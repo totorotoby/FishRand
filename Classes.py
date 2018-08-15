@@ -25,7 +25,7 @@ class Fish:
     k_2 = None  # Same as k_1 but for k_2 (rate constant chemical elem via respiratory)
     k_d = None  # Same but for k_d (clearance rate constant via ingestion of food)
     k_e = None  # (rate constant via excretion into egested feces)
-    k_gb = None  # Gut–biota partition coefficient
+    k_gb = None  # Gut biota partition coefficient
     Gv = None  # Gill ventilation rate
     Gf = None  # fecal egestion rate
     Vld = None  # lipid fraction of diet
@@ -84,7 +84,6 @@ class Fish:
         self.Mo = (1 - self.Mp)
 
     # sets the Gill ventilation rate of zooplank
-    # TODO there was a domain error with one of the GV's has to do with negatives?
     def calc_gv(self, region):
         region_cox = region.Cox
         try:
@@ -274,7 +273,7 @@ class Zooplank:
     k_2 = []  # Same as k_1 but for k_2 (rate constant chemical elem via respiratory)
     k_d = []  # Same but for k_d (clearance rate constant via ingestion of food)
     k_e = []  # (rate constant via excretion into egested feces)
-    k_gb = []  # Gut–biota partition coefficient
+    k_gb = []  # Gut biota partition coefficient
     Gv = None  # Gill ventilation rate
     Gf = None  # fecal egestion rate
     Vld = None  # lipid fraction of diet
@@ -301,6 +300,7 @@ class Zooplank:
         self.e_n = e_n
         self.e_w = e_w
         self.flag = flag
+
 
     def __str__(self):
         return self.__dict__
@@ -517,7 +517,7 @@ class Chemical:
 
     # parameter #
     name = ''
-    Kow = None  # Octanol–water partition coefficient
+    Kow = None  # Octanol water partition coefficient
     Cs = None  # Chemical concentration in sediment
     Cwto = None  # Chemical concentration in overlying water (total)
     Cwdo = None  # Chemical concentration in overlying water (dissolved)
@@ -605,8 +605,8 @@ class Region:
     Css = None  # Concentration of suspended solids in water
     Ocs = None  # Sediment organic Carbon Content
     S = None  # Dissolved oxygen saturation
-    adoc = None  # DOC–octanol proportionality constant
-    apoc = None  # POC–octanol proportionality constant
+    adoc = None  # DOC octanol proportionality constant
+    apoc = None  # POC octanol proportionality constant
 
     # parameter or calc #
     Cox = None  # Dissolved Oxygen Content

@@ -10,8 +10,7 @@ def set_all_h_and_s(model_para, all_data):
         for item in list:
             for i in range(len(item)):
                 if type(item[i]) == pr.Var:
-                    pr.set_hyper_cube(model_para, item[i])
-                    item[i].take_samples()
+                    pr.set_hyper_samp_cube(model_para, item[i])
 
 def check_inst_non_st(inst,u_iter, v_iter):
 
@@ -98,7 +97,6 @@ def init_phyto(phyto_data, chemicals,u_iter, v_iter):
     phytos = []
     phyto = phyto_data[0]
     phyto = check_inst_non_st(phyto,u_iter, v_iter)
-    #print(phyto)
 
     # Potential loop in the future
 
@@ -430,39 +428,44 @@ def pretty(d, indent=0):
 
 
 
-def run_bio(flag):
+def run_bio(flag, filename, endname):
 
     if flag == 0:
-        reg_data, chem_data, fish_data, zoo_data, phyto_data, diet_data = FR_Input_Output.determ_convert_to_lists("FR_Input_det.xls")
-        single_iter(reg_data, chem_data, fish_data, zoo_data, phyto_data, diet_data, flag)
+        all_data = FR_Input_Output.determ_convert_to_lists(filename)
+        #exit(0)
+        conc_log = single_iter(all_data[0], all_data[1], all_data[2], all_data[3], all_data[4], all_data[5],0, endname)
+        return conc_log
     else:
         dictionares = []
-        model_para, all_data  = FR_Input_Output.stat_convert_to_lists('FR_Input_st_small_Var.xls')
+        model_para, all_data  = FR_Input_Output.stat_convert_to_lists(filename)
 
         v_iter = int(model_para[0])
         u_iter = int(model_para[1])
-        print(u_iter)
-        print(v_iter)
 
         set_all_h_and_s(model_para, all_data)
-
+        inner_count = 0
         u_count = 0
         while (u_count < u_iter):
             u_count += 1
             v_count = 0
             while (v_count < v_iter):
-                log = single_iter(all_data[0], all_data[1], all_data[2], all_data[3], all_data[4], all_data[5], u_count, v_count,1)
+                log = single_iter(all_data[0], all_data[1], all_data[2], all_data[3], all_data[4], all_data[5],1 ,endname ,u_iter=u_count,v_iter=inner_count)
                 dictionares.append(log)
                 v_count += 1
+                inner_count += 1
 
         results_dic = pr.make_result_dist(dictionares)
 
-        print(results_dic)
-        for region in results_dic.values():
-            for animal, animals in region.items():
-                for chemical, cont in animals.items():
-                    print(animal, chemical , cont.bestparam())
-                    cont.plot_info()
+        return results_dic
+
+def result_print(results_dic):
+
+    for region in results_dic.values():
+        for animal, animals in region.items():
+            for chemical, cont in animals.items():
+                print(cont.bestparam()[0])
+                cont.plot_info()
+
 
 
 def plot_small(graph_list):
@@ -483,7 +486,7 @@ def plot_small(graph_list):
         plt.show()
 
 
-def single_iter(reg_data, chem_data, fish_data, zoo_data, phyto_data, diet_data, u_iter, v_iter,flag):
+def single_iter(reg_data, chem_data, fish_data, zoo_data, phyto_data, diet_data,flag, inputfilename, u_iter=0, v_iter=0):
 
     regions = init_region(reg_data,u_iter, v_iter)
     chemicals = init_chems(chem_data, regions[0],u_iter, v_iter)
@@ -493,14 +496,16 @@ def single_iter(reg_data, chem_data, fish_data, zoo_data, phyto_data, diet_data,
     fishs = reorder_fish(fishs)
     conc_log = solve(regions, chemicals, phytos, zoops, fishs)
     if flag == 0:
-        FR_Input_Output.deter_write_output(regions, fishs, chemicals, phytos, zoops)
-        return None
+        anwser = str(input('\n Would you like to save results to an excel sheet?\n'))
+        if anwser == 'y':
+            FR_Input_Output.deter_write_output(regions, fishs, chemicals, phytos, zoops, inputfilename)
+        return conc_log
     else:
         return conc_log
 
 
-def main():
-
-    run_bio(1)
-
-main()
+# def main():
+#
+#     run_bio(1,'sheets/input/FR_Input_st_small_Var.xls')
+#
+# main()

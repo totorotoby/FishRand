@@ -29,29 +29,32 @@ class Var:
             mean = self.param[0]
             std = self.param[1]
             self.values = st.norm(loc=mean, scale=std).ppf(self.lhs)
-
         elif self.dist == 'Uniform':
             a = self.param[0]
             b = self.param[1]
             self.values = st.uniform(loc=a, scale=b).ppf(self.lhs)
-
         elif self.dist == 'Triangle':
             a = self.param[0]
             b = self.param[1]
             c = (self.param[2] - a) / b
             self.values = st.triang(c, loc=a, scale=b).ppf(self.lhs)
-
         elif self.dist == 'Log-Normal':
             mu_log = self.param[0]
             sigma_log = self.param[1]
             mu, sigma = lognorm_to_norm(mu_log,sigma_log)
             self.values = st.lognorm(sigma, scale=mu).ppf(self.lhs)
-
         elif self.dist == 'Log-Uniform':
             a = self.param[0]
             b = self.param[1]
             self.values = loguniform(loc=a, scale=b).ppf(self.lhs)
-
+        elif self.dist == 'Beta':
+            alpha = self.param[0]
+            beta =  self.param[1]
+            self.values = st.beta(alpha,beta).ppf(self.lhs)
+        elif self.dist == 'Weibull':
+            lamb = self.param[0]
+            k = self.param[1]
+            self.values = st.weibull_min(c=k, scale = lamb).ppf(self.lhs)
         else:
             print(self.dist)
             print('There is a unknown distribution called ', '\''+ self.dist + '\'')
@@ -102,20 +105,18 @@ class ResultDist:
 
         g_norm_mean = g_norm_mean / len(self.values)
         g_norm_var = var(self.values)
+        g_norm_std = math.sqrt(g_norm_var)
 
-        #print(g_norm_var)
-        #print(g_norm_mean)
+        g_lognorm_mu = math.exp(g_norm_mean+(math.pow( g_norm_std,2)/2))
+        g_lognorm_sigma = math.exp(2*g_norm_mean+math.pow(g_norm_std,2))*math.exp(math.pow(g_norm_std,2)-1)
 
-        g_lognorm_mu = 1#math.exp(g_norm_mean+(math.pow(g_norm_var,2)/2))
-        g_lognorm_sigma = .5#math.exp(2*g_norm_mean+math.pow(g_norm_var,2))*math.exp(math.pow(g_norm_var,2)-1)
+        g_uni_b = 2*math.pow( g_norm_std,2)
+        g_uni_a = g_norm_mean - math.pow( g_norm_std,2)
 
-        g_uni_b = 2*math.pow(g_norm_var,2)
-        g_uni_a = g_norm_mean - math.pow(g_norm_var,2)
-
-        return [[g_norm_mean, g_norm_var],[g_lognorm_mu,g_lognorm_sigma], [g_uni_a,g_uni_b]]
+        return [[g_norm_mean, g_norm_std],[g_lognorm_mu,g_lognorm_sigma], [g_uni_a,g_uni_b]]
 
 
-    def make_pdf_hist(self) -> list:
+    def make_pdf_hist(self):
 
 
         hist = {}
@@ -126,17 +127,13 @@ class ResultDist:
 
         return [bins, kde]
 
-    def plot_info(self) -> None:
+    def plot_info(self):
 
 
         fit_params = self.cdfs[self.index][1]
 
         fig, ax = plt.subplots(1, 2, figsize=(12, 6))
 
-        # histogram
-        # hist_plot = list(sorted(self.hist.items(), key=lambda x: x[0]))
-        # x = [i[0] for i in hist_plot]
-        # y = [i[1] for i in hist_plot]
         pdf_x_label = '(ng/g) of ' + self.chem + ' in ' + self.animal
         pdf_y_label = 'P(x)'
         cdf_y_label = 'P(X < x)'
@@ -149,8 +146,6 @@ class ResultDist:
         x = self.hist[0]
         xmin = min(self.hist[0])
         xmax = max(self.hist[0])
-
-
 
         if self.dist_types[self.index] == 'norm':
             mean = fit_params[0]
@@ -206,7 +201,7 @@ class ResultDist:
 
         return x1
 
-    def make_cdfs(self) -> (list,list):
+    def make_cdfs(self):
 
         width = 1/len(self.values)
         y = []
@@ -220,10 +215,12 @@ class ResultDist:
 
             cdf_list[i].append(param)
 
+
+
         return cdf_list, y
 
 
-    def ks_cdf(self) -> int:
+    def ks_cdf(self):
 
         ks_list = []
 
@@ -242,32 +239,36 @@ class ResultDist:
 
     def bestparam(self):
 
+        params = []
         self.count += 1
-        string = str(self.dist_types[self.index] + '(')
+        string = str(self.animal) + ' ' + str(self.chem) + ' '
+        string += str(self.dist_types[self.index] + '(')
 
         for i in range (len(self.cdfs[self.index][1])-1):
+            params.append(self.cdfs[self.index][1][i])
             string += str(self.cdfs[self.index][1][i])
             string += ', '
+        params.append(self.cdfs[self.index][1][i+1])
         string += str(self.cdfs[self.index][1][i+1])
         string += ')'
-        return string
+        return [string, params]
 
 
-def set_hyper_cube(model_para, Var):
+def set_hyper_samp_cube(model_para, Var):
 
     v_iter = int(model_para[0])
     u_iter = int(model_para[1])
     bin_num = int(model_para[2])
 
     if Var.type == 'V':
-        hype_sample = v_iter//bin_num + 10
+        hype_sample = v_iter*u_iter//bin_num + 2
     else:
-        hype_sample = u_iter//bin_num + 10
+        hype_sample = u_iter//bin_num + 2
 
     lhs = pyDOE.lhs(bin_num, samples=hype_sample)
     lhs = lhs.ravel()
     Var.lhs = lhs
-
+    Var.take_samples()
 
 
 def lognorm_to_norm(mu_log,sigma_log):

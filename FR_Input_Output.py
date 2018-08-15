@@ -1,5 +1,4 @@
-import xlrd
-import xlsxwriter
+import xlrd, xlsxwriter
 import datetime
 #import Classes as cs
 import prob as pr
@@ -71,7 +70,7 @@ def stat_convert_to_lists(filename):
 
 def get_model_para(para_col, model_para):
 
-    for i in range (len(para_col)):
+    for i in range (3):
         model_para.append(para_col[i].value)
 
 def get_data(entry_col, dist_col, instance_len, new_list):
@@ -167,20 +166,32 @@ def determ_convert_to_lists(filename):
                     data.append(new_reg)
                 new_reg = []
             else:
-                new_reg.append(data_raw[i])
+                try:
+                    new_reg.append(float(data_raw[i]))
+                except:
+                    new_reg.append(data_raw[i])
         if len(new_reg) != 0:
             data.append(new_reg)
         chem_reg_data.append(data)
 
 #!!!!!!!!!!! might need to change so we can have multiple phyto !!!!!!!!!!!
-
+    zoop = []
+    phyto = []
     # getting phyto and zoop data #
     for i in range (zo_len+1):
         if i > 0:
-            zoo_data.append(zoop_column[i].value)
+            try:
+                zoop.append(float(zoop_column[i].value))
+            except:
+                zoop.append(zoop_column[i].value)
+    zoo_data.append(zoop)
     for i in range (ph_len+1):
         if i > 0:
-            phyto_data.append(phy_column[i].value)
+            try:
+                phyto.append(float(phy_column[i].value))
+            except:
+                phyto.append(phy_column[i].value)
+    phyto_data.append(phyto)
 
 
 # !!!!!!!!!!! might need to change so we can have multiple phyto !!!!!!!!!!!
@@ -199,8 +210,10 @@ def determ_convert_to_lists(filename):
                 fish_data.append(new_fish)
             new_fish = []
         else:
-
-            new_fish.append(fish_data_raw[i])
+            try:
+                new_fish.append(float(fish_data_raw[i]))
+            except:
+                new_fish.append(fish_data_raw[i])
     fish_data.append(new_fish)
 
 
@@ -217,8 +230,8 @@ def determ_convert_to_lists(filename):
     return reg_data, chem_data, fish_data, zoo_data, phyto_data, diet_data
 
 
-def deter_write_output(regions, fish, chemicals, phyto, zoop):
-    output_name  = "FR_Model_" + '{:%Y-%m-%d %H:%M}'.format(datetime.datetime.now()) + '.xls'
+def deter_write_output(regions, fish, chemicals, phyto, zoop, inputfilename):
+    output_name  = "sheets/output/FR_Model_" + '{:%Y-%m-%d %H:%M}'.format(datetime.datetime.now()) + '_from_' + str(inputfilename) + '.xls'
     workbook = xlsxwriter.Workbook(output_name)
     worksheet = workbook.add_worksheet()
     num_org = len(fish) + len(phyto) + len(zoop)
@@ -247,6 +260,6 @@ def deter_write_output(regions, fish, chemicals, phyto, zoop):
                 chem_write = p + 1
                 worksheet.write(chem_write, write_fish, fish[j].Cb[p])
 
+    workbook.close()
 
-
-stat_convert_to_lists('FR_Input_st_large_Var.xls')
+#stat_convert_to_lists('FR_Input_st_large_Var.xls')
