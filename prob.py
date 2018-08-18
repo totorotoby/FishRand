@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from scipy import optimize
 from scipy import stats
 from numpy import linspace
-from numpy import var
+import numpy
 
 class Var:
 
@@ -35,14 +35,14 @@ class Var:
             self.values = st.uniform(loc=a, scale=b).ppf(self.lhs)
         elif self.dist == 'Triangle':
             a = self.param[0]
-            b = self.param[1]
+            b = self.param[1] - self.param[0]
             c = (self.param[2] - a) / b
             self.values = st.triang(c, loc=a, scale=b).ppf(self.lhs)
         elif self.dist == 'Log-Normal':
-            mu_log = self.param[0]
-            sigma_log = self.param[1]
-            mu, sigma = lognorm_to_norm(mu_log,sigma_log)
-            self.values = st.lognorm(sigma, scale=mu).ppf(self.lhs)
+            m_y = self.param[0]
+            sig_y = self.param[1]
+            s, scale = lognorm_to_scipyinput(m_y,sig_y)
+            self.values = st.lognorm(s=s, scale=scale).ppf(self.lhs)
         elif self.dist == 'Log-Uniform':
             a = self.param[0]
             b = self.param[1]
@@ -51,6 +51,8 @@ class Var:
             alpha = self.param[0]
             beta =  self.param[1]
             self.values = st.beta(alpha,beta).ppf(self.lhs)
+            self.values = sorted(self.values)
+            totalwidth = max
         elif self.dist == 'Weibull':
             lamb = self.param[0]
             k = self.param[1]
@@ -81,7 +83,6 @@ class ResultDist:
     dist_types = ['norm', 'lognorm', 'uniform']
 
     def __init__(self, values, chemical, animal):
-
         self.count = 0
         self.chem = chemical
         self.animal = animal
@@ -89,43 +90,122 @@ class ResultDist:
         self.values.sort()
         self.init_guess = self.inital_guess()
         self.num_bins = len(self.values)//10
-        self.hist = self.make_pdf_hist()
+        #self.hist = self.make_pdf_hist()
         self.cdfs, self.y = self.make_cdfs()
         self.index = self.ks_cdf()
+        #self.show_all_cdf()
         self.best_para = self.bestparam()
         #self.plot_info()
 
-
-
     def inital_guess(self):
+        # guess for normal
+        M_y = numpy.mean(self.values)
+        Sig_y = numpy.std(self.values)
 
-        g_norm_mean = 0
-        for value in self.values:
-            g_norm_mean += value
+        # guess for lognormal
+        s, scale = lognorm_to_scipyinput(M_y, Sig_y)
+        m_x = math.log(scale)
+        sig_x = s
 
-        g_norm_mean = g_norm_mean / len(self.values)
-        g_norm_var = var(self.values)
-        g_norm_std = math.sqrt(g_norm_var)
+        uni_b = 2*Sig_y
+        uni_a = M_y - Sig_y
 
-        g_lognorm_mu = math.exp(g_norm_mean+(math.pow( g_norm_std,2)/2))
-        g_lognorm_sigma = math.exp(2*g_norm_mean+math.pow(g_norm_std,2))*math.exp(math.pow(g_norm_std,2)-1)
+        return [[M_y, Sig_y],[m_x, sig_x], [uni_a,uni_b]]
 
-        g_uni_b = 2*math.pow( g_norm_std,2)
-        g_uni_a = g_norm_mean - math.pow( g_norm_std,2)
+    def make_cdfs(self):
 
-        return [[g_norm_mean, g_norm_std],[g_lognorm_mu,g_lognorm_sigma], [g_uni_a,g_uni_b]]
+        width = 1/len(self.values)
+        y = []
+        for i in range (len(self.values)):
+            y.append(0+(width*i))
 
+        cdf_list = [[stats.norm.cdf], [my_log_normal_cdf], [stats.uniform.cdf]]
+
+        for i in range (len(cdf_list)):
+
+            param = optimize.curve_fit(cdf_list[i][0], self.values, y, p0=self.init_guess[i])[0]
+
+            cdf_list[i].append(param)
+
+
+        cdf_list[1][1] = [cdf_list[1][1][1], 0, math.exp(cdf_list[1][1][0])]
+
+
+        return cdf_list, y
+
+
+    def ks_cdf(self):
+
+        ks_list = []
+
+        for i in range (len(self.dist_types)):
+            ks = stats.kstest(self.values, self.dist_types[i], args=self.cdfs[i][1])[0]
+            ks_list.append(ks)
+
+        print('ks: ',ks_list)
+
+        min = 2
+        index = 0
+        for i in range (len(ks_list)):
+            if ks_list[i] < min:
+                min = ks_list[i]
+                index = i
+
+        return index
+
+
+
+#TODO get new version of scipy so that rv_histogram works, and then we can plot pdf, then fix make_pdf_hist
 
     def make_pdf_hist(self):
 
-
-        hist = {}
-
-        bins, step = linspace(self.values[0],self.values[len(self.values)-1], self.num_bins, retstep=True)
-        kde = stats.gaussian_kde(self.values)
+        #print(self.values)
+        hist = numpy.histogram(self.values, bins=self.num_bins)
+        hist_dist = stats.rv_histogram(hist)
 
 
-        return [bins, kde]
+
+        #bins, step = linspace(self.values[0],self.values[len(self.values)-1], self.num_bins, retstep=True)
+
+        #plt.plot(bins,hist_dist.pdf(bins))
+       #kde = stats.gaussian_kde(self.values)
+
+
+        #return [bins, kde]
+
+
+    def show_all_cdf(self):
+
+        fig, ax = plt.subplots(1, 3, figsize=(12, 6))
+        titles = ['CDF: With Normal Fit', 'CDF: With Log-Normal Fit', 'CDF: With Uniform Fit']
+        totalwidth = 2*(max(self.values) - min(self.values))
+        x1 = make_x1(totalwidth)
+        print(x1)
+
+        lognorm_param = self.cdfs[1][1]
+        normal_param = self.cdfs[0][1]
+        uniform_param = self.cdfs[2][1]
+        print(lognorm_param,normal_param,uniform_param)
+
+
+
+        for i in range (len(ax)):
+            ax[i].set_xlabel('(ng/g) of ' + self.chem + ' in ' + self.animal, size='large')
+            ax[i].set_ylabel('P(X < x)')
+            ax[i].title.set_text(titles[i])
+            ax[self.index].title.set_text(titles[self.index] + '(Considered Optimal by ks-test)')
+
+        for i in range(len(ax)):
+            ax[i].plot(self.values, self.y, 'ro', color='r')
+
+
+        ax[0].plot(x1, stats.norm.cdf(x1, scale=normal_param[1], loc=normal_param[0]), linewidth=2.0, color='g')
+        ax[1].plot(x1, stats.lognorm.cdf(x1, s=lognorm_param[0] ,scale=lognorm_param[2]), linewidth=2.0, color='g')
+        ax[2].plot(x1, stats.uniform.cdf(x1, scale=uniform_param[1], loc=uniform_param[0]), linewidth=2.0, color='g')
+
+
+        plt.show()
+
 
     def plot_info(self):
 
@@ -143,18 +223,16 @@ class ResultDist:
         ax[0].set_ylabel(pdf_y_label, size='large')
         ax[1].set_xlabel(pdf_x_label, size='large')
         ax[1].set_ylabel(cdf_y_label, size='large')
-        x = self.hist[0]
-        xmin = min(self.hist[0])
-        xmax = max(self.hist[0])
+        #x = self.hist[0]
 
         if self.dist_types[self.index] == 'norm':
             mean = fit_params[0]
             std = fit_params[1]
             totalwidth = 2*(mean+(3*std))
-            x1 = self.make_x1(totalwidth)
+            x1 = make_x1(totalwidth)
 
-            ax[0].set_xlim(xmin, xmax)
-            ax[0].plot(x, self.hist[1](x), 'ro', color='r')
+            #ax[0].set_xlim(xmin, xmax)
+            #ax[0].plot(x, self.hist[1](x), 'ro', color='r')
             ax[0].plot(x1, stats.norm.pdf(x1, loc=mean, scale=std), linewidth=2.0)
             ax[1].set_xlim(self.values[0], self.values[len(self.values)-1])
             ax[1].plot(self.values,self.y, 'ro', color='r')
@@ -166,10 +244,10 @@ class ResultDist:
             a = fit_params[0]
             b = fit_params[1]
             totalwidth = 2*(a+b)
-            x1 = self.make_x1(totalwidth)
+            x1 = make_x1(totalwidth)
 
-            ax[0].set_xlim(xmin, xmax)
-            ax[0].plot(x, self.hist[1](x), 'ro', color='r')
+            #ax[0].set_xlim(xmin, xmax)
+            #ax[0].plot(x, self.hist[1](x), 'ro', color='r')
             ax[0].plot(x1, stats.uniform.pdf(x1, loc=a, scale=b), linewidth=2.0)
             ax[1].set_xlim(self.values[0], self.values[len(self.values) - 1])
             ax[1].plot(self.values, self.y, 'ro', color='r')
@@ -180,62 +258,15 @@ class ResultDist:
             mu = fit_params[0]
             sig2 = fit_params[1]
             totalwidth = 2*(mu+(3*sig2))
-            x1 = self.make_x1(totalwidth)
+            x1 = make_x1(totalwidth)
 
-            ax[0].set_xlim(xmin, xmax)
-            ax[0].plot(x, self.hist[1](x), 'ro', color='r')
+            #ax[0].set_xlim(xmin, xmax)
+            #ax[0].plot(x, self.hist[1](x), 'ro', color='r')
             ax[0].plot(x1, stats.lognorm.pdf(x1, 1 ,loc=mu, scale=sig2), linewidth=2.0)
             ax[1].set_xlim(self.values[0], self.values[len(self.values) - 1])
             ax[1].plot(self.values, self.y, 'ro', color='r')
             ax[1].plot(x1, stats.lognorm.cdf(x1, 1, loc=mu, scale=sig2), color='g')
             plt.show()
-
-
-
-    def make_x1(self,total_width):
-        interval = total_width / 1000
-
-        x1 = []
-        for i in range(1000):
-            x1.append(interval * i)
-
-        return x1
-
-    def make_cdfs(self):
-
-        width = 1/len(self.values)
-        y = []
-        for i in range (len(self.values)):
-            y.append(0+(width*i))
-
-        cdf_list = [[stats.norm.cdf], [stats.lognorm.cdf], [stats.uniform.cdf]]
-
-        for i in range (len(cdf_list)):
-            param = optimize.curve_fit(cdf_list[i][0], self.values, y, p0=self.init_guess[i])[0]
-
-            cdf_list[i].append(param)
-
-
-
-        return cdf_list, y
-
-
-    def ks_cdf(self):
-
-        ks_list = []
-
-        for i in range (len(self.dist_types)):
-            ks = stats.kstest(self.values, self.dist_types[i], args=self.cdfs[i][1])[0]
-            ks_list.append(ks)
-
-        min = 2
-        index = 0
-        for i in range (len(ks_list)):
-            if ks_list[i] < min:
-                min = ks_list[i]
-                index = i
-
-        return index
 
     def bestparam(self):
 
@@ -254,6 +285,43 @@ class ResultDist:
         return [string, params]
 
 
+###### graphing and lognormal help methods ##############
+
+
+def make_x1(total_width):
+
+    interval = total_width / float(1000)
+
+    x1 = []
+    for i in range(1000):
+        toappend = interval * i
+        x1.append(toappend)
+
+    return x1
+
+def my_log_normal_cdf(x, M_y, Sig_y):
+
+    to_run = (numpy.log(x) - M_y)/Sig_y
+    F_x = st.norm.cdf(to_run)
+
+    return F_x
+
+
+def lognorm_to_scipyinput(M_y,Sig_y):
+    print(M_y,Sig_y)
+    m_x = (2 * math.log(M_y)) - (.5) * (math.log(math.pow(Sig_y, 2) + math.pow(M_y, 2)))
+
+    scale = math.exp(m_x)
+
+    sigma2 = -2 * math.log(M_y) + math.log(math.pow(Sig_y, 2) + math.pow(M_y, 2))
+    print(sigma2)
+    s = math.sqrt(sigma2)
+
+    return s, scale
+
+
+#### overarching loop methods ##########
+
 def set_hyper_samp_cube(model_para, Var):
 
     v_iter = int(model_para[0])
@@ -269,15 +337,6 @@ def set_hyper_samp_cube(model_para, Var):
     lhs = lhs.ravel()
     Var.lhs = lhs
     Var.take_samples()
-
-
-def lognorm_to_norm(mu_log,sigma_log):
-
-    mu = 2*math.log(mu_log) - (1/2)*math.log((sigma_log*sigma_log) + (mu_log*mu_log))
-    sigma = math.sqrt(-2*(math.log(mu_log))+math.log((sigma_log*sigma_log) + (mu_log*mu_log)))
-
-    return mu, sigma
-
 
 def make_result_dist(dicts):
 

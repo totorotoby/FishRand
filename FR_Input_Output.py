@@ -5,7 +5,7 @@ import prob as pr
 
 # Reads in all data from spread sheets
 
-def stat_convert_to_lists(filename):
+def convert_to_lists(filename):
 
     all_sheets = xlrd.open_workbook(filename)
 
@@ -127,108 +127,6 @@ def get_diet_data(fish_data, diet_sheet, diet_data, entrysize):
             diet_data[new_name].append(new_prey_data)
 
 
-def determ_convert_to_lists(filename):
-
-    fish_data_raw = []  # messy output from xlrd
-    fish_data = []  # clean fish array
-    zoo_data = []  # clean zoo array
-    phyto_data = []  # clean phyto array
-    f_len = 11  # number of inputs per fish
-    zo_len = 11  # number of inputs per zoo
-    ph_len = 4  # number of inputs per phyto
-    reg_chem_len = [10,7] # number of inputs per region
-
-    # getting columns #
-    all_sheets = xlrd.open_workbook(filename)
-
-    org_sheet = all_sheets.sheet_by_index(2)
-
-    fish_column = org_sheet.col(1)
-    zoop_column = org_sheet.col(3)
-    phy_column = org_sheet.col(5)
-
-    # getting region and chemical data #
-    chem_reg_data=[]
-    for k in range (2):
-        data = []
-        sheet = all_sheets.sheet_by_index(k)
-        reg_column = sheet.col(1)
-        data_raw = []
-        for cell in reg_column:
-            data_raw.append(cell.value)
-
-        new_reg = []
-        for i in range(len(data_raw)):
-            # if we are on a label
-            if i % (reg_chem_len[k] + 1) == 0:
-                # if the list has something in it
-                if len(new_reg) != 0:
-                    data.append(new_reg)
-                new_reg = []
-            else:
-                try:
-                    new_reg.append(float(data_raw[i]))
-                except:
-                    new_reg.append(data_raw[i])
-        if len(new_reg) != 0:
-            data.append(new_reg)
-        chem_reg_data.append(data)
-
-#!!!!!!!!!!! might need to change so we can have multiple phyto !!!!!!!!!!!
-    zoop = []
-    phyto = []
-    # getting phyto and zoop data #
-    for i in range (zo_len+1):
-        if i > 0:
-            try:
-                zoop.append(float(zoop_column[i].value))
-            except:
-                zoop.append(zoop_column[i].value)
-    zoo_data.append(zoop)
-    for i in range (ph_len+1):
-        if i > 0:
-            try:
-                phyto.append(float(phy_column[i].value))
-            except:
-                phyto.append(phy_column[i].value)
-    phyto_data.append(phyto)
-
-
-# !!!!!!!!!!! might need to change so we can have multiple phyto !!!!!!!!!!!
-
-    # getting fish_data #
-
-    for cell in fish_column:
-        fish_data_raw.append(cell.value)
-
-    new_fish = []
-    for i in range(len(fish_data_raw)):
-        # if we aren't on a label
-        if i%(f_len+1) == 0:
-            # if the list has something in it
-            if len(new_fish) != 0:
-                fish_data.append(new_fish)
-            new_fish = []
-        else:
-            try:
-                new_fish.append(float(fish_data_raw[i]))
-            except:
-                new_fish.append(fish_data_raw[i])
-    fish_data.append(new_fish)
-
-
-    # getting Diet data #
-
-    diet_data = {}
-    entrysize = len(fish_data) + 5
-    diet_sheet = all_sheets.sheet_by_index(3)
-    get_diet_data(fish_data,diet_sheet,diet_data,entrysize)
-
-    reg_data = chem_reg_data[0]
-    chem_data = chem_reg_data[1]
-
-    return reg_data, chem_data, fish_data, zoo_data, phyto_data, diet_data
-
 
 def deter_write_output(regions, fish, chemicals, phyto, zoop, inputfilename):
     output_name  = "sheets/output/FR_Model_" + '{:%Y-%m-%d %H:%M}'.format(datetime.datetime.now()) + '_from_' + str(inputfilename) + '.xls'
@@ -261,5 +159,3 @@ def deter_write_output(regions, fish, chemicals, phyto, zoop, inputfilename):
                 worksheet.write(chem_write, write_fish, fish[j].Cb[p])
 
     workbook.close()
-
-#stat_convert_to_lists('FR_Input_st_large_Var.xls')

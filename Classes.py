@@ -89,7 +89,7 @@ class Fish:
         try:
             self.Gv = 1400 * ( math.pow(self.Wb, .65) / region_cox)
         except ValueError:
-            print('Weight of ' + self.name + ' was sampled as a negative number. This makes no sense. Check the range of the weight distribution.')
+            print('Weight of ' + self.name + ' was sampled as a negative number. This makes no sense. Check the range of the weight distribution. \n Caught at Gv calculation.')
             exit(0)
     # sets G_d for this zooplank
     def calc_gd(self, t, css, flag,sigma=1):
@@ -99,20 +99,20 @@ class Fish:
             try:
                 self.Gd = .022 * math.pow(self.Wb, .85) * math.exp((.06 * t))
             except ValueError:
-                print('Weight of ' + self.name + ' was sampled as a negative number. This makes no sense. Check the range of the weight distibution.')
+                print('Weight of ' + self.name + ' was sampled as a negative number. This makes no sense. Check the range of the weight distibution. \n Caught at Gd calculation.')
                 exit(0)
     def calc_kg(self, T):
         if T < 15:
             try:
                 self.Kg = .0005 * math.pow(self.Wb, -.2)
             except ValueError:
-                print('Weight of ' + self.name + ' was sampled as a negative number. This makes no sense. Check the range of the weight distibution.')
+                print('Weight of ' + self.name + ' was sampled as a negative number. This makes no sense. Check the range of the weight distibution. \n Caught at Kg calculation.')
                 exit(0)
-        if T > 15:
+        if T >= 15:
             try:
                 self.Kg = .00251 * math.pow(self.Wb, -.2)
             except ValueError:
-                print('Weight of ' + self.name + ' was sampled as a negative number. This makes no sense. Check the range of the weight distibution.')
+                print('Weight of ' + self.name + ' was sampled as a negative number. This makes no sense. Check the range of the weight distibution. \n Caught at Gv calculation.')
                 exit(0)
     # returns k_1 of chemical for this zooplank
     def calc_k1(self, chem_ew):
@@ -335,7 +335,7 @@ class Zooplank:
         try:
             self.Gv = 1400 * ( math.pow(self.Wb, .65) / region_cox)
         except ValueError:
-            print('Weight of ' + self.name + ' was sampled as a negative number. This makes no sense. Check the range of the weight distribution.')
+            print('Weight of ' + self.name + ' was sampled as a negative number. This makes no sense. Check the range of the weight distribution. \n Caught at Gv calculation.')
 
     # sets G_d for this zooplank
     def calc_gd(self, t, css, flag,sigma=1):
@@ -347,7 +347,7 @@ class Zooplank:
     def calc_kg(self, T):
         if T < 15:
             self.Kg = .0005 * math.pow(self.Wb, -.2)
-        if T > 15:
+        if T >= 15:
             self.Kg = .00251 * math.pow(self.Wb, -.2)
 
     # returns k_1 of chemical for this zooplank

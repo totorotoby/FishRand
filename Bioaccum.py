@@ -431,13 +431,13 @@ def pretty(d, indent=0):
 def run_bio(flag, filename, endname):
 
     if flag == 0:
-        all_data = FR_Input_Output.determ_convert_to_lists(filename)
+        all_data = FR_Input_Output.convert_to_lists(filename)[1]
         #exit(0)
         conc_log = single_iter(all_data[0], all_data[1], all_data[2], all_data[3], all_data[4], all_data[5],0, endname)
         return conc_log
     else:
         dictionares = []
-        model_para, all_data  = FR_Input_Output.stat_convert_to_lists(filename)
+        model_para, all_data  = FR_Input_Output.convert_to_lists(filename)
 
         v_iter = int(model_para[0])
         u_iter = int(model_para[1])
@@ -445,6 +445,7 @@ def run_bio(flag, filename, endname):
         set_all_h_and_s(model_para, all_data)
         inner_count = 0
         u_count = 0
+        print('percentage done: ')
         while (u_count < u_iter):
             u_count += 1
             v_count = 0
@@ -453,6 +454,9 @@ def run_bio(flag, filename, endname):
                 dictionares.append(log)
                 v_count += 1
                 inner_count += 1
+                print( '\r' + str(100*(inner_count/(v_iter*u_iter))), end='')
+
+
 
         results_dic = pr.make_result_dist(dictionares)
 
@@ -496,16 +500,9 @@ def single_iter(reg_data, chem_data, fish_data, zoo_data, phyto_data, diet_data,
     fishs = reorder_fish(fishs)
     conc_log = solve(regions, chemicals, phytos, zoops, fishs)
     if flag == 0:
-        anwser = str(input('\n Would you like to save results to an excel sheet?\n'))
+        anwser = str(input('\nWould you like to save results to an excel sheet?\n'))
         if anwser == 'y':
             FR_Input_Output.deter_write_output(regions, fishs, chemicals, phytos, zoops, inputfilename)
         return conc_log
     else:
         return conc_log
-
-
-# def main():
-#
-#     run_bio(1,'sheets/input/FR_Input_st_small_Var.xls')
-#
-# main()
