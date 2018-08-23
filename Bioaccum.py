@@ -1,5 +1,7 @@
 # Where we run the bioaccumlation model
-import matplotlib.pyplot as plt
+import matplotlib
+matplotlib.use("TkAgg")
+from matplotlib import pyplot as plt
 import Classes as obj
 import FR_Input_Output
 import prob as pr
@@ -432,7 +434,6 @@ def run_bio(flag, filename, endname):
 
     if flag == 0:
         all_data = FR_Input_Output.convert_to_lists(filename)[1]
-        #exit(0)
         conc_log = single_iter(all_data[0], all_data[1], all_data[2], all_data[3], all_data[4], all_data[5],0, endname)
         return conc_log
     else:
@@ -471,7 +472,6 @@ def result_print(results_dic):
                 cont.plot_info()
 
 
-
 def plot_small(graph_list):
 
     width = 1 / len(graph_list)
@@ -488,7 +488,6 @@ def plot_small(graph_list):
         plt.plot(x,y,'ro', color='r')
         plt.xlim(x[0],x[len(x)-1])
         plt.show()
-
 
 def single_iter(reg_data, chem_data, fish_data, zoo_data, phyto_data, diet_data,flag, inputfilename, u_iter=0, v_iter=0):
 

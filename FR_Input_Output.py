@@ -129,7 +129,7 @@ def get_diet_data(fish_data, diet_sheet, diet_data, entrysize):
 
 
 def deter_write_output(regions, fish, chemicals, phyto, zoop, inputfilename):
-    output_name  = "sheets/output/FR_Model_" + '{:%Y-%m-%d %H:%M}'.format(datetime.datetime.now()) + '_from_' + str(inputfilename) + '.xls'
+    output_name  = "sheets/output/FR_Model_" + '{:%Y-%m-%d %H:%M}'.format(datetime.datetime.now()) + '_from_' + str(inputfilename)
     workbook = xlsxwriter.Workbook(output_name)
     worksheet = workbook.add_worksheet()
     num_org = len(fish) + len(phyto) + len(zoop)
