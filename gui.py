@@ -14,15 +14,16 @@ class app(tk.Frame):
 
 
         self.r_dictionary = None
-        self.viewoptions = []
-        self.optvars = []
+        self.viewdict = []
+        self.dictvars = []
+        self.viewopt = None
+        self.filename = ''
         master.title("FishRand")
         super().__init__(master)
         self.grid()
         self.add_widg()
 
     def add_widg(self):
-        print('hello')
         ###Top Labels###
         tk.Label(self, text="Input:", font=("Times New Roman", 18), height= 2).grid(row=2,column=0, columnspan=1)
         tk.Label(self, text="View Distributions", font=("Times New Roman", 18), height= 2).grid(row=2,column=2, columnspan=1, sticky=tk.W)
@@ -46,8 +47,8 @@ class app(tk.Frame):
             optvar.set("None")
             opt = tk.OptionMenu(self, optvar, *options[i//4])
             opt.grid(row=i+2, column=2, sticky=tk.W)
-            self.viewoptions.append(opt)
-            self.optvars.append(optvar)
+            self.viewdict.append(opt)
+            self.dictvars.append(optvar)
         
             
         ###choosing what graphs to view###
@@ -56,15 +57,15 @@ class app(tk.Frame):
         options = [("CDFs with all fits", 0), ("PDFs with all fits", 1),
                    ("Both with all fits", 2), ("CDF and PDF of specified fit", 3)
                    ]
-        viewnum = tk.IntVar()
         count = 4
-        for text, opt in options:
-            button = tk.Radiobutton(self, text=text, variable = viewnum, value = opt)
+        self.viewopt = tk.IntVar()
+        for text, option in options:
+            button = tk.Radiobutton(self, text=text, variable = self.viewopt, value = option)
             button.grid(column=3, row = count, sticky=tk.W)
             count +=1
-
+            #self.viewopt.append(viewnum)
         #command= needs to be edited                                                                  
-        getgraphs = tk.Button(self, text="Show Distributions").grid(row=8, column=3, sticky=tk.W)
+        getgraphs = tk.Button(self, text="Show Distributions", command=self.show_dist).grid(row=8, column=3, sticky=tk.W)
 
         
         ttk.Separator(self,orient=tk.VERTICAL).grid(row=1, column=1 , rowspan=10, sticky='ns')
@@ -104,45 +105,46 @@ class app(tk.Frame):
 
     def run_bio(self):
 
-        self.r_dictionary = run_bio(1, self.filename, self.parse_filename())
+        if self.filename == '':
+            print('need exception here')
+        else:
+            self.r_dictionary = run_bio(1, self.filename, self.parse_filename())
 
-        regions = list(self.r_dictionary.keys())
-        regions = ['None'] + regions
+            regions = list(self.r_dictionary.keys())
+            regions = ['None'] + regions
 
-        animalstotal = []
+            animalstotal = []
 
-        for value in self.r_dictionary.values():
-            keys = list(value.keys())
-            chemicals = list(list(value.values())[0].keys())
-            for animal in keys:
-                animalstotal.append(animal)
+            for value in self.r_dictionary.values():
+                keys = list(value.keys())
+                chemicals = list(list(value.values())[0].keys())
+                for animal in keys:
+                    animalstotal.append(animal)
 
-        animalstotal = ['None'] + animalstotal
-        chemicals = ['None'] + chemicals
-        reset_list  = [regions, animalstotal, chemicals]
-
-
-        ###refresh menus###
-        for i in range (len(self.viewoptions)):
-            menu = self.viewoptions[i]
-            var = self.optvars[i]
-
-            var.set('None')
-            menu['menu'].delete(0, 'end')
-
-            for entry in reset_list[i]:
-                menu['menu'].add_command(label=entry, command=tk._setit(var, entry))
+            animalstotal = ['None'] + animalstotal
+            chemicals = ['None'] + chemicals
+            reset_list  = [regions, animalstotal, chemicals]
 
 
+            ###refresh menus###
+            for i in range (len(self.viewdict)):
+                menu = self.viewdict[i]
+                var = self.dictvars[i]
 
+                var.set('None')
+                menu['menu'].delete(0, 'end')
 
-
-
+                for entry in reset_list[i]:
+                    menu['menu'].add_command(label=entry, command=tk._setit(var, entry))
 
     def parse_filename(self):
 
         pieces = self.filename.split('/')
         return pieces[len(pieces) - 1]
+
+    def show_dist(self):
+
+        print('blah')
 
 
 def closing():

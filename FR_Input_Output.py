@@ -2,6 +2,7 @@ import xlrd, xlsxwriter
 import datetime
 #import Classes as cs
 import prob as pr
+import Time_parser
 
 # Reads in all data from spread sheets
 
@@ -12,8 +13,7 @@ def convert_to_lists(filename):
     f_len = 11  # number of inputs per fish
     zo_len = 11  # number of inputs per zoo
     ph_len = 4  # number of inputs per phyto
-    reg_len = 10  # number of inputs per region
-    chem_len = 7
+    reg_len = 9  # number of inputs per region
 
     model_para = []
     model_sheet = all_sheets.sheet_by_index(0)
@@ -30,18 +30,25 @@ def convert_to_lists(filename):
 
     get_data(entry_col,dist_col,reg_len,region_data)
 
+    temp_data = []
+    temp_sheet = all_sheets.sheet_by_index(2)
 
-    chem_sheet = all_sheets.sheet_by_index(2)
+    num_timestep = Time_parser.num_steps(model_para[4], model_para[5], model_para[6])
+    get_temp_data(temp_data, temp_sheet, num_timestep, len(region_data))
+
+    chem_len = 5 + (len(region_data)*3)
+
+    chem_sheet = all_sheets.sheet_by_index(3)
 
     entry_col = chem_sheet.col(1)
     dist_col = chem_sheet.col(2)
 
     chem_data = []
 
-    get_data(entry_col,dist_col,chem_len,chem_data)
+    get_chem_data(entry_col,dist_col,chem_len,chem_data, len(region_data))
 
 
-    org_sheet = all_sheets.sheet_by_index(3)
+    org_sheet = all_sheets.sheet_by_index(4)
 
     fish_entry_col = org_sheet.col(1)
     fish_dist_col = org_sheet.col(2)
@@ -60,18 +67,46 @@ def convert_to_lists(filename):
 
     diet_data = {}
     entrysize = len(fish_data) + 5
-    diet_sheet = all_sheets.sheet_by_index(4)
+    diet_sheet = all_sheets.sheet_by_index(5)
     get_diet_data(fish_data,diet_sheet,diet_data,entrysize)
 
-    total = [region_data, chem_data, fish_data, zoop_data, phyto_data, diet_data]
+    mig_data = {}
+    mig_sheet = all_sheets.sheet_by_index(6)
+    get_mig_data(mig_data, mig_sheet)
 
-    return model_para, total
+    total = [region_data, temp_data, chem_data, phyto_data, zoop_data, fish_data, diet_data, mig_data]
 
+    return model_para, total, num_timestep
 
 def get_model_para(para_col, model_para):
 
-    for i in range (3):
+    for i in range (1, len(para_col)):
         model_para.append(para_col[i].value)
+
+
+
+def get_temp_data(temp_data, temp_sheet, num_timestep, reg_len):
+
+    h_cells = num_timestep * 2
+    for i in range (2, reg_len + 2):
+        try:
+            row = temp_sheet.row(i)
+        except:
+            break
+        regional_temps = []
+        for i in range (1, h_cells, 2):
+            entry = row[i].value
+            if type(entry) == float:
+                regional_temps.append(entry)
+            if type(entry) == str:
+                entry = entry.split(', ')
+                param = row[i+1].value.split(', ')
+                param = [float(i) for i in param]
+                toadd = pr.Var(entry[0],entry[1],param)
+                regional_temps.append(toadd)
+
+        temp_data.append(regional_temps)
+
 
 def get_data(entry_col, dist_col, instance_len, new_list):
 
@@ -90,26 +125,32 @@ def get_data(entry_col, dist_col, instance_len, new_list):
                 new_entry.append(entry_col[i].value)
 
             else:
-                entry = entry_col[i].value
-                dist_par = dist_col[i].value
-                if type(entry) == float and dist_par == '':
-                     new_entry.append(entry)
-                elif type(dist_par) == str and entry != '':
-                    entry = entry.split(', ')
-                    ty = entry[0]
-                    dist_name = entry[1]
-                    dist_par = dist_par.split(', ')
-                    try:
-                        dist_par = [float(i) for i in dist_par]
-                    except ValueError:
-                        print('In ' + new_entry[0] + ', ' + str(dist_par) + ' something is wrong with format.')
-                        exit(0)
-                    to_add = pr.Var(ty, dist_name, dist_par)
-                    new_entry.append(to_add)
-                else:
-                    new_entry.append(dist_par)
+                data_get_helper(entry_col[i], dist_col[i], new_entry)
     if len(new_entry) != 0:
         new_list.append(new_entry)
+
+
+def data_get_helper(preentry, dist, new_entry):
+
+    entry = preentry.value
+    dist_par = dist.value
+    if type(entry) == float and dist_par == '':
+        new_entry.append(entry)
+    elif type(dist_par) == str and entry != '':
+        entry = entry.split(', ')
+        ty = entry[0]
+        dist_name = entry[1]
+        dist_par = dist_par.split(', ')
+        try:
+            dist_par = [float(i) for i in dist_par]
+        except ValueError:
+            print('In ' + str(new_entry[0]) + ', ' + str(dist_par) + ' something is wrong with format.')
+            exit(0)
+        to_add = pr.Var(ty, dist_name, dist_par)
+        new_entry.append(to_add)
+    else:
+        new_entry.append(dist_par)
+
 
 def get_diet_data(fish_data, diet_sheet, diet_data, entrysize):
     # getting Diet data #
@@ -127,9 +168,43 @@ def get_diet_data(fish_data, diet_sheet, diet_data, entrysize):
             diet_data[new_name].append(new_prey_data)
 
 
+def get_chem_data(entry_col,dist_col,chem_len, chem_data, num_regions):
+
+    for i in range (len(entry_col)):
+        if i % chem_len == 0:
+            new_chem = []
+            sed_con = []
+            total_con = []
+            dis_con = []
+        if i % chem_len == 1:
+            new_chem.append(entry_col[i].value)
+            data_get_helper(entry_col[i+1], dist_col[i+1], new_chem)
+        if i % chem_len == 3:
+            for j in range (i, i+num_regions*3):
+                if (j-i) % 3 == 0:
+                    data_get_helper(entry_col[j],dist_col[j],sed_con)
+                if (j - i) % 3 == 1:
+                    data_get_helper(entry_col[j], dist_col[j], total_con)
+                if (j - i) % 3 == 2:
+                    data_get_helper(entry_col[j], dist_col[j], dis_con)
+            new_chem.append(sed_con)
+            new_chem.append(total_con)
+            new_chem.append(dis_con)
+        if i % chem_len == chem_len-2:
+            data_get_helper(entry_col[i], dist_col[i], new_chem)
+            data_get_helper(entry_col[i+1], dist_col[i+1], new_chem)
+            chem_data.append(new_chem)
+
+
+def get_mig_data(mig_data, mig_sheet):
+
+    for i in range (1, mig_sheet.nrows):
+        row = mig_sheet.row(i)
+        mig_data[row[0].value] = [row[1].value, [row[i].value for i in range (2, len(row))]]
+
 
 def deter_write_output(regions, fish, chemicals, phyto, zoop, inputfilename):
-    output_name  = "sheets/output/FR_Model_" + '{:%Y-%m-%d %H:%M}'.format(datetime.datetime.now()) + '_from_' + str(inputfilename)
+    output_name  = "sheets/output/FR_Model_" + '{:%Y-%m-%d %H:%M}'.format(datetime.datetime.now()) + '_from_' + str(inputfilename) + '.xls'
     workbook = xlsxwriter.Workbook(output_name)
     worksheet = workbook.add_worksheet()
     num_org = len(fish) + len(phyto) + len(zoop)
