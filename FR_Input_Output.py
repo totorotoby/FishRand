@@ -34,6 +34,7 @@ def convert_to_lists(filename):
     temp_sheet = all_sheets.sheet_by_index(2)
 
     num_timestep = Time_parser.num_steps(model_para[4], model_para[5], model_para[6])
+    num_timestep = num_timestep + 1
     get_temp_data(temp_data, temp_sheet, num_timestep, len(region_data))
 
     chem_len = 5 + (len(region_data)*3)
@@ -203,34 +204,34 @@ def get_mig_data(mig_data, mig_sheet):
         mig_data[row[0].value] = [row[1].value, [row[i].value for i in range (2, len(row))]]
 
 
-def deter_write_output(regions, fish, chemicals, phyto, zoop, inputfilename):
+def deter_write_output(*args, inputfilename):
     output_name  = "sheets/output/FR_Model_" + '{:%Y-%m-%d %H:%M}'.format(datetime.datetime.now()) + '_from_' + str(inputfilename) + '.xls'
     workbook = xlsxwriter.Workbook(output_name)
     worksheet = workbook.add_worksheet()
-    num_org = len(fish) + len(phyto) + len(zoop)
+    num_org = len(args[1]) + len(args[3]) + len(args[2])
 
-    for i in range(len(chemicals)):
-        worksheet.write(i+1, 0, chemicals[i].name)
-    for i in range (len(regions)):
+    for i in range(len(args[4])):
+        worksheet.write(i + 1, 0, args[4][i].name)
+    for i in range (len(args[0])):
         write_region = (i * (num_org + 1))
-        worksheet.write(0, write_region , regions[i].name)
-        for j in range (len(phyto)):
+        worksheet.write(0, write_region, args[0][i].name)
+        for j in range (len(args[3])):
             write_phyto = (write_region + 1) + j
-            worksheet.write(0, write_phyto, phyto[j].name)
-            for p in range (len(phyto[j].Cb)):
+            worksheet.write(0, write_phyto, args[3][j].name)
+            for p in range (len(args[3][j].Cb)):
                 chem_write = p + 1
-                worksheet.write(chem_write, write_phyto, phyto[j].Cb[p])
-        for j in range (len(zoop)):
+                worksheet.write(chem_write, write_phyto, args[3][j].Cb[p])
+        for j in range (len(args[2])):
             write_zoop = ((write_region + write_phyto + 1) + j)
-            worksheet.write(0, write_zoop, zoop[j].name)
-            for p in range(len(zoop[j].Cb)):
+            worksheet.write(0, write_zoop, args[2][j].name)
+            for p in range(len(args[2][j].Cb)):
                 chem_write = p + 1
-                worksheet.write(chem_write, write_zoop, zoop[j].Cb[p])
-        for j in range (len(fish)):
+                worksheet.write(chem_write, write_zoop, args[2][j].Cb[p])
+        for j in range (len(args[1])):
             write_fish = ((write_region + write_phyto + write_zoop) + j)
-            worksheet.write(0, write_fish, fish[j].name)
-            for p in range(len(fish[j].Cb)):
+            worksheet.write(0, write_fish, args[1][j].name)
+            for p in range(len(args[1][j].Cb)):
                 chem_write = p + 1
-                worksheet.write(chem_write, write_fish, fish[j].Cb[p])
+                worksheet.write(chem_write, write_fish, args[1][j].Cb[p])
 
     workbook.close()
