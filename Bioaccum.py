@@ -1,5 +1,4 @@
 # Where we run the bioaccumlation model
-#TODO rewrite chemical inputer, finish fish and zoops so can try a solve
 import matplotlib
 matplotlib.use("TkAgg")
 from matplotlib import pyplot as plt
@@ -207,10 +206,11 @@ def init_zoop(zoo_data, regions, chemicals, phyto, time_steps, u_iter, v_iter):
 
 
 
-def init_fish_b_spatial(fish_data, regions, chemicals, phyto, zoop, diet_data, time_steps, u_iter, v_iter):
+def init_fish_pre_region(fish_data, regions, chemicals, phyto, zoops, diet_data, time_steps, u_iter, v_iter):
 
     tempfishs = []
-    tempfishs.append(zoop)
+    for zoop in zoops:
+        tempfishs.append(zoop)
     tempfishs.append(phyto)
 
     fishs = []
@@ -254,59 +254,39 @@ def init_fish_b_spatial(fish_data, regions, chemicals, phyto, zoop, diet_data, t
                         toadd.calc_gd_filter(regions[j].Css, k, j)
                     if toadd.kg_set == 0:
                         toadd.calc_kg(regions[j].T, k, j)
-        print(toadd.Vnd)
+        #print(toadd.Vnd)
         fishs.append(toadd)
 
+    return fishs, tempfishs
 
-#def init_fish_f_spatial():
 
-    #for i in range(len(fishs)):
-        #fishs[i].calc_diet_per(tempfishs,region)
-    #     fishs[i].calc_gut_per(#)
-    #     fishs[i].calc_gf()
-    #
-    # count = 0
-    # # going back through so that we can now set diets
-    # for i in range (len(fishs)):
-    #     fish = fishs[i]
-    #     k_1 = []
-    #     k_2 = []
-    #     k_gb = []
-    #     k_e = []
-    #     k_d = []
-    #
-    #     for j in range (len(chemicals)):
-    #         kow = chemicals[j].Kow
-    #         ew = chemicals[j].Ew
-    #         ed = chemicals[j].Ed
-    #         k1 =fish.calc_k1(ew)
-    #         k_1.append(k1)
-    #         k2 = fish.calc_k2(kow,k1)
-    #         k_2.append(k2)
-    #         kgb = fish.calc_kgb(kow)
-    #         k_gb.append(kgb)
-    #         ke = fish.calc_ke(ed,kgb)
-    #         k_e.append(ke)
-    #         kd = fish.calc_kd(ed)
-    #         k_d.append(kd)
-    #
-    #
-    #     fish.k_1 = k_1
-    #     fish.k_2 = k_2
-    #     fish.k_gb = k_gb
-    #     fish.k_e = k_e
-    #     fish.k_d = k_d
-    #
-    #
-    #     if fish.init_check():
-    #         count += 1
-    #
-    # if count == len(fishs):
-    #     return fishs
-    # else:
-    #     print('Something is wrong with a fish entry')
-    #     exit(0)
-    #
+def init_fish_post_region(fishs, tempfishs, regions, chemicals, time_steps):
+
+    # TODO Need to redo once spatial is ready specifically regions[0] will not necessarily be regions 0
+    for i in range(len(fishs)):
+
+        fishs[i].calc_diet_per(tempfishs, regions[0].Ocs)
+        fishs[i].calc_gut_per()
+
+
+        # ^^^ From here on is Fine only ^^^
+        for j in range (len(regions)):
+            for k in range (time_steps):
+                fishs[i].calc_gf(k,j)
+
+
+                for p in range (len(chemicals)):
+                    kow = chemicals[p].Kow
+                    ed = chemicals[p].Ed
+                    ew = chemicals[p].Ew
+                    fishs[i].calc_k1(ew, k, j, p)
+                    fishs[i].calc_k2(kow, fishs[i].k_1, k, j ,p)
+                    fishs[i].calc_kgb(kow, p)
+                    fishs[i].calc_ke(ed, k, j, p)
+                    fishs[i].calc_kd(ed, k, j ,p)
+
+
+    return fishs
 
 def reorder_fish(fishs):
 
@@ -374,22 +354,11 @@ def find_next_fish(possible_fish, current_fish, below):
     return nextfish
 
 
-def solve(regions, chemicals, phytos, zoops, fishs):
+def solve_steady_state(region, chemicals, phytos, zoops, fishs):
 
     # nested dictonary where can look up first by region then chemical then animal to find concentration
-    #assuming one region for now
     conc_log = {}
-    conc_log[regions[0].name] = {}
-
-    conc_log = solve_phyto(chemicals,phytos,conc_log, regions[0])
-    conc_log = solve_zoop(chemicals,zoops, conc_log, regions[0])
-    conc_log = solve_fish(chemicals,fishs,conc_log,regions[0])
-
-    return conc_log
-
-
-
-def solve_phyto(chemicals,phytos, conc_log, region):
+    conc_log[region.name] = {}
 
     phytolog = conc_log[region.name]
     Cb = []
@@ -397,41 +366,29 @@ def solve_phyto(chemicals,phytos, conc_log, region):
     phyto = phytos[0]
     phytolog[phyto.name] = {}
     for i in range (len(chemicals)):
-        cwd = chemicals[i].Cwdo
+        cwd = chemicals[i].Cwdo[0]
         conc_in_phyto = phyto.solve_steady_state(cwd, i)
         Cb.append(conc_in_phyto)
         phytolog[phyto.name][chemicals[i].name] = conc_in_phyto
     phyto.Cb = Cb
 
-    return conc_log
-
-
-def solve_zoop(chemicals, zoops, conc_log, region):
-
     zooplog = conc_log[region.name]
-    #assuming one zoop
-    zoops = zoops[0]
-    Cb = []
-    zooplog[zoops.name] = {}
-    for i in range (len(chemicals)):
+    for zoo in zoops:
+        Cb = []
+        zooplog[zoo.name] = {}
+        for i in range (len(chemicals)):
+            # since single region all chemical properties index by 0
+            phi = chemicals[i].phi[0]
+            Cwdp = chemicals[i].Cwp[0]
+            Cwdo = chemicals[i].Cwdo[0]
+            Cwto = chemicals[i].Cwto[0]
+            phyto_con = conc_log[region.name]['Phytoplankton'][chemicals[i].name]
 
-        phi = chemicals[i].phi
-        Cwdp = chemicals[i].Cwp
-        Cwdo = chemicals[i].Cwdo
-        Cwto = chemicals[i].Cwto
-        phyto_con = conc_log[region.name]['Phytoplankton'][chemicals[i].name]
+            conc_in_zoops = zoo.solve_steady_state(phi, i, Cwto, Cwdp, Cwdo, phyto_con)
+            Cb.append(conc_in_zoops)
+            zooplog[zoo.name][chemicals[i].name] = conc_in_zoops
 
-        conc_in_zoops = zoops.solve_steady_state(phi, i, Cwto, Cwdp,Cwdo, phyto_con)
-        Cb.append(conc_in_zoops)
-        zooplog[zoops.name][chemicals[i].name] = conc_in_zoops
-
-    zoops.Cb = Cb
-
-    return conc_log
-
-
-
-def solve_fish(chemicals, fishs, conc_log, region):
+        zoo.Cb = Cb
 
     fishlog = conc_log[region.name]
 
@@ -439,16 +396,15 @@ def solve_fish(chemicals, fishs, conc_log, region):
         fishlog[fishs[i].name] = {}
         Cb = []
         for j in range (len(chemicals)):
-            phi = chemicals[j].phi
-            Cwp = chemicals[j].Cwp
-            Cwdo = chemicals[j].Cwdo
+            phi = chemicals[j].phi[0]
+            Cwp = chemicals[j].Cwp[0]
+            Cwdo = chemicals[j].Cwdo[0]
             con_in_i = fishs[i].solve_steady_state(phi, j, Cwp, Cwdo, fishlog, chemicals[j])
             Cb.append(con_in_i)
             fishlog[fishs[i].name][chemicals[j].name] = con_in_i
         fishs[i].Cb = Cb
 
     return conc_log
-
 
 def pretty(d, indent=0):
    for key, value in d.items():
@@ -457,40 +413,6 @@ def pretty(d, indent=0):
          pretty(value, indent+1)
       else:
          print('\t' * (indent+1) + str(value))
-
-
-def run_bio_all(flag, filename, endname):
-
-    if flag == 0:
-        all_data = FR_Input_Output.convert_to_lists(filename)[1]
-        conc_log = single_iter(all_data[0], all_data[1], all_data[2], all_data[3], all_data[4], all_data[5],0, endname)
-        return conc_log
-    else:
-        dictionares = []
-        model_para, all_data  = FR_Input_Output.convert_to_lists(filename)
-
-        v_iter = int(model_para[0])
-        u_iter = int(model_para[1])
-
-        set_all_h_and_s(model_para, all_data)
-        inner_count = 0
-        u_count = 0
-        print('percentage done: ')
-        while (u_count < u_iter):
-            u_count += 1
-            v_count = 0
-            while (v_count < v_iter):
-                log = single_iter(all_data[0], all_data[1], all_data[2], all_data[3], all_data[4], all_data[5],1 ,endname ,u_count=u_count, v_count=inner_count)
-                dictionares.append(log)
-                v_count += 1
-                inner_count += 1
-                print( '\r' + str(100*(inner_count/(v_iter*u_iter))), end='')
-
-
-
-        results_dic = pr.make_result_dist(dictionares)
-
-        return results_dic
 
 def result_print(results_dic):
 
@@ -501,52 +423,77 @@ def result_print(results_dic):
                 cont.plot_info()
 
 
-def plot_small(graph_list):
+# are we solving steady state on single region, solving with time on single region, or time on multiple regions
+def filter_cases(filename):
 
-    width = 1 / len(graph_list)
-    y = []
-    for i in range(len(graph_list)):
-        y.append(0 + (width * i))
-    print(len(graph_list[0]),len(graph_list))
-    for j in range(len(graph_list[0])):
-        x = []
-        for i in range(len(graph_list)):
-            x.append(graph_list[i][j])
-        x = sorted(x)
-        print(x)
-        plt.plot(x,y,'ro', color='r')
-        plt.xlim(x[0],x[len(x)-1])
-        plt.show()
+    model_para, all_data, time_steps = FR_Input_Output.convert_to_lists('sheets/input/tests/testy_test.xlsx')
 
-def single_iter(reg_data, chem_data, fish_data, zoo_data, phyto_data, diet_data, flag, inputfilename, u_count=0, v_count=0):
+    v_iter = int(model_para[0])
+    u_iter = int(model_para[1])
 
-    regions = init_region(reg_data, u_count, v_count)
-    chemicals = init_chems_conditional(chem_data, regions[0], u_count, v_count)
-    phytos = init_phyto(regions[0], phyto_data, chemicals, u_count, v_count)
-    zoops = init_zoop(zoo_data, regions[0], phytos[0], chemicals, u_count, v_count)
-    fishs = init_fish_b_spatial(fish_data, diet_data, regions[0], chemicals, phytos[0], zoops[0], u_count, v_count)
-    fishs = reorder_fish(fishs)
-    conc_log = solve(regions, chemicals, phytos, zoops, fishs)
-    if flag == 0:
-        anwser = str(input('\nWould you like to save results to an excel sheet?\n'))
-        if anwser == 'y':
-            FR_Input_Output.deter_write_output(regions, fishs, chemicals, phytos, zoops, inputfilename)
-        return conc_log
-    else:
-        return conc_log
+    # if steady state problem wants to be solved
+    if len(all_data[0]) == 1 and model_para[8] == 'YES':
 
+        dictionaries = []
+        set_all_h_and_s(model_para, all_data)
+        inner_count = 0
+        u_count = 0
+        print('percentage done: ')
+        while (u_count < u_iter):
+            u_count += 1
+            v_count = 0
+            while (v_count < v_iter):
+                concentration_log, bundle = single_bio_iter(model_para,all_data,time_steps, u_count, v_count)
+                v_count += 1
+                inner_count += 1
+                dictionaries.append(concentration_log)
+                print('\r' + str(100 * (inner_count / (v_iter * u_iter))), end='')
 
-# def init_all(reg_data, chem_data, fish_data, zoo_data, phyto_data, diet_data, u_iter=0, v_iter=0):
-#
-#     regions = init_region(reg_data, u_iter, v_iter)
-#     chemicals = init_chems_conditional(chem_data, regions[0], u_iter, v_iter)
-#     phytos = init_phyto_unconditional(phyto_data, chemicals, u_iter, v_iter)
-#     zoops = init_zoop_unconditional(zoo_data, regions[0], phytos[0], chemicals, u_iter, v_iter)
-#     fishs = init_fish_unconditional(fish_data, diet_data, regions[0], chemicals, phytos[0], zoops[0], u_iter, v_iter)
-#     fishs = reorder_fish(fishs)
+        # if no statistical simulation
+        if len(dictionaries) == 1:
+
+            FR_Input_Output.deter_write_output(bundle,filename)
+
+        # if we ran bio monte carlo
+        else:
+            results_dic = pr.make_result_dist(dictionaries)
+            return results_dic
+
+    #if len(all_data[0]) > 1 and model_para == 'NO':
 
 
-def test_init_chem():
+
+
+
+
+def single_bio_iter(model_para, all_data, time_steps, u_count=0, v_count=0):
+
+    sample_data = model_para[0:3]
+    reg_data = all_data[0]
+    temp_data = all_data[1]
+    chem_data = all_data[2]
+    set_all_h_and_s(sample_data, all_data)
+    regions = init_region(time_steps, reg_data,temp_data,10, 6)
+    chemicals = init_chems_unconditional(chem_data, len(regions), 10, 6)
+    chemicals = init_chems_conditional(chemicals,regions)
+    phytos = init_phyto(all_data[3],chemicals,10,6)
+    zoops = init_zoop(all_data[4],regions,chemicals,phytos[0], time_steps, 10, 6)
+    fishs, tempfishs = init_fish_pre_region(all_data[5], regions, chemicals, phytos[0], zoops, all_data[6], time_steps, 10, 6)
+
+    ##
+    ## figure out what region we are in somewhere in here (insert spatial)
+    ##
+
+    fishs = init_fish_post_region(fishs,tempfishs, regions, chemicals, time_steps)
+
+    if model_para[8] == 'YES':
+        conc_log = solve_steady_state(regions[0], chemicals, phytos, zoops, fishs)
+        return conc_log, [regions, fishs, zoops, phytos, chemicals]
+
+    #else solve non-steady state
+
+
+def test_changing_time():
     model_para, all_data, time_steps = FR_Input_Output.convert_to_lists('sheets/input/tests/testy_test.xlsx')
     sample_data = model_para[0:3]
     reg_data = all_data[0]
@@ -558,6 +505,14 @@ def test_init_chem():
     chemicals = init_chems_conditional(chemicals,regions)
     phytos = init_phyto(all_data[3],chemicals,10,6)
     zoops = init_zoop(all_data[4],regions,chemicals,phytos[0], time_steps, 10, 6)
-    fishs = init_fish_b_spatial(all_data[5], regions, chemicals, phytos[0], zoops, all_data[6], time_steps, 10, 6)
+    fishs, tempfishs = init_fish_pre_region(all_data[5], regions, chemicals, phytos[0], zoops, all_data[6], time_steps, 10, 6)
+    ##
+    ## figure out what region we are in somewhere in here (insert spatial)
+    ##
+    fishs = init_fish_post_region(fishs,tempfishs, regions, chemicals, time_steps)
+    print(fishs)
 
-test_init_chem()
+
+
+#test_changing_time()
+filter_cases('sheets/input/tests/testy_test.xlsx')

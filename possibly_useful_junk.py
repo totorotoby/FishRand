@@ -145,3 +145,58 @@ def init_check(self):
             return True
 
         return False
+
+
+
+def plot_small(graph_list):
+
+    width = 1 / len(graph_list)
+    y = []
+    for i in range(len(graph_list)):
+        y.append(0 + (width * i))
+    print(len(graph_list[0]),len(graph_list))
+    for j in range(len(graph_list[0])):
+        x = []
+        for i in range(len(graph_list)):
+            x.append(graph_list[i][j])
+        x = sorted(x)
+        print(x)
+        plt.plot(x,y,'ro', color='r')
+        plt.xlim(x[0],x[len(x)-1])
+        plt.show()
+
+
+
+def run_bio_all(flag, filename, endname):
+
+    if flag == 0:
+        all_data = FR_Input_Output.convert_to_lists(filename)[1]
+        conc_log = single_iter(all_data[0], all_data[1], all_data[2], all_data[3], all_data[4], all_data[5],0, endname)
+        return conc_log
+    else:
+        dictionares = []
+        model_para, all_data  = FR_Input_Output.convert_to_lists(filename)
+
+        v_iter = int(model_para[0])
+        u_iter = int(model_para[1])
+
+        set_all_h_and_s(model_para, all_data)
+        inner_count = 0
+        u_count = 0
+        print('percentage done: ')
+        while (u_count < u_iter):
+            u_count += 1
+            v_count = 0
+            while (v_count < v_iter):
+                log = single_bio_iter(all_data[0], all_data[1], all_data[2], all_data[3], all_data[4], all_data[5],1 ,endname ,u_count=u_count, v_count=inner_count)
+                dictionares.append(log)
+                v_count += 1
+                inner_count += 1
+                print( '\r' + str(100*(inner_count/(v_iter*u_iter))), end='')
+
+
+
+        results_dic = pr.make_result_dist(dictionares)
+
+        return results_dic
+
