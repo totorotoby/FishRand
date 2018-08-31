@@ -11,6 +11,8 @@ def num_steps(start_string, end_string, step):
         difference = (end-start).days//30
     if step == 'Quarter':
         difference = (end - start).days // 91
+    if step == 'Day':
+        difference = (end - start).days
 
     return difference
 

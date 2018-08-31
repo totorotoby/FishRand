@@ -200,3 +200,25 @@ def run_bio_all(flag, filename, endname):
 
         return results_dic
 
+
+
+
+def test_changing_time():
+    model_para, all_data, time_steps = FR_Input_Output.convert_to_lists('sheets/input/tests/testy_test.xlsx')
+    sample_data = model_para[0:3]
+    reg_data = all_data[0]
+    temp_data = all_data[1]
+    chem_data = all_data[2]
+    set_all_h_and_s(sample_data, all_data)
+    regions = init_region(time_steps, reg_data,temp_data,10, 6)
+    chemicals = init_chems_unconditional(chem_data, len(regions), 10, 6)
+    chemicals = init_chems_conditional(chemicals,regions)
+    phytos = init_phyto(all_data[3],chemicals,10,6)
+    zoops = init_zoop(all_data[4],regions,chemicals,phytos[0], time_steps, 10, 6)
+    fishs, tempfishs = init_fish_pre_region(all_data[5], regions, chemicals, phytos[0], zoops, all_data[6], time_steps, 10, 6)
+    ##
+    ## figure out what region we are in somewhere in here (insert spatial)
+    ##
+    fishs = init_fish_post_region(fishs,tempfishs, regions, chemicals, time_steps)
+
+#test_changing_time()

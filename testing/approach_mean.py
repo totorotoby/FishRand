@@ -1,3 +1,5 @@
+import sys
+sys.path.append("../")
 from Bioaccum import *
 from numpy import linspace
 import openpyxl
@@ -30,7 +32,7 @@ def reprint(write_work, sheet, write_sheet, dist_col_num, instance_len, scale):
                         new_std = mean * scale
                         new_print = str(mean) + ', ' + str(new_std)
                         write_sheet.cell(row=i+1, column=dist_col_num+1).value = new_print
-    write_work.save('sheets/input/tests/FR_Input_st_small_Var_new.xlsx')
+    write_work.save('../sheets/input/tests/FR_Input_st_small_Var.xlsx')
 
 
 def single_round(it, steps):
@@ -40,8 +42,8 @@ def single_round(it, steps):
     reg_len = 10  # number of inputs per region
     chem_len = 7
 
-    all_sheets = xlrd.open_workbook('sheets/input/tests/FR_Input_st_small_Var.xlsx')
-    write_work = openpyxl.load_workbook('sheets/input/tests/FR_Input_st_small_Var_new.xlsx')
+    all_sheets = xlrd.open_workbook('../sheets/input/tests/approach_mean_read.xlsx')
+    write_work = openpyxl.load_workbook('../sheets/input/tests/FR_Input_st_small_Var.xlsx')
     reg_sheet_read = all_sheets.sheet_by_index(1)
     reg_sheet_write = write_work.worksheets[1]
 
@@ -58,14 +60,14 @@ def single_round(it, steps):
     reprint(write_work, an_sheet_read, an_sheet_write, 9, ph_len, steps[it])
 
 
-    single_dic = run_bio(1,'sheets/input/tests/FR_Input_st_small_Var_new.xlsx', 'approach_mean_write')
+    single_dic = run_bio(1,'../sheets/input/tests/FR_Input_st_small_Var.xlsx', 'approach_mean_write')
 
     return single_dic
 
 def loop():
 
-    iter = 20
-    det_results = run_bio(0,'sheets/input/FR_Input_det.xls', 'FR_Input_det')
+    iter = 1
+    det_results = run_bio(0,'../sheets/input/FR_Input_det.xls', 'FR_Input_det')
     steps = linspace(.01, .7, iter)
     result_dic = {}
     print('Fraction done:')

@@ -87,9 +87,11 @@ class ResultDist:
 
     def __init__(self, values, chemical, animal):
         self.count = 0
+
         self.chem = chemical
         self.animal = animal
         self.values = values
+        self.display = 0
         self.values.sort()
         self.init_guess = self.inital_guess()
         self.num_bins = len(self.values)//50
@@ -100,6 +102,7 @@ class ResultDist:
         self.x1 = make_x1(self.values)
         self.index = self.ks_cdf()
         self.best_para = self.bestparam()
+
 
     def inital_guess(self):
         # guess for normal
@@ -113,8 +116,12 @@ class ResultDist:
 
         uni_b = 2*Sig_y
         uni_a = M_y - Sig_y
-        
-        gamma_k = (math.pow(M_y,2))/(math.pow(Sig_y,2))
+
+        try:
+            gamma_k = (math.pow(M_y,2))/(math.pow(Sig_y,2))
+        except:
+            print('gamma bug', self.chem, self.animal, self.values)
+            exit(0)
         gamma_theta = (math.pow(Sig_y,2))/M_y
         
         # returns guess array...order: [normal, lognormal, uniform, gamma]
@@ -264,8 +271,6 @@ class ResultDist:
         if len(best_param) == 3:
             ax[1].plot(x1, self.cdf_list[index](x1, best_param[0], loc = best_param[1], scale=best_param[2]), linewidth=2.0, color='g')
 
-        
-
 
     def show(self):
 
@@ -279,6 +284,7 @@ class ResultDist:
             self.plot_pdf()
             self.plot_cdf()
         plt.show()
+
 
     def bestparam(self):
 
@@ -331,8 +337,11 @@ def lognorm_to_scipyinput(M_y,Sig_y):
     scale = math.exp(m_x)
 
     sigma2 = -2 * math.log(M_y) + math.log(math.pow(Sig_y, 2) + math.pow(M_y, 2))
-
-    s = math.sqrt(sigma2)
+    try:
+        s = math.sqrt(sigma2)
+    except:
+        print('normal to log normal bug', sigma2, M_y, Sig_y)
+        exit(0)
 
     return s, scale
 
@@ -341,8 +350,8 @@ def lognorm_to_scipyinput(M_y,Sig_y):
 
 def set_hyper_samp_cube(model_para, Var):
 
-    v_iter = int(model_para[0])
-    u_iter = int(model_para[1])
+    u_iter = int(model_para[0])
+    v_iter = int(model_para[1])
     bin_num = int(model_para[2])
 
     if Var.type == 'V':

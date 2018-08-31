@@ -204,8 +204,8 @@ def get_mig_data(mig_data, mig_sheet):
         mig_data[row[0].value] = [row[1].value, [row[i].value for i in range (2, len(row))]]
 
 
-def deter_write_output(*args, inputfilename):
-    output_name  = "sheets/output/FR_Model_" + '{:%Y-%m-%d %H:%M}'.format(datetime.datetime.now()) + '_from_' + str(inputfilename) + '.xls'
+def deter_write_output(*args):
+    output_name  = "sheets/output/FR_Model_" + '{:%Y-%m-%d %H:%M}'.format(datetime.datetime.now()) + '_from_' + str(args[5]) + '.xls'
     workbook = xlsxwriter.Workbook(output_name)
     worksheet = workbook.add_worksheet()
     num_org = len(args[1]) + len(args[3]) + len(args[2])
