@@ -3,7 +3,7 @@ import math
 #
 class Fish:
 
-    def __init__(self, name, weight, vlb, diet_frac, flag, num_regions, num_chemicals, vnb=.2, e_l=.75, e_n=.75, e_w=.5):
+    def __init__(self, name, weight, vlb, diet_frac, flag, num_regions, num_chemicals, per_step,vnb=.2, e_l=.75, e_n=.75, e_w=.5):
         self.name = name
         self.Wb = weight  # wet weight
         self.Vlb = vlb  # Percent Lipid Content
@@ -37,9 +37,7 @@ class Fish:
         self.k_e = [[0 for _ in range(num_chemicals)] for _ in range(num_regions)] # (rate constant via excretion into egested feces)
         self.k_d = [[0 for _ in range(num_chemicals)] for _ in range(num_regions)]  # (clearance rate constant via ingestion of food)
 
-        self.Mbt = 0  # mass of chemical at time t-1 for differental equation
-        self.Mbdelt = 0  # change in mass of chemical in fish from time t-1 to time t
-        self.Cb = 0  # concentration for steady state
+        self.days_per_step = per_step
 
     def __str__(self):
         return self.__dict__.__str__()
@@ -214,7 +212,7 @@ class Fish:
 class Zooplank:
 
 
-    def __init__(self, name, weight, vlb, flag, times, num_regions, num_chemicals, mp=0, vnb=.2, e_l=.72, e_n=.72, e_w=.25):
+    def __init__(self, name, weight, vlb, flag, times, num_regions, num_chemicals, per_step, mp=0, vnb=.2, e_l=.72, e_n=.72, e_w=.25):
 
         self.name = name
         self.Wb = weight  # wet weight
@@ -247,9 +245,7 @@ class Zooplank:
         self.k_e = [[0 for _ in range(num_chemicals)] for _ in range(num_regions)] # (rate constant via excretion into egested feces)
         self.k_d = [[0 for _ in range(num_chemicals)] for _ in range(num_regions)]  # (clearance rate constant via ingestion of food)
 
-        self.Mbt = 0  # mass of chemical at time t-1 for differental equation
-        self.Mbdelt = 0  # change in mass of chemical in fish from time t-1 to time t
-        self.Cb = 0  # concentration for steady state
+        self.days_per_step = per_step
 
     def __str__(self):
         return str(self.__dict__)
@@ -347,24 +343,32 @@ class Zooplank:
 
 
     # Where log is the dictonary of chemical concentrations
-    def solve_steady_state(self, phi, i, Cwto, Cwdp,Cwdo, phyto_con):
+    def solve_steady_state(self, phi, i, Cwto, Cwdp, Cwdo, phyto_con):
 
         denom = self.k_2[0][i] + self.k_e[0][i] + self.Kg[0]
-
-        if phi != False:
-            f_num = self.k_1[0][i] * (self.Mo * phi * Cwto + self.Mp * Cwdp)
-        else:
-            f_num = (self.k_1[0][i] * self.Mo * Cwdo) + (self.k_1[0][i] * self.Mp * Cwdp)
+        f_num = (self.k_1[0][i]* phi * self.Mo * Cwdo) + (self.k_1[0][i] * self.Mp * Cwdp)
         f_num = f_num/1000
 
         l_num = phyto_con * self.k_d[0][i]
 
         return (f_num + l_num) / denom
 
+    def solve_next_time_step(self, phi, region_index, chemical_index, Cwto, Cwdp, Cwdo, phyto_con, prior_Mbt):
+
+        f_num = (self.k_1[region_index][chemical_index] * self.Mo * Cwdo) + (self.k_1[region_index][chemical_index] * self.Mp * Cwdp)
+        f_num = f_num/1000
+
+        l_num = phyto_con * self.k_d[region_index][chemical_index]
+
+        first = f_num + l_num
+        second = (self.k_2[region_index][chemical_index] + self.k_e[region_index][chemical_index]) * prior_Mbt
+
+        return first - second
+
 
 class Pplank:
 
-    def __init__(self, name, kg=None, a=.00006, b=5.5, vlp=.005, vnp=.065):
+    def __init__(self, name, per_step, len_chems, kg=None, a=.00006, b=5.5, vlp=.005, vnp=.065):
         self.name = name
         self.Vlb = vlp
         self.Vnb = vnp
@@ -374,9 +378,8 @@ class Pplank:
         self.B = b
         self.k_1 = []  # List of k_1 (clearance rate constant) for each chemical. List should be number of chemicals long
         self.k_2 = []  # Same as k_1 but for k_2 (rate constant chemical elem via respiratory)
-        self.Mbt = 0  # mass of chemical for multiple times
-        self.Mbdelt = 0
-        self.Cb = 0  # concentration for steady state
+
+        self.days_per_step = per_step
 
     def __str__(self):
         return str(self.__dict__)
@@ -435,6 +438,12 @@ class Pplank:
     def solve_steady_state(self, Cwd, i):
 
         return (self.k_1[i] * Cwd) / (self.k_2[i] + self.Kg)
+
+    def solve_next_time_step(self, Cwd, i, prior_Mbt):
+
+        deriv = (self.k_1[i] * Cwd) - (self.k_2[i] * prior_Mbt)
+        change = deriv * self.days_per_step
+        return prior_Mbt + change
 
 
 

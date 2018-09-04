@@ -33,7 +33,7 @@ def convert_to_lists(filename):
     temp_data = []
     temp_sheet = all_sheets.sheet_by_index(2)
 
-    num_timestep = Time_parser.num_steps(model_para[4], model_para[5], model_para[6])
+    num_timestep, time_per_step = Time_parser.num_steps(model_para[4], model_para[5], model_para[6])
     num_timestep = num_timestep + 1
     get_temp_data(temp_data, temp_sheet, num_timestep, len(region_data))
 
@@ -77,7 +77,7 @@ def convert_to_lists(filename):
 
     total = [region_data, temp_data, chem_data, phyto_data, zoop_data, fish_data, diet_data, mig_data]
 
-    return model_para, total, num_timestep
+    return model_para, total, num_timestep, time_per_step
 
 def get_model_para(para_col, model_para):
 

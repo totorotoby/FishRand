@@ -7,12 +7,16 @@ def num_steps(start_string, end_string, step):
 
     if step == 'Week':
         difference = (end-start).days//7
+        time_per_step = 7
     if step == 'Month':
         difference = (end-start).days//30
+        time_per_step = 30
     if step == 'Quarter':
         difference = (end - start).days // 91
+        time_per_step = 91
     if step == 'Day':
         difference = (end - start).days
+        time_per_step = 1
 
-    return difference
+    return difference, time_per_step
 
