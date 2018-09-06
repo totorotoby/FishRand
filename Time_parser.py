@@ -15,7 +15,7 @@ def num_steps(start_string, end_string, step):
         difference = (end - start).days // 91
         time_per_step = 91
     if step == 'Day':
-        difference = (end - start).days
+        difference = (end - start).days - 1
         time_per_step = 1
 
     return difference, time_per_step

@@ -88,14 +88,13 @@ def get_model_para(para_col, model_para):
 
 def get_temp_data(temp_data, temp_sheet, num_timestep, reg_len):
 
-    h_cells = num_timestep * 2
     for i in range (2, reg_len + 2):
         try:
             row = temp_sheet.row(i)
         except:
             break
         regional_temps = []
-        for i in range (1, h_cells, 2):
+        for i in range (1, len(row), 2):
             entry = row[i].value
             if type(entry) == float:
                 regional_temps.append(entry)
@@ -135,18 +134,24 @@ def data_get_helper(preentry, dist, new_entry):
 
     entry = preentry.value
     dist_par = dist.value
-    if type(entry) == float and dist_par == '':
+    if entry == '' and type(dist_par) == str and dist_par != '':
+        print('You must specify a distribution where you provide ' + dist_par)
+        exit(0)
+    elif type(entry) == float and dist_par == '':
         new_entry.append(entry)
     elif type(dist_par) == str and entry != '':
-        entry = entry.split(', ')
-        ty = entry[0]
-        dist_name = entry[1]
-        dist_par = dist_par.split(', ')
+        entry = entry.split(',')
+        ty = entry[0].strip()
+        dist_name = entry[1].strip()
+
+        dist_par = dist_par.split(',')
+        dist_par = map(str.strip, dist_par)
         try:
             dist_par = [float(i) for i in dist_par]
         except ValueError:
-            print('In ' + str(new_entry[0]) + ', ' + str(dist_par) + ' something is wrong with format.')
+            print('In ' + str(new_entry[0]) + ', ' + str(list(dist_par)) + ' something is wrong with format.')
             exit(0)
+
         to_add = pr.Var(ty, dist_name, dist_par)
         new_entry.append(to_add)
     else:

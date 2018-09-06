@@ -367,7 +367,6 @@ def set_hyper_samp_cube(model_para, Var):
 def make_result_dist(dicts):
 
     result_dict = {}
-
     for region, values in dicts[0].items():
         result_dict[region] = {}
         for animal, values1 in values.items():

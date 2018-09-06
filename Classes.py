@@ -1,15 +1,13 @@
-# The fish, invert, Pplank, Zooplank, and chemical objects has parameters for input that are from Arnot (2004) right now
 import math
-#
-class Fish:
 
-    def __init__(self, name, weight, vlb, diet_frac, flag, num_regions, num_chemicals, per_step,vnb=.2, e_l=.75, e_n=.75, e_w=.5):
+class Zooplank:
+
+    def __init__(self, name, weight, vlb, flag, num_chemicals, per_step, vnb=.2, e_l=.72, e_n=.72, e_w=.25):
         self.name = name
         self.Wb = weight  # wet weight
         self.Vlb = vlb  # Percent Lipid Content
         self.Vnb = vnb  # percent Nonlipid organic matter
         self.Mp = 0  # Percent Water Ventilated
-        self.diet_frac = diet_frac
         self.e_l = e_l  # Dietary absorption efficiency of lipids
         self.e_n = e_n  # Dietary absorption efficiency of nonlipid organic matter
         self.e_w = e_w  # Dietary absorption efficiency of water
@@ -17,31 +15,30 @@ class Fish:
         self.Mo = 0  # Percent Over Water Ventilated
         self.Vwb = 0  # Percent Water Content
         self.Vld = 0  # lipid fraction of diet
-        self.Vndc = 0  # nonlip fraction of diet from dirt
-        self.Vndm = 0   # nonlip fracion of diet from animal
+        self.Vnd = 0  # nonlip fraction of diet
         self.Vwd = 0  # Water fraction of diet
         self.Vlg = 0  # lipid fraction of gut
         self.Vng = 0  # Non-lipid fraction of gut
         self.Vwg = 0  # water fraction of gut
+        self.Vng = 0  # Non-lipid fraction of gut
 
         self.gd_set = 0
         self.kg_set = 0
 
-        self.Gv = [0 for _ in range(num_regions)] # Gill ventilation rate
-        self.Gd = [0 for _ in range(num_regions)]  # Feeding rate
-        self.Kg = [0 for _ in range(num_regions)]  # Growth rate
-        self.Gf = [0 for _ in range(num_regions)] # fecal egestion rate
-        self.k_1 = [[0 for _ in range(num_chemicals)] for _ in range(num_regions)] # clearance rate constant
-        self.k_2 = [[0 for _ in range(num_chemicals)] for _ in range(num_regions)] # (rate constant chemical elem via respiratory)
+        self.Gv = 0 # Gill ventilation rate
+        self.Gd = 0  # Feeding rate
+        self.Kg = 0 # Growth rate
+        self.Gf = 0 # fecal egestion rate
+        self.k_1 = [0 for _ in range(num_chemicals)]  # clearance rate constant
+        self.k_2 = [0 for _ in range(num_chemicals)] # (rate constant chemical elem via respiratory)
         self.k_gb = [0 for _ in range(num_chemicals)]  # Gut biota partition coefficient
-        self.k_e = [[0 for _ in range(num_chemicals)] for _ in range(num_regions)] # (rate constant via excretion into egested feces)
-        self.k_d = [[0 for _ in range(num_chemicals)] for _ in range(num_regions)]  # (clearance rate constant via ingestion of food)
+        self.k_e = [0 for _ in range(num_chemicals)]# (rate constant via excretion into egested feces)
+        self.k_d = [0 for _ in range(num_chemicals)] # (clearance rate constant via ingestion of food)
 
         self.days_per_step = per_step
 
     def __str__(self):
         return self.__dict__.__str__()
-
 
     def set_el_en_ew(self, el, en, ew):
         self.e_l = el
@@ -51,16 +48,11 @@ class Fish:
     def set_mp(self,mp):
         self.Mp = mp
 
-    def set_gd(self,gd, len_reg):
-        for j in range(len_reg):
-            self.Gd[j] = gd
-        self.gd_set = 1
+    def set_gd(self,gd):
+        self.Gd = gd
 
-    def set_kg(self, kg, len_reg):
-
-        for j in range(len_reg):
-            self.Kg[j] = kg
-        self.kg_set = 1
+    def set_kg(self, kg):
+        self.Kg = kg
 
     def set_vnb(self,vnb):
         self.Vnb = vnb
@@ -71,76 +63,153 @@ class Fish:
     def calc_mo(self):
         self.Mo = (1 - self.Mp)
 
-
     # sets the Gill ventilation rate of zooplank
-    def calc_gv(self, regional_cox, region_index):
-        try:
-            self.Gv[region_index] = 1400 * ( math.pow(self.Wb, .65) / regional_cox)
-        except ValueError:
-            print('Weight of ' + self.name + ' was sampled as a negative number. This makes no sense. Check the range of the weight distribution. \n Caught at Gv calculation.')
+    def calc_gv(self, region_cox):
+        self.Gv = 1400 * ( math.pow(self.Wb, .65) / region_cox)
 
     # sets G_d for this zooplank
-    def calc_gd_filter(self, css ,region_index, sigma=1):
-        self.Gd[region_index] = self.Gv[region_index] * css * sigma
+    def calc_gd_filter(self, css, sigma=1):
+        self.Gd = self.Gv * css * sigma
 
-    def calc_gd_no_filter(self, T, time_index, region_index):
-        temp_at_time = T[time_index]
-        self.Gd[region_index] = .022 * math.pow(self.Wb, .85) * math.exp((.06 * temp_at_time))
+    def calc_gd_no_filter(self, T):
 
-    def calc_kg(self, T_region, time_index, region_index):
-        if T_region[time_index] < 15:
-            self.Kg[region_index] = .0005 * math.pow(self.Wb, -.2)
-        if T_region[time_index] >= 15:
-            self.Kg[region_index] = .00251 * math.pow(self.Wb, -.2)
+        self.Gd = .022 * math.pow(self.Wb, .85) * math.exp((.06 * T))
 
-    def calc_gf(self, region_index):
-
-        self.Gf[region_index] = (((1-self.e_l)*self.Vld) + ((1-self.e_n)*self.Vndc) + ((1-self.e_n)*self.Vndm) + ((1-self.e_w)*self.Vwd))*self.Gd[region_index]
+    def calc_kg(self, T):
+        if T < 15:
+            self.Kg = .0005 * math.pow(self.Wb, -.2)
+        if T > 15:
+            self.Kg = .00251 * math.pow(self.Wb, -.2)
 
     # returns k_1 of chemical for this zooplank
-    def calc_k1(self, chem_ew, region_index, chemical_index):
-        self.k_1[region_index][chemical_index] = chem_ew * (self.Gv[region_index] / self.Wb)
+    def calc_k1(self, chem_ew, chem_index):
+        self.k_1[chem_index] = chem_ew * (self.Gv / self.Wb)
+
 
     # returns k_2 of chemical for this zooplank
-    def calc_k2(self, chem_kow, k_1, region_index, chemical_index, beta=.035, density_lip=.9 , density_w=1):
+    def calc_k2(self, chem_kow, chem_index, beta=.035, density_lip=.9 , density_w=1):
+
         k_bw = (self.Vlb * chem_kow)/density_lip + (self.Vnb * beta * chem_kow) + (self.Vwb/density_w)
-        self.k_2[region_index][chemical_index] = k_1[region_index][chemical_index] / k_bw
+        self.k_2[chem_index] = self.k_1[chem_index] / k_bw
 
     # returns k_d of chemical for this zooplank
-    def calc_kd(self, ed, region_index, chemical_index):
+    def calc_kd(self, chem_ed, chem_index):
 
-        self.k_d[region_index][chemical_index] = ed * (self.Gd[region_index] / self.Wb)
+        self.k_d[chem_index] = chem_ed * (self.Gd / self.Wb)
+
+    # sets the percentages of zooplank diet that are lipid, non-lipid and water
+    def calc_diet_per(self, phyto):
+
+        self.Vld = phyto.Vlb
+        self.Vnd = phyto.Vnb
+        self.Vwd = 1 - (self.Vld + self.Vnd)
 
     # sets the percentages of the gut
     def calc_gut_per(self):
+        self.Vlg = ((1 - self.e_l) * self.Vld) / (((1 - self.e_l) * self.Vld) + ((1 - self.e_n) * self.Vnd) + ((1 - self.e_w) * self.Vwd))
+        self.Vng = ((1 - self.e_n) * self.Vnd) / (((1 - self.e_l) * self.Vld) + ((1 - self.e_n) * self.Vnd) + ((1 - self.e_w) * self.Vwd))
+        self.Vwg = ((1 - self.e_w) * self.Vwd) / (((1 - self.e_l) * self.Vld) + ((1 - self.e_n) * self.Vnd) + ((1 - self.e_w) * self.Vwd))
+    # sets Gf for this zooplank
+    def calc_gf(self):
+        self.Gf = (((1-self.e_l)*self.Vld) + ((1-self.e_n)*self.Vnd)+((1-self.e_w)*self.Vwd))*self.Gd
 
-        self.Vlg = ((1 - self.e_l) * self.Vld) / (((1 - self.e_l) * self.Vld) + ((1 - self.e_n) * self.Vndc)+ ((1 - self.e_n) * self.Vndm) + ((1 - self.e_w) * self.Vwd))
-        self.Vngc = ((1 - self.e_n) * self.Vndc) / (((1 - self.e_l) * self.Vld) + ((1 - self.e_n) * self.Vndc)+ ((1 - self.e_n) * self.Vndm) + ((1 - self.e_w) * self.Vwd))
-        self.Vngm = ((1 - self.e_n) * self.Vndm) / (((1 - self.e_l) * self.Vld) + ((1 - self.e_n) * self.Vndc)+ ((1 - self.e_n) * self.Vndm) + ((1 - self.e_w) * self.Vwd))
-        self.Vwg = ((1 - self.e_w) * self.Vwd) / (((1 - self.e_l) * self.Vld) + ((1 - self.e_n) * self.Vndc)+ ((1 - self.e_n) * self.Vndm) + ((1 - self.e_w) * self.Vwd))
-
-
-
-    # # returns K_gb for certian chemical
-    # def calc_kgb(self, chem_kow, chem_index,beta1=.35, beta2=.035, density_lip=.9, density_w=1, z_water=.05):
-    #     top = ((self.Vlg * (z_water*chem_kow))/density_lip) + (self.Vng * beta1 * (z_water*chem_kow)) + (z_water*self.Vwg/density_w)
-    #     bottom = ((self.Vlb * (z_water*chem_kow))/density_lip) + (self.Vnb * beta2 * z_water * chem_kow) + (z_water*self.Vwb/density_w)
-    #     self.k_gb[chem_index] = top/bottom
-
+    # returns K_gb for certian chemical
     def calc_kgb(self, chem_kow, chem_index, beta1=.35, beta2=.035, density_lip=.9, density_w=1, z_water=.05):
-
-        top = ((self.Vlg * (z_water*chem_kow))/density_lip) + (self.Vngc * beta1 * (z_water*chem_kow)) + (self.Vngm * beta2 * (z_water*chem_kow)) + (z_water*self.Vwg/density_w)
+        top = ((self.Vlg * (z_water*chem_kow))/density_lip) + (self.Vng * beta1 * (z_water*chem_kow)) + (z_water*self.Vwg/density_w)
         bottom = ((self.Vlb * (z_water*chem_kow))/density_lip) + (self.Vnb * beta2 * z_water * chem_kow) + (z_water*self.Vwb/density_w)
-        self.k_gb[chem_index] = top/bottom
-
+        k_gb = top/bottom
+        self.k_gb[chem_index] = k_gb
 
     # returns k_e for certain chemical
-    def calc_ke(self, chem_ed, region_index, chem_index):
-        self.k_e[region_index][chem_index] = (self.k_gb[chem_index]/self.Wb) * chem_ed * self.Gf[region_index]
+    def calc_ke(self, chem_ed, chem_index):
+        k_e = (self.k_gb[chem_index]/self.Wb) * chem_ed * self.Gf
+        self.k_e[chem_index] = k_e
+
+    def init_check(self):
+
+        checks = 0
+
+        # check 1
+        atts = self.__dict__
+        count = 0
+        for entry in atts.values():
+            if entry != None:
+                count += 1
+
+        if count == len(atts.values()):
+            checks += 1
+
+        #check 2
+        if len(self.k_1) == len(self.k_2):
+            checks += 1
+
+        if checks == 2:
+            return True
+
+        return False
+
+    # Where log is the dictonary of chemical concentrations
+    def solve_steady_state(self, phi, chem_index, Cwto, Cwds, phyto_con):
+
+
+        denom = self.k_2[chem_index] + self.k_e[chem_index] + self.Kg
+
+        f_num = self.k_1[chem_index] * (self.Mo * phi * Cwto + self.Mp * Cwds)
+        f_num = f_num/1000
+
+        l_num = phyto_con * self.k_d[chem_index]
+
+        return (f_num + l_num) / denom
+
+
+    def solve_next_time_step(self, phi, chem_index, Cwto, Cwds, phyto_con, pre_step):
+
+
+
+        f_num = self.k_1[chem_index] * (self.Mo * phi * Cwto + self.Mp * Cwds)
+        f_num = f_num / 1000
+
+        l_num = phyto_con * self.k_d[chem_index]
+
+        q = f_num + l_num
+        k = self.k_2[chem_index] + self.k_e[chem_index]
+
+        #print('zoop: ', q, k)
+        top = (pre_step * ((1 / self.days_per_step) - (k / 2)) + q)
+        bottom = (1 / self.days_per_step) + (k / 2)
+
+        return top/bottom
+
+
+# noinspection PyMethodOverriding,PyMethodOverriding
+class Fish(Zooplank):
+
+    def __init__(self, name, weight, vlb, diet_data,flag, num_chemicals, per_step,vnb=.2, e_l=.75, e_n=.75, e_w=.5):
+        Zooplank.__init__(self,name,weight,vlb,flag,num_chemicals,per_step,vnb,e_l,e_n,e_w)
+        self.diet_frac = diet_data
+        self.Vndc = 0  # nonlip fraction of diet from dirt
+        self.Vndm = 0  # nonlip fracion of diet from animal
+        self.Vngc = 0  # Non-lipid fraction of gut
+        self.Vngm = 0
+
+
+    # returns k_1 of chemical for this zooplank
+    def calc_k1(self, chem_ew, chem_index):
+        self.k_1[chem_index] = chem_ew * (self.Gv / self.Wb)
+
+    # returns k_2 of chemical for this zooplank
+    def calc_k2(self, chem_kow, chem_index, beta=.035, density_lip=.9 , density_w=1):
+
+        k_bw = (self.Vlb * chem_kow)/density_lip + (self.Vnb * beta * chem_kow) + (self.Vwb/density_w)
+        self.k_2[chem_index] = self.k_1[chem_index] / k_bw
+
+    # returns k_d of chemical for this zooplank
+    def calc_kd(self, chem_ed, chem_index):
+
+        self.k_d[chem_index] = chem_ed * (self.Gd / self.Wb)
 
     # sets the percentages of zooplank diet that are lipid, non-lipid and water
-    def calc_diet_per(self, fishlog, Ocs):
-
+    def calc_diet_per(self, fishlog, region = None):
 
         total_nonlip_c = 0
         total_nonlip_m = 0
@@ -154,6 +223,7 @@ class Fish:
                 # finding right fish
 
                 if fishlog[i].name == self.diet_frac[j][0] and self.diet_frac[j][0] == 'Phytoplankton':
+
                     l_toadd = self.diet_frac[j][1] * (fishlog[i].Vlb)
                     nl_toadd = self.diet_frac[j][1] * (fishlog[i].Vnb)
 
@@ -170,8 +240,8 @@ class Fish:
                     total_lip += l_toadd
 
                 elif self.diet_frac[j][0] == 'Sediment/Detritus' and count == 0:
-                    # TODO This whole function is defined by what region we are in and need to redo, percentage of diet
-                    total_nonlip_c += self.diet_frac[j][1] * (Ocs)
+
+                    total_nonlip_c += self.diet_frac[j][1] * (region.Ocs)
                     count += 1
 
 
@@ -179,17 +249,36 @@ class Fish:
         self.Vld = total_lip
         self.Vndc = total_nonlip_c
         self.Vndm = total_nonlip_m
-        self.Vwd= 1 - (self.Vld + self.Vndc + self.Vndm)
+        self.Vwd = 1 - (self.Vld + self.Vndc + self.Vndm)
+
+
+    # sets the percentages of the gut
+    def calc_gut_per(self):
+
+        self.Vlg = ((1 - self.e_l) * self.Vld) / (((1 - self.e_l) * self.Vld) + ((1 - self.e_n) * self.Vndc)+ ((1 - self.e_n) * self.Vndm) + ((1 - self.e_w) * self.Vwd))
+        self.Vngc = ((1 - self.e_n) * self.Vndc) / (((1 - self.e_l) * self.Vld) + ((1 - self.e_n) * self.Vndc)+ ((1 - self.e_n) * self.Vndm) + ((1 - self.e_w) * self.Vwd))
+        self.Vngm = ((1 - self.e_n) * self.Vndm) / (((1 - self.e_l) * self.Vld) + ((1 - self.e_n) * self.Vndc)+ ((1 - self.e_n) * self.Vndm) + ((1 - self.e_w) * self.Vwd))
+        self.Vwg = ((1 - self.e_w) * self.Vwd) / (((1 - self.e_l) * self.Vld) + ((1 - self.e_n) * self.Vndc)+ ((1 - self.e_n) * self.Vndm) + ((1 - self.e_w) * self.Vwd))
+
+    # sets Gf for this zooplank
+    def calc_gf(self):
+
+        self.Gf = (((1-self.e_l)*self.Vld) + ((1-self.e_n)*self.Vndc) + ((1-self.e_n)*self.Vndm) + ((1-self.e_w)*self.Vwd))*self.Gd
+
+    # returns K_gb for certian chemical
+    def calc_kgb(self, chem_kow, chem_index, beta1=.35, beta2=.035, density_lip=.9, density_w=1, z_water=.05):
+
+        top = ((self.Vlg * (z_water*chem_kow))/density_lip) + (self.Vngc * beta1 * (z_water*chem_kow)) + (self.Vngm * beta2 * (z_water*chem_kow)) + (z_water*self.Vwg/density_w)
+        bottom = ((self.Vlb * (z_water*chem_kow))/density_lip) + (self.Vnb * beta2 * z_water * chem_kow) + (z_water*self.Vwb/density_w)
+        k_gb = top/bottom
+        self.k_gb[chem_index] = k_gb
 
 
     #Where log is the dictonary of chemical concentrations for region
-    def solve_steady_state(self, phi, i, Cwdp, Cwdo, log, chemical):
+    def solve_steady_state(self, phi, chem_index, Cwp, Cwds, log, chemical):
 
-        denom = self.k_2[0][i] + self.k_e[0][i] + self.Kg[0]
-
-        f_num = (self.k_1[0][i] * self.Mo * Cwdo) + (self.k_1[0][i] * self.Mp * Cwdp)
-
-
+        denom = self.k_2[chem_index] + self.k_e[chem_index] + self.Kg
+        f_num = (self.k_1[chem_index] * self.Mo * Cwds) + (self.k_1[chem_index] * self.Mp * Cwp)
 
         l_num = 0
 
@@ -197,192 +286,68 @@ class Fish:
             if self.diet_frac[j][1] > 0:
 
                 if self.diet_frac[j][0] == 'Sediment/Detritus':
-                    concentration = chemical.Cs[0]
+
+                    concentration = chemical.Cs
                     l_num += (self.diet_frac[j][1]*concentration)
 
                 else:
                     concentration = log[self.diet_frac[j][0]][chemical.name]
                     l_num += (self.diet_frac[j][1]*concentration)
 
-        l_num = l_num * self.k_d[0][i]
+        l_num = l_num * self.k_d[chem_index]
 
         return (f_num + l_num)/denom
 
+    def solve_next_time_step(self, phi, chem_index, Cwp, Cwds, fishlog_new, fishlog_old, chemical,pre_step):
 
-class Zooplank:
+        k = self.k_2[chem_index] + self.k_e[chem_index]
 
+        q1 = (self.k_1[chem_index] * self.Mo * Cwds) + (self.k_1[chem_index] * self.Mp * Cwp)
 
-    def __init__(self, name, weight, vlb, flag, times, num_regions, num_chemicals, per_step, mp=0, vnb=.2, e_l=.72, e_n=.72, e_w=.25):
+        q2 = 0
 
-        self.name = name
-        self.Wb = weight  # wet weight
-        self.Vlb = vlb # Percent Lipid Content
-        self.Vnb = vnb  # percent Nonlipid organic matter
-        self.Mp = mp    # Percent Water Ventilated
-        self.e_l = e_l  # Dietary absorption efficiency of lipids
-        self.e_n = e_n  # Dietary absorption efficiency of nonlipid organic matter
-        self.e_w = e_w  # Dietary absorption efficiency of water
-        self.flag = flag
-        self.Mo = 0  # Percent Over Water Ventilated
-        self.Vwb = 0  # Percent Water Content
-        self.Vld = 0  # lipid fraction of diet
-        self.Vnd = 0  # Non-lipid fraction of diet
-        self.Vwd = 0  # Water fraction of diet
-        self.Vlg = 0  # lipid fraction of gut
-        self.Vng = 0  # Non-lipid fraction of gut
-        self.Vwg = 0  # water fraction of gut
+        for j in range(len(self.diet_frac)):
 
-        self.gd_set = 0
-        self.kg_set = 0
+            if self.diet_frac[j][1] > 0:
 
-        self.Gv = [0 for _ in range(num_regions)] # Gill ventilation rate
-        self.Gd = [0 for _ in range(num_regions)]  # Feeding rate
-        self.Kg = [0 for _ in range(num_regions)]  # Growth rate
-        self.Gf = [0 for _ in range(num_regions)] # fecal egestion rate
-        self.k_1 = [[0 for _ in range(num_chemicals)] for _ in range(num_regions)] # clearance rate constant
-        self.k_2 = [[0 for _ in range(num_chemicals)] for _ in range(num_regions)] # (rate constant chemical elem via respiratory)
-        self.k_gb = [0 for _ in range(num_chemicals)]  # Gut biota partition coefficient
-        self.k_e = [[0 for _ in range(num_chemicals)] for _ in range(num_regions)] # (rate constant via excretion into egested feces)
-        self.k_d = [[0 for _ in range(num_chemicals)] for _ in range(num_regions)]  # (clearance rate constant via ingestion of food)
+                if self.diet_frac[j][0] == 'Sediment/Detritus':
 
-        self.days_per_step = per_step
+                    concentration = chemical.Cs
+                    q2 += (self.diet_frac[j][1]*concentration)
 
-    def __str__(self):
-        return str(self.__dict__)
+                else:
+                    old_conc = fishlog_old[self.diet_frac[j][0]][chemical.name]
+                    new_conc = fishlog_new[self.diet_frac[j][0]][chemical.name]
+                    concentration = (old_conc + new_conc)/2
+                    q2+= (self.diet_frac[j][1]*concentration)
 
-    def set_el_en_ew(self, el, en, ew):
-        self.e_l = el
-        self.e_n = en
-        self.e_w = ew
+        q2 = q2 * self.k_d[chem_index]
 
-    def set_mp(self,mp):
-        self.Mp = mp
+        q = q1 + q2
+        #print('pumpkin: ', q, k)
+        top = (pre_step * ((1 / self.days_per_step) - (k / 2)) + q)
+        bottom = (1 / self.days_per_step) + (k / 2)
 
-    def set_gd(self,gd, len_reg):
-        for j in range(len_reg):
-            self.Gd[j] = gd
-        self.gd_set = 1
-
-    def set_kg(self, kg, len_reg):
-
-        for j in range(len_reg):
-            self.Kg[j] = kg
-        self.kg_set = 1
-
-    def set_vnb(self,vnb):
-        self.Vnb = vnb
-
-    def calc_vwb(self):
-        self.Vwb = (1 - (self.Vlb + self.Vnb))
-
-    def calc_mo(self):
-        self.Mo = (1 - self.Mp)
-
-    # sets the Gill ventilation rate of zooplank
-    def calc_gv(self, regional_cox, region_index):
-        try:
-            self.Gv[region_index] = 1400 * ( math.pow(self.Wb, .65) / regional_cox)
-        except ValueError:
-            print('Weight of ' + self.name + ' was sampled as a negative number. This makes no sense. Check the range of the weight distribution. \n Caught at Gv calculation.')
-
-    # sets G_d for this zooplank
-    def calc_gd_filter(self, css ,region_index, sigma=1):
-        self.Gd[region_index] = self.Gv[region_index] * css * sigma
-
-    def calc_gd_no_filter(self, T, time_index, region_index):
-        temp_at_time = T[time_index]
-        self.Gd[region_index] = .022 * math.pow(self.Wb, .85) * math.exp((.06 * temp_at_time))
-
-    def calc_kg(self, T_region, time_index, region_index):
-        if T_region[time_index] < 15:
-            self.Kg[region_index] = .0005 * math.pow(self.Wb, -.2)
-        if T_region[time_index] >= 15:
-            self.Kg[region_index] = .00251 * math.pow(self.Wb, -.2)
-
-    def calc_gf(self, region_index):
-        self.Gf[region_index] = (((1 - self.e_l) * self.Vld) + ((1 - self.e_n) * self.Vnd) + ((1 - self.e_w) * self.Vwd)) * self.Gd[region_index]
-
-    # returns k_1 of chemical for this zooplank
-    def calc_k1(self, chem_ew, region_index, chemical_index):
-        self.k_1[region_index][chemical_index] = chem_ew * (self.Gv[region_index] / self.Wb)
-
-    # returns k_2 of chemical for this zooplank
-    def calc_k2(self, chem_kow, k_1, region_index, chemical_index, beta=.035, density_lip=.9 , density_w=1):
-        k_bw = (self.Vlb * chem_kow)/density_lip + (self.Vnb * beta * chem_kow) + (self.Vwb/density_w)
-        self.k_2[region_index][chemical_index] = k_1[region_index][chemical_index] / k_bw
-
-    # returns k_d of chemical for this zooplank
-    def calc_kd(self, ed, region_index, chemical_index):
-
-        self.k_d[region_index][chemical_index] = ed * (self.Gd[region_index] / self.Wb)
-
-    # sets the percentages of zooplank diet that are lipid, non-lipid and water
-    def calc_diet_per(self, phyto):
-
-        self.Vld = phyto.Vlb
-        self.Vnd = phyto.Vnb
-        self.Vwd = 1 - (self.Vld + self.Vnd)
-
-    # sets the percentages of the gut
-    def calc_gut_per(self):
-        self.Vlg = ((1 - self.e_l) * self.Vld) / (((1 - self.e_l) * self.Vld) + ((1 - self.e_n) * self.Vnd) + ((1 - self.e_w) * self.Vwd))
-        self.Vng = ((1 - self.e_n) * self.Vnd) / (((1 - self.e_l) * self.Vld) + ((1 - self.e_n) * self.Vnd) + ((1 - self.e_w) * self.Vwd))
-        self.Vwg = ((1 - self.e_w) * self.Vwd) / (((1 - self.e_l) * self.Vld) + ((1 - self.e_n) * self.Vnd) + ((1 - self.e_w) * self.Vwd))
-
-    # returns K_gb for certian chemical
-    def calc_kgb(self, chem_kow, chem_index,beta1=.35, beta2=.035, density_lip=.9, density_w=1, z_water=.05):
-        top = ((self.Vlg * (z_water*chem_kow))/density_lip) + (self.Vng * beta1 * (z_water*chem_kow)) + (z_water*self.Vwg/density_w)
-        bottom = ((self.Vlb * (z_water*chem_kow))/density_lip) + (self.Vnb * beta2 * z_water * chem_kow) + (z_water*self.Vwb/density_w)
-        self.k_gb[chem_index] = top/bottom
-
-
-    # returns k_e for certain chemical
-    def calc_ke(self, chem_ed, region_index,  chem_index):
-
-        self.k_e[region_index][chem_index] = (self.k_gb[chem_index]/self.Wb) * chem_ed * self.Gf[region_index]
-
-
-    # Where log is the dictonary of chemical concentrations
-    def solve_steady_state(self, phi, i, Cwto, Cwdp, Cwdo, phyto_con):
-
-        denom = self.k_2[0][i] + self.k_e[0][i] + self.Kg[0]
-        f_num = (self.k_1[0][i]* phi * self.Mo * Cwdo) + (self.k_1[0][i] * self.Mp * Cwdp)
-        f_num = f_num/1000
-
-        l_num = phyto_con * self.k_d[0][i]
-
-        return (f_num + l_num) / denom
-
-    def solve_next_time_step(self, phi, region_index, chemical_index, Cwto, Cwdp, Cwdo, phyto_con, prior_Mbt):
-
-        f_num = (self.k_1[region_index][chemical_index] * self.Mo * Cwdo) + (self.k_1[region_index][chemical_index] * self.Mp * Cwdp)
-        f_num = f_num/1000
-
-        l_num = phyto_con * self.k_d[region_index][chemical_index]
-
-        first = f_num + l_num
-        second = (self.k_2[region_index][chemical_index] + self.k_e[region_index][chemical_index]) * prior_Mbt
-
-        return first - second
+        return top/bottom
 
 
 class Pplank:
 
-    def __init__(self, name, per_step, len_chems, kg=None, a=.00006, b=5.5, vlp=.005, vnp=.065):
+    def __init__(self, name, kg, len_chem, per_step,a=.00006, b=5.5, vlb=.005, vnb=.065):
         self.name = name
-        self.Vlb = vlp
-        self.Vnb = vnp
-        self.Vwb = 0  # Water Content
+        self.Vlb = vlb
+        self.Vnb = vnb
+        self.Vwb = 0
         self.Kg = kg
         self.A = a
         self.B = b
-        self.k_1 = []  # List of k_1 (clearance rate constant) for each chemical. List should be number of chemicals long
-        self.k_2 = []  # Same as k_1 but for k_2 (rate constant chemical elem via respiratory)
+        self.k_1 = [0 for _ in range (len_chem)]  # List of k_1 (clearance rate constant) for each chemical. List should be number of chemicals long
+        self.k_2 = [0 for _ in range (len_chem)]  # Same as k_1 but for k_2 (rate constant chemical elem via respiratory)
 
         self.days_per_step = per_step
 
     def __str__(self):
-        return str(self.__dict__)
+        return self.__dict__.__str__()
 
     def set_a_b(self,a,b):
         self.A = a
@@ -394,22 +359,21 @@ class Pplank:
     def set_vnp(self,vnp):
         self.Vnb = vnp
 
-    def calc_vwp(self):
+    def calc_vwb(self):
         self.Vwb = 1 - (self.Vlb - self.Vnb)
 
     def set_kg(self, kg):
         self.Kg = kg
 
-
     # returns k_1 of chemical for this pplank dependent on chem kow
-    def calc_k1(self, chem_kow):
-        k1 = 1/(self.A + (self.B/chem_kow))
-        return k1
+    def calc_k1(self, chem_kow, chem_index):
+        self.k_1[chem_index] = 1/(self.A + (self.B/chem_kow))
+
 
     # returns k_2 of chemical for this pplank
-    def calc_k2(self, chem_kow, k_1, density_lip=.9, density_w=1):
+    def calc_k2(self, chem_kow, chem_index, density_lip=.9, density_w=1):
         k_pw = (self.Vlb * chem_kow) / density_lip + (self.Vnb * .35 * chem_kow) + (self.Vwb / density_w)
-        return k_1 / k_pw
+        self.k_2[chem_index] = self.k_1[chem_index] / k_pw
 
 
     def init_check(self):
@@ -439,25 +403,30 @@ class Pplank:
 
         return (self.k_1[i] * Cwd) / (self.k_2[i] + self.Kg)
 
-    def solve_next_time_step(self, Cwd, i, prior_Mbt):
+    def solve_next_time_step(self, Cwd, chem_index, pre_step):
 
-        deriv = (self.k_1[i] * Cwd) - (self.k_2[i] * prior_Mbt)
-        change = deriv * self.days_per_step
-        return prior_Mbt + change
 
+        q = self.k_1[chem_index] * Cwd
+        k = (self.k_2[chem_index])
+
+        #print('pplank: ', q, k)
+        top = (pre_step * ((1/self.days_per_step)-(k/2))+ q)
+        bottom = (1/self.days_per_step) + (k/2)
+
+        return top/bottom
 
 
 class Chemical:
 
-    def __init__(self, name, kow, cs, len_regions):
+    def __init__(self, name, kow, cs):
         self.name = name
         self.Kow = math.pow(10,kow)
         self.Cs = cs
-        self.phi = [-1 for _ in range (len_regions)]
-        self.Cwp = [-1 for _ in range (len_regions)]
-        self.Cwto = [-1 for _ in range (len_regions)]
-        self.Cwdo = [-1 for _ in range (len_regions)]
-        self.Ddoc = 0
+        self.phi = -1
+        self.Cwp = -1
+        self.Cwto = -1
+        self.Cwdo = -1
+        self.Ddoc = -1
         self.Dpoc = 0
         self.Ew = self.calc_ew()
         self.Ed = self.calc_ed()
@@ -465,11 +434,11 @@ class Chemical:
     def __str__(self):
         return self.__dict__.__str__()
 
-    def set_cwto(self,cwto, index):
-            self.Cwto[index] = cwto
+    def set_cwto(self,cwto):
+            self.Cwto = cwto
 
-    def set_cwdo(self,cwdo, index):
-            self.Cwdo[index] = cwdo
+    def set_cwdo(self,cwdo):
+            self.Cwdo = cwdo
 
 
     def set_ddoc_dpoc(self,ddoc,dpoc):
@@ -485,27 +454,24 @@ class Chemical:
         Ed = math.pow((0.0000003*self.Kow + 2), -1)
         return Ed
 
-    def calc_pore_water(self, region, index):
-        Ocs = region.Ocs
-        self.Cwp[index] = self.Cs[index]/(Ocs * .35 * self.Kow)
+    def calc_pore_water(self, Ocs):
+        self.Cwp = self.Cs/(Ocs * .35 * self.Kow)
 
-    def calc_phi_and_cwdo(self, region, index):
+    def calc_phi_and_cwdo(self, region):
 
-        if self.Cwto[index] != -1 and self.Cwdo[index] != -1:
-            phi = self.Cwdo[index]/self.Cwto[index]
+        if self.Cwto != -1 and self.Cwdo != -1:
+            phi = self.Cwdo/self.Cwto
         else:
             adoc = region.adoc
             apoc = region.apoc
             xdoc = region.Xdoc
             xpoc = region.Xpoc
 
-            phi = 1/((1+xpoc*self.Dpoc*apoc*self.Kow)+(xdoc*self.Ddoc*adoc*self.Kow))
+            self.phi = 1/((1+xpoc*self.Dpoc*apoc*self.Kow)+(xdoc*self.Ddoc*adoc*self.Kow))
 
 
-        self.phi[index] = phi
-
-        if self.Cwdo[index] == -1 and self.Cwto[index] != -1:
-            self.Cwdo[index] = (self.Cwto[index]/1000) * self.phi[index]
+        if self.Cwdo == -1 and self.Cwto != -1:
+            self.Cwdo = (self.Cwto/1000) * self.phi
 
     def init_check(self):
         atts = self.__dict__
@@ -518,6 +484,9 @@ class Chemical:
             return True
 
         return False
+
+
+
 
 class Region:
 
@@ -541,12 +510,12 @@ class Region:
         self.adoc = adoc
         self.apoc = apoc
 
-    def set_cox(self,cox, index):
+    def set_cox(self,cox):
 
             self.Cox = cox
 
-    def calc_cox(self, index):
-        self.Cox = (((-.24 * self.T[index]) + 14.04) * self.S)
+    def calc_cox(self):
+        self.Cox = (((-.24 * self.T) + 14.04) * self.S)
 
     def init_check(self):
         atts = self.__dict__
