@@ -1,14 +1,13 @@
-from scipy import stats as st
 import pyDOE
 import math
+import numpy
 import matplotlib
+from scipy import stats as st
 matplotlib.use("TkAgg")
 from matplotlib import pyplot as plt
 from scipy import optimize
 from scipy import stats
 from scipy import special
-from numpy import linspace
-import numpy
 
 class Var:
 
@@ -22,9 +21,8 @@ class Var:
 
     def __str__(self):
 
-        to_print = '\ntype | ' + self.type + '\ndistribution | ' + self.dist +'\nparameters | ' + str(self.param)
+        to_print = '\ntype | ' + self.type + '\ndistribution | ' + self.dist + '\nparameters | ' + str(self.param)
         return to_print
-
 
     def take_samples(self):
 
@@ -44,41 +42,38 @@ class Var:
         elif self.dist == 'Log-Normal':
             m_y = self.param[0]
             sig_y = self.param[1]
-            s, scale = lognorm_to_scipyinput(m_y,sig_y)
+            s, scale = lognorm_to_scipyinput(m_y, sig_y)
             self.values = st.lognorm(s=s, scale=scale).ppf(self.lhs)
         elif self.dist == 'Log-Uniform':
             a = self.param[0]
             b = self.param[1]
-            self.values = loguniform(loc=a, scale=b).ppf(self.lhs)
+            self.values = Loguniform(loc=a, scale=b).ppf(self.lhs)
         elif self.dist == 'Beta':
             alpha = self.param[0]
-            beta =  self.param[1]
-            self.values = st.beta(alpha,beta).ppf(self.lhs)
+            beta = self.param[1]
+            self.values = st.beta(alpha, beta).ppf(self.lhs)
             self.values = sorted(self.values)
-            totalwidth = max
         elif self.dist == 'Weibull':
             lamb = self.param[0]
             k = self.param[1]
-            self.values = st.weibull_min(c=k, scale = lamb).ppf(self.lhs)
+            self.values = st.weibull_min(c=k, scale=lamb).ppf(self.lhs)
         else:
             print(self.dist)
-            print('There is a unknown distribution called ', '\''+ self.dist + '\'')
+            print('There is a unknown distribution called ', '\'' + self.dist + '\'')
             exit(0)
 
 
-class loguniform:
+class Loguniform:
 
     def __init__(self, loc=-1, scale=0, base=math.e):
         self.loc = loc
         self.scale = scale
         self.base = base
 
-    def ppf(self,q):
+    def ppf(self, q):
 
         uniform = st.uniform(loc=self.loc, scale=self.scale)
         return math.pow(self.base, uniform.ppf(q))
-
-
 
 
 class ResultDist:
@@ -91,18 +86,17 @@ class ResultDist:
         self.chem = chemical
         self.animal = animal
         self.values = values
-        self.display = 0
+        self.display = 4
         self.values.sort()
         self.init_guess = self.inital_guess()
         self.num_bins = len(self.values)//50
         self.hist = self.make_pdf_hist()
         self.cdfs, self.y = self.make_cdfs()
-        self.pdfs = [stats.norm.pdf,stats.lognorm.pdf,stats.uniform.pdf,stats.gamma.pdf]
-        self.cdf_list = [stats.norm.cdf,stats.lognorm.cdf,stats.uniform.cdf,stats.gamma.cdf]
+        self.pdfs = [stats.norm.pdf, stats.lognorm.pdf, stats.uniform.pdf, stats.gamma.pdf]
+        self.cdf_list = [stats.norm.cdf, stats.lognorm.cdf, stats.uniform.cdf, stats.gamma.cdf]
         self.x1 = make_x1(self.values)
         self.index = self.ks_cdf()
         self.best_para = self.bestparam()
-
 
     def inital_guess(self):
         # guess for normal
@@ -117,26 +111,22 @@ class ResultDist:
         uni_b = 2*Sig_y
         uni_a = M_y - Sig_y
 
-        try:
-            gamma_k = (math.pow(M_y,2))/(math.pow(Sig_y,2))
-        except:
-            print('gamma bug', self.chem, self.animal, self.values)
-            exit(0)
-        gamma_theta = (math.pow(Sig_y,2))/M_y
+        gamma_k = (math.pow(M_y, 2))/(math.pow(Sig_y, 2))
+        gamma_theta = (math.pow(Sig_y, 2))/M_y
         
         # returns guess array...order: [normal, lognormal, uniform, gamma]
-        return [[M_y, Sig_y],[m_x, sig_x], [uni_a,uni_b], [gamma_k, gamma_theta]]
+        return [[M_y, Sig_y], [m_x, sig_x], [uni_a, uni_b], [gamma_k, gamma_theta]]
 
     def make_cdfs(self):
 
         width = 1/len(self.values)
         y = []
-        for i in range (len(self.values)):
+        for i in range(len(self.values)):
             y.append(0+(width*i))
 
         cdf_list = [[stats.norm.cdf], [my_log_normal_cdf], [stats.uniform.cdf], [my_gamma_cdf]]
 
-        for i in range (len(cdf_list)):
+        for i in range(len(cdf_list)):
 
             param = optimize.curve_fit(cdf_list[i][0], self.values, y, p0=self.init_guess[i])[0]
             cdf_list[i].append(param)
@@ -146,25 +136,22 @@ class ResultDist:
 
         return cdf_list, y
 
-
     def ks_cdf(self):
 
         ks_list = []
 
-        for i in range (len(self.dist_types)):
+        for i in range(len(self.dist_types)):
             ks = stats.kstest(self.values, self.dist_types[i], args=self.cdfs[i][1])[0]
             ks_list.append(ks)
-            
-        
-        min = 2
+
+        minimum = 2
         index = 0
-        for i in range (len(ks_list)):
-            if ks_list[i] < min:
-                min = ks_list[i]
+        for i in range(len(ks_list)):
+            if ks_list[i] < minimum:
+                minimum = ks_list[i]
                 index = i
 
         return index
-
 
     def make_pdf_hist(self):
 
@@ -172,48 +159,46 @@ class ResultDist:
         return [hist, bins]
      
     def plot_cdf(self):
-        
 
         fig, ax = plt.subplots(1, 4, figsize=(24, 12))
 
         titles = ['CDF: With Normal Fit', 'CDF: With Log-Normal Fit', 'CDF: With Uniform Fit',
                   'CDF: With Gamma Fit']
 
-        #CDF x-axis
+        # CDF x-axis
         x1 = self.x1
        
-        #CDF parameters
+        # CDF parameters
         lognorm_param = self.cdfs[1][1]
         normal_param = self.cdfs[0][1]
         uniform_param = self.cdfs[2][1]
         gamma_param = self.cdfs[3][1]
 
-
-        for i in range (len(ax)):
+        for i in range(len(ax)):
             
-            #CDF axis labels
+            # CDF axis labels
             ax[i].set_xlabel('(ng/g) of ' + self.chem + ' in ' + self.animal, size='large')
             ax[i].set_ylabel('P(X < x)')
 
-            #titles    
+            # titles
             ax[i].title.set_text(titles[i])
             ax[self.index].title.set_text(titles[self.index] + '(Considered Optimal by ks-test)')
 
-            #plot points
+            # plot points
             ax[i].plot(self.values, self.y, 'ro', color='r')
 
         ax[0].plot(x1, stats.norm.cdf(x1, scale=normal_param[1], loc=normal_param[0]), linewidth=2.0, color='g')
-        ax[1].plot(x1, stats.lognorm.cdf(x1, s=lognorm_param[0] ,scale=lognorm_param[2]), linewidth=2.0, color='g')
+        ax[1].plot(x1, stats.lognorm.cdf(x1, s=lognorm_param[0], scale=lognorm_param[2]), linewidth=2.0, color='g')
         ax[2].plot(x1, stats.uniform.cdf(x1, scale=uniform_param[1], loc=uniform_param[0]), linewidth=2.0, color='g')
-        ax[3].plot(x1, stats.gamma.cdf(x1, a=gamma_param[0], loc = gamma_param[1], scale = gamma_param[2]), linewidth=2.0, color='g')
+        ax[3].plot(x1, stats.gamma.cdf(x1, a=gamma_param[0], loc=gamma_param[1], scale=gamma_param[2]),
+                   linewidth=2.0, color='g')
         
     def plot_pdf(self):
 
         titles = ['PDF: With Normal Fit', 'PDF: With Log-Normal Fit', 'PDF: With Uniform Fit',
                   'PDF: With Gamma Fit']
-        
 
-        fig1, ax1 = plt.subplots(1,4, figsize=(24,12))
+        fig1, ax1 = plt.subplots(1, 4, figsize=(24, 12))
 
         x1 = self.x1
 
@@ -222,46 +207,43 @@ class ResultDist:
         uniform_param = self.cdfs[2][1]
         gamma_param = self.cdfs[3][1]
 
-        for i in range (len(ax1)):
+        for i in range(len(ax1)):
             ax1[i].set_xlabel('(ng/g) of ' + self.chem + ' in ' + self.animal, size='large')
             ax1[i].set_ylabel('P(x)')
             ax1[self.index].title.set_text(titles[self.index] + '(Considered Optimal by ks-test)')
             ax1[i].title.set_text(titles[i])
-            ax1[i].scatter(self.hist[1][:-1],self.hist[0], s=16)
+            ax1[i].scatter(self.hist[1][:-1], self.hist[0], s=16)
             ax1[i].set_ylim(min(self.hist[0]))
 
         ax1[0].plot(x1, stats.norm.pdf(x1, scale=normal_param[1], loc=normal_param[0]), linewidth=2.0, color='g')
-        ax1[1].plot(x1, stats.lognorm.pdf(x1, s=lognorm_param[0] ,scale=lognorm_param[2]), linewidth=2.0, color='g')
+        ax1[1].plot(x1, stats.lognorm.pdf(x1, s=lognorm_param[0], scale=lognorm_param[2]), linewidth=2.0, color='g')
         ax1[2].plot(x1, stats.uniform.pdf(x1, scale=uniform_param[1], loc=uniform_param[0]), linewidth=2.0, color='g')
-        ax1[3].plot(x1, stats.gamma.pdf(x1, a=gamma_param[0], loc = gamma_param[1], scale=gamma_param[2]), linewidth=2.0, color='g')
+        ax1[3].plot(x1, stats.gamma.pdf(x1, a=gamma_param[0], loc=gamma_param[1], scale=gamma_param[2]),
+                    linewidth=2.0, color='g')
 
     def plot_single(self, index):
 
-        titles = ['CDF: With Normal Fit', 'CDF: With Log-Normal Fit', 'CDF: With Uniform Fit',
-                  'CDF: With Gamma Fit']
-        titles1 = ['PDF: With Normal Fit', 'PDF: With Log-Normal Fit', 'PDF: With Uniform Fit',
-                  'PDF: With Gamma Fit']
+        titles = ['CDF: With Normal Fit', 'CDF: With Log-Normal Fit', 'CDF: With Uniform Fit', 'CDF: With Gamma Fit']
+        titles1 = ['PDF: With Normal Fit', 'PDF: With Log-Normal Fit', 'PDF: With Uniform Fit', 'PDF: With Gamma Fit']
 
-        fig, ax = plt.subplots(1,2, figsize=(24,12))
-        
+        fig, ax = plt.subplots(1, 2, figsize=(24, 12))
 
         x1 = self.x1
         
         best_param = self.cdfs[index][1]
 
-        
         for i in range(len(ax)):
             ax[i].set_xlabel('(ng/g) of ' + self.chem + ' in ' + self.animal, size='large')
             
         ax[0].title.set_text(titles1[index])
         ax[0].set_ylabel('P(x)')
-        ax[0].scatter(self.hist[1][:-1],self.hist[0], s=16)
+        ax[0].scatter(self.hist[1][:-1], self.hist[0], s=16)
         ax[0].set_ylim(min(self.hist[0]))
         if len(best_param) == 2:
             ax[0].plot(x1, self.pdfs[index](x1, scale=best_param[1], loc=best_param[0]), linewidth=2.0, color='g')
         if len(best_param) == 3:
-            ax[0].plot(x1, self.pdfs[index](x1, best_param[0], loc = best_param[1], scale=best_param[2]), linewidth=2.0, color='g')
-
+            ax[0].plot(x1, self.pdfs[index](x1, best_param[0], loc=best_param[1], scale=best_param[2]),
+                       linewidth=2.0, color='g')
 
         ax[1].title.set_text(titles[index])
         ax[1].set_ylabel('P(X < x)')
@@ -269,22 +251,21 @@ class ResultDist:
         if len(best_param) == 2:
             ax[1].plot(x1, self.cdf_list[index](x1, scale=best_param[1], loc=best_param[0]), linewidth=2.0, color='g')
         if len(best_param) == 3:
-            ax[1].plot(x1, self.cdf_list[index](x1, best_param[0], loc = best_param[1], scale=best_param[2]), linewidth=2.0, color='g')
-
+            ax[1].plot(x1, self.cdf_list[index](x1, best_param[0], loc=best_param[1], scale=best_param[2]),
+                       linewidth=2.0, color='g')
 
     def show(self):
 
         if self.display == 0:
             self.plot_pdf()
-        if self.display == 1:
+        elif self.display == 1:
             self.plot_cdf()
-        if self.display ==2:
+        elif self.display == 2:
             self.plot_single(self.index)
         else:
             self.plot_pdf()
             self.plot_cdf()
         plt.show()
-
 
     def bestparam(self):
 
@@ -293,7 +274,7 @@ class ResultDist:
         string = str(self.animal) + ' ' + str(self.chem) + ' '
         string += str(self.dist_types[self.index] + '(')
 
-        for i in range (len(self.cdfs[self.index][1])-1):
+        for i in range(len(self.cdfs[self.index][1])-1):
             params.append(self.cdfs[self.index][1][i])
             string += str(self.cdfs[self.index][1][i])
             string += ', '
@@ -303,9 +284,7 @@ class ResultDist:
         return [string, params]
 
 
-###### graphing, gamma, and lognormal help methods ##############
-
-
+# graphing, gamma, and lognormal help methods
 def make_x1(values):
 
     mean = numpy.mean(values)
@@ -321,6 +300,7 @@ def my_log_normal_cdf(x, M_y, Sig_y):
     F_x = st.norm.cdf(to_run)
 
     return F_x
+
 
 def my_gamma_cdf(x, alpha, beta):
 
@@ -346,7 +326,7 @@ def lognorm_to_scipyinput(M_y,Sig_y):
     return s, scale
 
 
-#### overarching loop methods ##########
+# overarching loop methods
 
 def set_hyper_samp_cube(model_para, Var):
 
@@ -364,6 +344,7 @@ def set_hyper_samp_cube(model_para, Var):
     Var.lhs = lhs
     Var.take_samples()
 
+
 def make_result_dist(dicts):
 
     result_dict = {}
@@ -372,19 +353,18 @@ def make_result_dist(dicts):
         for animal, values1 in values.items():
             result_dict[region][animal] = {}
             for chemical in values1.keys():
-                values = get_values(region,chemical, animal, dicts)
-                new_dist = ResultDist(values, chemical,animal)
+                values = get_values(region, chemical, animal, dicts)
+                new_dist = ResultDist(values, chemical, animal)
                 result_dict[region][animal][chemical] = new_dist
-
 
     return result_dict
 
-def get_values(region,chem, animal, dicts):
+
+def get_values(region, chem, animal, dicts):
 
     dist_list = []
 
-    for dict in dicts:
-        dist_list.append(dict[region][animal][chem])
+    for diction in dicts:
+        dist_list.append(diction[region][animal][chem])
 
     return dist_list
-

@@ -12,7 +12,6 @@ class app(tk.Frame):
 
     def __init__(self, master=None):
 
-
         self.r_dictionary = None
         self.viewdict = []
         self.dictvars = []
@@ -60,7 +59,7 @@ class app(tk.Frame):
         count = 4
         self.viewopt = tk.IntVar()
         for text, option in options:
-            button = tk.Radiobutton(self, text=text, variable = self.viewopt, value = option)
+            button = tk.Radiobutton(self, text=text, variable=self.viewopt, value=option)
             button.grid(column=3, row = count, sticky=tk.W)
             count +=1
             #self.viewopt.append(viewnum)

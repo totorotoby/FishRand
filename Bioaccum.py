@@ -17,16 +17,16 @@ def set_all_h_and_s(model_para, all_data):
                     pr.set_hyper_samp_cube(model_para, item[i])
                 if type(item[i]) == list:
                     list_item = item[i]
-                    for j in range (len(list_item)):
+                    for j in range(len(list_item)):
                         if (item[i][j]) == pr.Var:
-                            pr.set_hyper_samp_cube(model_para,item[i][j])
+                            pr.set_hyper_samp_cube(model_para, item[i][j])
 
 
 def check_inst_non_st(inst, u_count, v_count):
     u_count = int(u_count)
     v_count = int(v_count)
     new_entry = []
-    for j in range (len(inst)):
+    for j in range(len(inst)):
         if type(inst[j]) == pr.Var:
             if inst[j].type == 'U':
                 new_entry.append(inst[j].values[u_count])
@@ -45,7 +45,7 @@ def init_region(reg_data, temp, u_count, v_count):
     for i in range(len(reg_data)):
         region = reg_data[i]
         region = check_inst_non_st(region, u_count, v_count)
-        toadd = obj.Region(region[0],temp, region[1],region[2],region[3],region[4],region[5])
+        toadd = obj.Region(region[0], temp, region[1], region[2], region[3], region[4], region[5])
 
         # dealing with cox
         if region[6] != '':
@@ -55,7 +55,7 @@ def init_region(reg_data, temp, u_count, v_count):
 
         # dealing with adoc apoc
         if region[7] != '' and region[8] != '':
-            toadd.set_adoc_apoc(region[7],region[8])
+            toadd.set_adoc_apoc(region[7], region[8])
 
         # checking to see if anything is missing
         if toadd.init_check():
@@ -67,6 +67,8 @@ def init_region(reg_data, temp, u_count, v_count):
     return regions
 
 # initiates chemicals for a specific single region
+
+
 def init_chems(chem_data, region, region_index, u_count, v_count):
 
     chemicals = []
@@ -74,11 +76,11 @@ def init_chems(chem_data, region, region_index, u_count, v_count):
 
         chemical = chem_data[i]
         chemical = check_inst_non_st(chemical, u_count, v_count)
-        toadd = obj.Chemical(chemical[0],chemical[1],chemical[2][region_index])
+        toadd = obj.Chemical(chemical[0], chemical[1], chemical[2][region_index])
 
         # dealing with ddoc and dpoc
         if chemical[5] and chemical[6] != '':
-            toadd.set_ddoc_dpoc(chemical[5],chemical[6])
+            toadd.set_ddoc_dpoc(chemical[5], chemical[6])
 
         # dealing with cwto and cwdo
         if chemical[3][i] != '':
@@ -112,7 +114,7 @@ def init_phyto(phyto_data, chemicals, u_count, v_count, per_step=0):
 
     toadd.calc_vwb()
 
-    for i in range (len(chemicals)):
+    for i in range(len(chemicals)):
 
         kow = chemicals[i].Kow
         toadd.calc_k1(kow, i)
@@ -124,7 +126,6 @@ def init_phyto(phyto_data, chemicals, u_count, v_count, per_step=0):
         print("Something is wrong with your ", 1,  "st Phyto Entry")
         exit(0)
 
-
     return phytos
 
 
@@ -132,7 +133,7 @@ def init_zoop(zoo_data, region, chemicals, phyto, u_count, v_count, per_step=0):
 
     zoops = []
 
-    for i in range (len(zoo_data)):
+    for i in range(len(zoo_data)):
         zoop = zoo_data[i]
         zoop = check_inst_non_st(zoop, u_count, v_count)
         # Potential loop in the future
@@ -145,7 +146,7 @@ def init_zoop(zoo_data, region, chemicals, phyto, u_count, v_count, per_step=0):
         if zoop[4] != '':
             toadd.set_mp(zoop[4])
         if zoop[5] != '' and zoop[6] != '' and zoop[7] != '':
-            toadd.set_el_en_ew(zoop[5],zoop[6],zoop[7])
+            toadd.set_el_en_ew(zoop[5], zoop[6], zoop[7])
         if zoop[8] != '':
             toadd.set_gd(zoop[8])
         if zoop[9] != '':
@@ -182,7 +183,6 @@ def init_zoop(zoo_data, region, chemicals, phyto, u_count, v_count, per_step=0):
     return zoops
 
 
-
 def init_fish_pre_region(fish_data, region, chemicals, phyto, zoops, diet_data, u_count, v_count, per_step=0):
 
     tempfishs = []
@@ -209,17 +209,15 @@ def init_fish_pre_region(fish_data, region, chemicals, phyto, zoops, diet_data, 
         toadd.calc_vwb()
         tempfishs.append(tempadd)
 
-
-        #inital param
+        # inital param
         if fish[6] != '' and fish[7] != '' and fish[8] != '':
-            toadd.set_el_en_ew(fish[6],fish[7],fish[8])
+            toadd.set_el_en_ew(fish[6], fish[7], fish[8])
         if fish[8] != '':
             toadd.set_gd(fish[8])
         if fish[9] != '':
             toadd.set_kg(fish[9])
         if fish[4] != '':
             toadd.set_mp(fish[4])
-
 
         toadd.calc_mo()
 
@@ -237,6 +235,8 @@ def init_fish_pre_region(fish_data, region, chemicals, phyto, zoops, diet_data, 
     return fishs, tempfishs
 
 # pre and post are necessary to deal with the diet issue
+
+
 def init_fish_post_region(fishs, tempfishs, region, chemicals):
 
     # TODO Need to redo once spatial is ready specifically regions[0] will not necessarily be regions 0
@@ -244,12 +244,9 @@ def init_fish_post_region(fishs, tempfishs, region, chemicals):
 
         fishs[i].calc_diet_per(tempfishs, region)
         fishs[i].calc_gut_per()
-
-
-        # ^^^ From here on is Fine only ^^^
         fishs[i].calc_gf()
 
-        for j in range (len(chemicals)):
+        for j in range(len(chemicals)):
             kow = chemicals[j].Kow
             ed = chemicals[j].Ed
             ew = chemicals[j].Ew
@@ -259,8 +256,8 @@ def init_fish_post_region(fishs, tempfishs, region, chemicals):
             fishs[i].calc_ke(ed, j)
             fishs[i].calc_kd(ed, j)
 
-
     return fishs
+
 
 def reorder_fish(fishs):
 
@@ -273,7 +270,7 @@ def reorder_fish(fishs):
             new_order.append(fish)
             below.append(fish.name)
             fishs.remove(fish)
-        if fish == None:
+        if fish is None:
             break
 
         below.append('Phytoplankton')
@@ -281,12 +278,12 @@ def reorder_fish(fishs):
         below.append('Sediment/Detritus')
 
     while True:
-        nextfish = find_next_fish(fishs, new_order, below)
+        nextfish = find_next_fish(fishs, below)
         if type(nextfish) == obj.Fish:
             new_order.append(nextfish)
             below.append(nextfish.name)
             fishs.remove(nextfish)
-        if nextfish == None:
+        if nextfish is None:
             break
 
     return new_order
@@ -301,7 +298,8 @@ def find_base_fish(fishs):
         count = 0
         for entry in fish.diet_frac:
 
-            if (entry[0] != 'Sediment/Detritus' and entry[0] != 'Phytoplankton' and entry[0] != 'Zooplankton') and entry[1] > 0:
+            if (entry[0] != 'Sediment/Detritus' and entry[0] != 'Phytoplankton' and entry[0] != 'Zooplankton')\
+                    and entry[1] > 0:
                 count += 1
 
         if count == 0:
@@ -310,7 +308,7 @@ def find_base_fish(fishs):
     return basefish
 
 
-def find_next_fish(possible_fish, current_fish, below):
+def find_next_fish(possible_fish, below):
 
     nextfish = None
 
@@ -324,7 +322,6 @@ def find_next_fish(possible_fish, current_fish, below):
         if count == 0:
             nextfish = fish
 
-
     return nextfish
 
 
@@ -335,21 +332,20 @@ def solve_steady(region, chemicals, phytos, zoops, fishs):
     conc_log[region.name] = {}
 
     phytolog = conc_log[region.name]
-    Cb = []
-    #assuming one phyto
+
+    # assuming one phyto
     phyto = phytos[0]
     phytolog[phyto.name] = {}
-    for i in range (len(chemicals)):
+    for i in range(len(chemicals)):
         cwd = chemicals[i].Cwdo
         conc_in_phyto = phyto.solve_steady_state(cwd, i)
         phytolog[phyto.name][chemicals[i].name] = conc_in_phyto
-
 
     zooplog = conc_log[region.name]
     for zoo in zoops:
         Cb = []
         zooplog[zoo.name] = {}
-        for i in range (len(chemicals)):
+        for i in range(len(chemicals)):
             # since single region all chemical properties index by 0
             phi = chemicals[i].phi
             Cwdo = chemicals[i].Cwdo
@@ -364,10 +360,10 @@ def solve_steady(region, chemicals, phytos, zoops, fishs):
 
     fishlog = conc_log[region.name]
 
-    for i in range (len(fishs)):
+    for i in range(len(fishs)):
         fishlog[fishs[i].name] = {}
         Cb = []
-        for j in range (len(chemicals)):
+        for j in range(len(chemicals)):
             phi = chemicals[j].phi
             Cwp = chemicals[j].Cwp
             Cwdo = chemicals[j].Cwdo
@@ -382,170 +378,136 @@ def solve_steady(region, chemicals, phytos, zoops, fishs):
 def init_prior_con_dic(regions, chems, phyto, zoops, fishs):
 
     prior_con_dic = {}
-    for k in range (len(regions)):
+    for k in range(len(regions)):
         prior_con_dic[regions[k][0]] = {}
-        for i in range (len(fishs)):
+        for i in range(len(fishs)):
             prior_con_dic[regions[k][0]][fishs[i][0]] = {}
-            for j in range (len(chems)):
+            for j in range(len(chems)):
                 prior_con_dic[regions[k][0]][fishs[i][0]][chems[j][0]] = 0
-        for i in range (len(zoops)):
+        for i in range(len(zoops)):
             prior_con_dic[regions[k][0]][zoops[i][0]] = {}
-            for j in range (len(chems)):
+            for j in range(len(chems)):
                 prior_con_dic[regions[k][0]][zoops[i][0]][chems[j][0]] = 0
         prior_con_dic[regions[k][0]][phyto[0][0]] = {}
-        for j in range (len(chems)):
+        for j in range(len(chems)):
             prior_con_dic[regions[k][0]][phyto[0][0]][chems[j][0]] = 0
     return prior_con_dic
 
 
-def solve_zoop_phyto_time_period(region, chemicals, phytos, zoops, fishs, prior_chem_amounts):
+def solve_zoop_phyto_time_period(region, chemicals, phytos, zoops, fishs, prior_chem_amounts, t):
 
     new_chem_amounts = deepcopy(prior_chem_amounts)
 
     phyto = phytos[0]
-    for j in range (len(chemicals)):
-        ### Phytos and zoops ####
+    for j in range(len(chemicals)):
+
+        # Phytos and zoops
         prior_C = prior_chem_amounts[region.name][phyto.name][chemicals[j].name]
-        new_chem_amounts[region.name][phyto.name][chemicals[j].name] = phyto.solve_next_time_step(chemicals[j].Cwdo, j, prior_C)
+        new_chem_amounts[region.name][phyto.name][chemicals[j].name] = phyto.solve_next_time_step(chemicals[j].Cwdo, j,
+                                                                                                  prior_C, t)
         for k in range(len(zoops)):
             prior_C = prior_chem_amounts[region.name][zoops[k].name][chemicals[j].name]
             phi = chemicals[j].phi
             Cwdo = chemicals[j].Cwdo
             Cwto = chemicals[j].Cwto
 
-            phyto_con = (new_chem_amounts[region.name][phyto.name][chemicals[j].name] + prior_chem_amounts[region.name][phyto.name][chemicals[j].name])/2
-            new_chem_amounts[region.name][zoops[k].name][chemicals[j].name] = zoops[k].solve_next_time_step(phi, j, Cwto, Cwdo, phyto_con, prior_C)
+            phyto_con = (new_chem_amounts[region.name][phyto.name][chemicals[j].name] +
+                         prior_chem_amounts[region.name][phyto.name][chemicals[j].name])/2
+            new_chem_amounts[region.name][zoops[k].name][chemicals[j].name] =\
+                zoops[k].solve_next_time_step(phi, j, Cwto, Cwdo, phyto_con, prior_C)
 
-        ### Fishes! ###
+        # Fishes!
 
         fishlog_new = new_chem_amounts[region.name]
         fishlog_old = prior_chem_amounts[region.name]
-        for i in range (len(fishs)):
+        for i in range(len(fishs)):
             prior_C = prior_chem_amounts[region.name][fishs[i].name][chemicals[j].name]
             phi = chemicals[j].phi
             Cwdo = chemicals[j].Cwdo
             Cwp = chemicals[i].Cwp
-            new_chem_amounts[region.name][fishs[i].name][chemicals[j].name] = fishs[i].solve_next_time_step(phi, j, Cwp, Cwdo, fishlog_new, fishlog_old, chemicals[j], prior_C)
+            new_chem_amounts[region.name][fishs[i].name][chemicals[j].name] =\
+                fishs[i].solve_next_time_step(phi, j, Cwp, Cwdo, fishlog_new, fishlog_old, chemicals[j], prior_C)
 
-
+    # print(new_chem_amounts['The Pond']['Pumpkinseed PC']['PCB52'], ', ')
     return new_chem_amounts
 
 
-def bio_monte_carlo_loop(model_para, all_data, temp, reg_index, u_iter, v_iter, per_step=0, p_dic=None):
-
+def bio_monte_carlo_loop(model_para, all_data, temp, reg_index, u_iter, v_iter, t, per_step=0, p_dic=None):
 
     p_dic_list = 0
-    #check if case is temporal and monte carlo
+    # check if case is temporal and monte carlo
     if type(p_dic) is list:
         p_dic_list = 1
     else:
         prior_conc = p_dic
-
 
     dictionaries = []
     set_all_h_and_s(model_para, all_data)
 
     inner_count = 0
     u_count = 0
-    while (u_count < u_iter):
+    while u_count < u_iter:
         u_count += 1
         v_count = 0
-        while (v_count < v_iter):
+        while v_count < v_iter:
 
             if p_dic_list == 1:
                 prior_conc = p_dic[inner_count]
 
-            concentration_log = single_bio_deterministic_iter(model_para, all_data, temp, reg_index, u_count, inner_count, per_step=per_step, p_dic=prior_conc)
+            concentration_log = single_bio_deterministic_iter(model_para, all_data, temp, reg_index, u_count,
+                                                              inner_count, t, per_step=per_step, p_dic=prior_conc)
             v_count += 1
             inner_count += 1
             dictionaries.append(concentration_log)
 
-
     return dictionaries
 
+
 def pretty(d, indent=0):
-   for key, value in d.items():
-      print('\t' * indent + str(key))
-      if isinstance(value, dict):
-         pretty(value, indent+1)
-      else:
-         print('\t' * (indent+1) + str(value))
+    for key, value in d.items():
+        print('\t' * indent + str(key))
+        if isinstance(value, dict):
+            pretty(value, indent+1)
+        else:
+            print('\t' * (indent+1) + str(value))
+
 
 def result_print(results_dic):
-
     for region in results_dic.values():
         for animal, animals in region.items():
             for chemical, cont in animals.items():
                 print(cont.bestparam()[0])
                 cont.show()
 
-def filter_stat_case(dictionaries, filename):
+
+def filter_stat_case(dictionaries):
 
     # if no statistical simulation
     if len(dictionaries) == 1:
 
-        return dictionaries
+        print(dictionaries[0])
+        return dictionaries[0]
 
     # if we ran bio monte carlo
     else:
         results_dic = pr.make_result_dist(dictionaries)
+        result_print(results_dic)
         return results_dic
 
 
-# are we solving steady state on single region, solving with time on single region, or time on multiple regions
-def filter_cases(filename):
-
-    model_para, all_data, time_steps, time_per_step = FR_Input_Output.convert_to_lists(filename)
-
-    # set up for
-    u_iter = int(model_para[0])
-    v_iter = int(model_para[1])
-    sample_data = model_para[0:3]
-    set_all_h_and_s(sample_data, all_data)
-    # if steady state problem wants to be solved
-    if len(all_data[0]) == 1 and model_para[8] == 'YES':
-        dictionaries = bio_monte_carlo_loop(model_para, all_data, all_data[1][0][0], 0, u_iter, v_iter)
-        results_dic= filter_stat_case(dictionaries, filename)
-
-    if model_para[8] == 'NO':
-
-        prior_concentrations = init_prior_con_dic(all_data[0], all_data[2], all_data[3], all_data[4], all_data[5])
-        t=0
-        steps_dic = []
-        while t < time_steps:
-            region_index = 0
-            temp = all_data[1][region_index][t]
-            dictionaries = bio_monte_carlo_loop(model_para, all_data, temp, region_index, u_iter, v_iter, per_step=time_per_step, p_dic=prior_concentrations)
-
-            steps_dic.append(dictionaries)
-            # Need to get prior concentrations, in none statistical case this is the only dictionary
-            if len(dictionaries) == 1:
-                prior_concentrations = dictionaries[0]
-            # we pass all of the dictonaries, and have to iterate through them according to u_count, and v_count
-            else:
-                prior_concentrations = dictionaries
-
-            t += 1
-
-        results_dic = filter_stat_case(dictionaries, filename)
-        result_print(results_dic)
-
-
-
-def single_bio_deterministic_iter(model_para, all_data, temp, reg_index, u_count, v_count, per_step=0, p_dic=None):
+def single_bio_deterministic_iter(model_para, all_data, temp, reg_index, u_count, v_count, t, per_step=0, p_dic=None):
 
     reg_data = all_data[0]
-    temp_data = all_data[1]
     chem_data = all_data[2]
 
     regions = init_region(reg_data, temp, u_count, v_count)
-    chemicals = init_chems(chem_data, regions[reg_index], reg_index , u_count, v_count)
-    phytos = init_phyto(all_data[3],chemicals, u_count, v_count, per_step=per_step)
+    chemicals = init_chems(chem_data, regions[reg_index], reg_index, u_count, v_count)
+    phytos = init_phyto(all_data[3], chemicals, u_count, v_count, per_step=per_step)
     zoops = init_zoop(all_data[4], regions[reg_index], chemicals, phytos[0], u_count, v_count, per_step=per_step)
-    fishs, tempfishs = init_fish_pre_region(all_data[5], regions[reg_index], chemicals, phytos[0], zoops, all_data[6], u_count, v_count, per_step=per_step)
+    fishs, tempfishs = init_fish_pre_region(all_data[5], regions[reg_index], chemicals, phytos[0], zoops, all_data[6],
+                                            u_count, v_count, per_step=per_step)
     fishs = reorder_fish(fishs)
-    fishs = init_fish_post_region(fishs,tempfishs, regions[reg_index], chemicals)
-
+    fishs = init_fish_post_region(fishs, tempfishs, regions[reg_index], chemicals)
 
     if len(all_data[0]) == 1 and model_para[8] == 'YES':
 
@@ -554,9 +516,6 @@ def single_bio_deterministic_iter(model_para, all_data, temp, reg_index, u_count
 
     if model_para[8] == 'NO':
 
-        new_concentrations = solve_zoop_phyto_time_period(regions[reg_index], chemicals, phytos, zoops, fishs, p_dic)
+        new_concentrations = solve_zoop_phyto_time_period(regions[reg_index], chemicals, phytos, zoops, fishs, p_dic, t)
         return new_concentrations
 
-
-
-filter_cases('sheets/input/tests/testy_test.xlsx')

@@ -1,5 +1,6 @@
 from datetime import datetime
 
+
 def num_steps(start_string, end_string, step):
 
     start = datetime.strptime(start_string, '%m,%d,%Y').date()
@@ -19,4 +20,3 @@ def num_steps(start_string, end_string, step):
         time_per_step = 1
 
     return difference, time_per_step
-
