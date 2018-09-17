@@ -234,7 +234,7 @@ def get_sites_data(sites_sheet):
         row += 1
 
     hotspots = []
-    row_num = 40
+    row_num = 39
     row = sites_sheet.row(row_num)
     #print(sites_sheet.row(row_num + 1))
     while row[0].value != '':
@@ -250,7 +250,10 @@ def get_sites_data(sites_sheet):
             hotspots.append(hotspot)
         row_num += 1
 
-    return [boundary, sites, hotspots]
+    draws = sites_sheet.row(40)[1].value
+
+
+    return [boundary, sites, hotspots, draws]
 
 
 def deter_write_output(*args):
