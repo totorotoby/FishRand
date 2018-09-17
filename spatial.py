@@ -112,7 +112,7 @@ def voronoi_finite_polygons_2d(vor, radius=None):
 
     return new_regions, np.asarray(new_vertices)
 
-
+# prints the intersection boundary and regional polygons of input
 def print_intersections(polygon, boundary, intersection = None):
 
     x_b, y_b = boundary.exterior.xy
@@ -131,6 +131,7 @@ def print_intersections(polygon, boundary, intersection = None):
 
     plt.show()
 
+# Plots a single region
 def plot_shape(shapes):
 
     min_x =[]
@@ -179,6 +180,7 @@ def plot_vor(vor, boundary, hotspots):
     plt.show()
 
 
+# Returns polygons representing the boundary regions and hotspots
 def setup(site_data):
 
     # get boundary polygon
@@ -214,6 +216,7 @@ def setup(site_data):
 
     return boundary, reg_polygons, attract_poly
 
+# returns probability of being in each hotspot, and probability of being outside of hotspots
 def hotspot_prob(boundary, attraction_polys):
 
     probs = []
@@ -229,6 +232,7 @@ def hotspot_prob(boundary, attraction_polys):
 
     return probs, outside
 
+# trims regional polygons so they don't include any overlap with hotspots
 def trim_regpoly(reg_poly, attraction_polys):
 
     trimmed = []
@@ -244,7 +248,7 @@ def trim_regpoly(reg_poly, attraction_polys):
 
     return trimmed_prob
 
-
+# Returns array of locations give probabilities calculated from areas and attraction factors
 def get_location(boundary, reg_poly, attraction_polys, fish, fish_num):
 
     fish_spec_polys = []
