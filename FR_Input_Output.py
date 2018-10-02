@@ -406,7 +406,6 @@ def write_temporal_excel(array, output_name, stops, stat_flag, regional_areas):
                         # if
                         sheet.write(count1 + 2 + (i + j) + (len(lower_dists) * i), k + 1,
                                     lower_dists[reg_list[i]][lower_org_list[j]][chem_list[k]].best_para[0])
-                        lower_dists[reg_list[i]][lower_org_list[j]][chem_list[k]].show()
 
             sheet.write(0, len(chem_list) + 1, 'Lower Food Web Mean Concentrations Weighted by Regional Area', big)
             sheet.write(1, len(chem_list) + 1, 'All Regions', bold)
@@ -435,7 +434,7 @@ def write_temporal_excel(array, output_name, stops, stat_flag, regional_areas):
 
             for i in range(len(upper_org_list)):
                 for j in range(len(chem_list)):
-                    sheet.write(count + 1 + i, j+ len(chem_list) + 1, str(upper_dists[upper_org_list[i]][chem_list[j]].v_mean_std))
+                    sheet.write(count + 1 + i, j+ len(chem_list) + 2, str(upper_dists[upper_org_list[i]][chem_list[j]].v_mean_std))
 
             workbook.close()
 

@@ -67,14 +67,12 @@ class app(tk.Frame):
             button = tk.Radiobutton(self, text=text, variable=self.viewopt, value=option)
             button.grid(column=3, row = count, sticky=tk.W)
             count +=1
-            #self.viewopt.append(viewnum)
-        #command= needs to be edited
 
         self.optvar1 = tk.StringVar(self)
         self.optvar1.set("None")
-        graph_type_opt = tk.OptionMenu(self, self.optvar1, "Normal", 'Lognormal', 'Uniform', 'Gamma').grid(row=8, column=3, sticky=tk.E)
-        getgraphs_single_time = tk.Button(self, text="Show Distributions", command=self.show_dist).grid(row=9, column=3, sticky=tk.SW)
-        get_time_graph = tk.Button(self, text="Show Time Graph", command=self.show_time_graph).grid(row=10, column=3, sticky=tk.SW)
+        tk.OptionMenu(self, self.optvar1, "Normal", 'Lognormal', 'Uniform', 'Gamma').grid(row=8, column=3, sticky=tk.E)
+        tk.Button(self, text="Show Distributions", command=self.show_dist).grid(row=9, column=3, sticky=tk.SW)
+        tk.Button(self, text="Show Time Graph", command=self.show_time_graph).grid(row=10, column=3, sticky=tk.SW)
 
         
         ttk.Separator(self,orient=tk.VERTICAL).grid(row=1, column=1 , rowspan=10, sticky='ns')
@@ -86,12 +84,11 @@ class app(tk.Frame):
         self.timeentry = tk.Entry(self)
         self.timeentry.grid(column=0,row=7, padx=20, pady=2)
         tk.Label(self, text="Filename:").grid(column=5, row=4, padx=20, pady=2)
-        filenameentry = tk.Entry(self)
-        filenameentry.grid(column=5,row=5, padx=20,pady=2)
-        direcbutton = tk.Button(self, text="Choose Directory", command=filedialog.askdirectory, width = 18)
+        self.filenameentry = tk.Entry(self)
+        self.filenameentry.grid(column=5,row=5, padx=20,pady=2)
+        direcbutton = tk.Button(self, text="Choose Directory", command=self.askdirectory, width = 18)
         direcbutton.grid(column=5,row=6,padx=20,pady=2)
-        #Command
-        savebutton = tk.Button(self, text="Save", width=18)
+        savebutton = tk.Button(self, text="Save", command=self.save_to_excel, width=18)
         savebutton.grid(column=5, row=7, padx=20,pady=2)
 
         ###inputs###
@@ -111,6 +108,9 @@ class app(tk.Frame):
 
         self.filename = filedialog.askopenfilename()
         self.parse_filename()
+
+    def askdirectory(self):
+        self.savedirec = filedialog.askdirectory()
 
     def run_model(self):
 
@@ -267,6 +267,23 @@ class app(tk.Frame):
 
         else:
             print('There is no time graph for steady state.')
+
+
+    def save_to_excel(self):
+
+        save_name = self.filenameentry.get()
+        use_name = self.savedirec + '/' +save_name
+
+        if self.output[0] == 'YES':
+
+            steady_state_output(self.to_write, self.stat_check, use_name)
+
+        if self.output[0] == 'NO':
+
+            temporal_output(self.stat_check, self.to_write, use_name, self.time_entry, self.region_areas)
+
+
+
 
 
 
