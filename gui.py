@@ -1,8 +1,13 @@
 import tkinter as tk
+import matplotlib
+matplotlib.use("TkAgg")
+from matplotlib import pyplot as plt
+from scipy import stats
+import numpy as np
 from tkinter import ttk
 from tkinter import filedialog
 from tkinter import messagebox
-from Bioaccum import run_bio
+from main import *
 
 
 exitflag = False
@@ -12,7 +17,7 @@ class app(tk.Frame):
 
     def __init__(self, master=None):
 
-        self.r_dictionary = None
+        self.output = None
         self.viewdict = []
         self.dictvars = []
         self.viewopt = None
@@ -32,19 +37,19 @@ class app(tk.Frame):
 
         ###getting reference to region animal chemical###
 
-        ident = ["Region:", "Organism:", "Chemical:"]
+        ident = ["Time:", 0, "Fish:", 0, "Chemical:"]
         #To be replaced
-        regs = ["None"]
-        animals = ["None"]
+        time = ["None"]
+        fishs = ["None"]
         chemicals = ["None"]
-        options = [regs, animals, chemicals]
+        options = [time, 0, fishs, 0,chemicals]
 
         for i in range (3,9,2):
 
-            tk.Label(self, text=ident[i//4]).grid(row=i+1, column=2, sticky=tk.W)
+            tk.Label(self, text=ident[i-3]).grid(row=i+1, column=2, sticky=tk.W)
             optvar = tk.StringVar(self)
             optvar.set("None")
-            opt = tk.OptionMenu(self, optvar, *options[i//4])
+            opt = tk.OptionMenu(self, optvar, *options[i-3])
             opt.grid(row=i+2, column=2, sticky=tk.W)
             self.viewdict.append(opt)
             self.dictvars.append(optvar)
@@ -54,7 +59,7 @@ class app(tk.Frame):
         
         tk.Label(self, text="Graph Options:").grid(column=3,row=4, sticky=tk.W)
         options = [("CDFs with all fits", 0), ("PDFs with all fits", 1),
-                   ("Both with all fits", 2), ("CDF and PDF of specified fit", 3)
+                   ("Both with all fits", 2), ("CDF and PDF of selected fit:", 3)
                    ]
         count = 4
         self.viewopt = tk.IntVar()
@@ -63,8 +68,13 @@ class app(tk.Frame):
             button.grid(column=3, row = count, sticky=tk.W)
             count +=1
             #self.viewopt.append(viewnum)
-        #command= needs to be edited                                                                  
-        getgraphs = tk.Button(self, text="Show Distributions", command=self.show_dist).grid(row=8, column=3, sticky=tk.W)
+        #command= needs to be edited
+
+        self.optvar1 = tk.StringVar(self)
+        self.optvar1.set("None")
+        graph_type_opt = tk.OptionMenu(self, self.optvar1, "Normal", 'Lognormal', 'Uniform', 'Gamma').grid(row=8, column=3, sticky=tk.E)
+        getgraphs_single_time = tk.Button(self, text="Show Distributions", command=self.show_dist).grid(row=9, column=3, sticky=tk.SW)
+        get_time_graph = tk.Button(self, text="Show Time Graph", command=self.show_time_graph).grid(row=10, column=3, sticky=tk.SW)
 
         
         ttk.Separator(self,orient=tk.VERTICAL).grid(row=1, column=1 , rowspan=10, sticky='ns')
@@ -72,23 +82,23 @@ class app(tk.Frame):
 
         ###saving data###
         
-        tk.Label(self, text="Timestep to save:").grid(column=5,row=4, padx=20)
-        timeentry = tk.Entry(self)
-        timeentry.grid(column=5,row=5, padx=20, pady=2)
-        tk.Label(self, text="Filename:").grid(column=5, row=6, padx=20, pady=2)
+        tk.Label(self, text="Timesteps to Save and Display:").grid(column=0,row=6, padx=20)
+        self.timeentry = tk.Entry(self)
+        self.timeentry.grid(column=0,row=7, padx=20, pady=2)
+        tk.Label(self, text="Filename:").grid(column=5, row=4, padx=20, pady=2)
         filenameentry = tk.Entry(self)
-        filenameentry.grid(column=5,row=7, padx=20,pady=2)
+        filenameentry.grid(column=5,row=5, padx=20,pady=2)
         direcbutton = tk.Button(self, text="Choose Directory", command=filedialog.askdirectory, width = 18)
-        direcbutton.grid(column=5,row=8,padx=20,pady=2)
+        direcbutton.grid(column=5,row=6,padx=20,pady=2)
         #Command
         savebutton = tk.Button(self, text="Save", width=18)
-        savebutton.grid(column=5, row=9, padx=20,pady=2)
+        savebutton.grid(column=5, row=7, padx=20,pady=2)
 
         ###inputs###
 
         inputbutton = tk.Button(self, text="Choose File", command=self.askfile, width=18)
-        inputbutton.grid(column=0, row=6)
-        tk.Button(self, text="Run", command=self.run_bio).grid(column=0, row=7)
+        inputbutton.grid(column=0, row=5)
+        tk.Button(self, text="Run", command=self.run_model).grid(column=0, row=8)
 
 
          ###Fish Image###                                                                                                                         
@@ -102,39 +112,64 @@ class app(tk.Frame):
         self.filename = filedialog.askopenfilename()
         self.parse_filename()
 
-    def run_bio(self):
+    def run_model(self):
 
         if self.filename == '':
-            print('need exception here')
+            print('Please choose an input file')
         else:
-            self.r_dictionary = run_bio(1, self.filename, self.parse_filename())
 
-            regions = list(self.r_dictionary.keys())
-            regions = ['None'] + regions
+            # get timesteps
 
-            animalstotal = []
+            time_entry = self.timeentry.get().split(",")
+            print(time_entry)
+            if time_entry[0] == '':
+                print('Need at least 1 Timestep.')
+            else:
+                self.time_entry = [int(i) for i in time_entry]
 
-            for value in self.r_dictionary.values():
-                keys = list(value.keys())
-                chemicals = list(list(value.values())[0].keys())
-                for animal in keys:
-                    animalstotal.append(animal)
+            # run the code
 
-            animalstotal = ['None'] + animalstotal
-            chemicals = ['None'] + chemicals
-            reset_list  = [regions, animalstotal, chemicals]
+            self.output = filter_cases(self.filename, self.time_entry, 'output_test.xlsx')
+
+            if self.output[0] == 'YES':
+
+                self.to_write = self.output[1]
+                self.stat_check = self.output[2]
 
 
-            ###refresh menus###
-            for i in range (len(self.viewdict)):
-                menu = self.viewdict[i]
-                var = self.dictvars[i]
 
-                var.set('None')
-                menu['menu'].delete(0, 'end')
+            if self.output[0] == 'NO':
 
-                for entry in reset_list[i]:
-                    menu['menu'].add_command(label=entry, command=tk._setit(var, entry))
+                self.to_write = self.output[1]
+                self.stat_check = self.output[2]
+                self.region_areas = self.output[3]
+                self.graph_data = self.output[4]
+
+            ########### TO SET UP INDIVDUAL GRAPHS ###########################
+
+                if self.stat_check == True:
+                    # update time steps
+                    times = time_entry
+                    # get fish names
+                    fishs = list(self.to_write[0][1].keys())
+                    chemicals = list(list(self.to_write[0][1].values())[0].keys())
+                    chemicals =  chemicals
+                    reset_list  = [times, fishs, chemicals]
+
+
+                    ###refresh menus###
+                    for i in range (len(self.viewdict)):
+                        menu = self.viewdict[i]
+                        var = self.dictvars[i]
+
+                        var.set('None')
+                        menu['menu'].delete(0, 'end')
+
+                        for entry in reset_list[i]:
+                            menu['menu'].add_command(label=entry, command=tk._setit(var, entry))
+
+            ##################################################################
+
 
     def parse_filename(self):
 
@@ -143,7 +178,96 @@ class app(tk.Frame):
 
     def show_dist(self):
 
-        print('blah')
+
+        if self.stat_check == True:
+
+            type_index_list = ['Normal', 'Lognormal', 'Uniform', 'Gamma']
+            type_index = self.optvar1.get()
+
+            dist_type = self.viewopt.get()
+
+
+            where  = []
+            for opt in self.dictvars:
+                where.append(opt.get())
+
+            dist_to_show = self.graph_data[int(where[0])][where[1]][where[2]]
+            dist_to_show.display = dist_type
+
+            dist_to_show.show(type_index_list.index(type_index))
+
+        if self.stat_check == False:
+
+            print('Concentration is deterministic. No Distrubtion to Plot.')
+
+
+    def show_time_graph(self):
+
+        if self.output[0] == 'NO':
+
+            fish = self.dictvars[1].get()
+            chemical = self.dictvars[2].get()
+
+            params = []
+            types = []
+            mean_stds = []
+            for dic in self.graph_data:
+                params.append(dic[fish][chemical].best_para[1])
+                types.append(dic[fish][chemical].index)
+                mean_stds.append(dic[fish][chemical].v_mean_std)
+
+
+
+            norm = lambda x, param, offset: offset - stats.norm.pdf(x, loc=param[0], scale=param[1])
+            lognorm = lambda x, param, offset: offset - stats.lognorm.pdf(x, s=param[0], loc=param[1], scale=param[2])
+            uniform = lambda x, param, offset: offset - stats.uniform.pdf(x, loc=param[0], scale=param[1])
+            gamma = lambda x, param, offset: offset - stats.gamma.pdf(x, a=param[0], loc=param[1], scale=param[2])
+
+            type_functions = [norm, lognorm, uniform, gamma]
+            fig, ax = plt.subplots()
+            ax.tick_params(bottom=False, labelbottom=False)
+
+            max_step = 0
+            for param, type, mean_std in zip(params, types, mean_stds):
+
+                if type == 1 or type == 3:
+                    y_plot = np.linspace(mean_std[0] - (4*mean_std[1]), mean_std[0] + (6*mean_std[1]), num=500)
+                else:
+                    y_plot = np.linspace(mean_std[0] - (3 * mean_std[1]), mean_std[0] + (3 * mean_std[1]), num=500)
+                values = type_functions[type](y_plot, param, 0)
+
+                if -min(values) > max_step:
+                    max_step = -min(values)
+
+            step = max_step + (.1 * max_step)
+
+            timesteps = [i*step for i in range (1, len(params)+1)]
+
+            data = zip(params, types, timesteps, mean_stds)
+            timelabel = list(range(len(params)))
+            count = 1
+            for param, type, time, mean_std in data:
+
+                y_plot = np.linspace(mean_std[0] - (4*mean_std[1]), mean_std[0] + (6*mean_std[1]), num=500)
+                ax.plot(type_functions[type](y_plot, param, time), y_plot, color='b')
+
+                mean_point_x = type_functions[type](mean_std[0], param, time)
+                ax.plot(mean_point_x, mean_std[0], 'o', color='b')
+
+                ax.annotate(str(count), xy=(time, mean_std[0]), xytext=(time, max(y_plot) + (max(y_plot)*.05)))
+                count += 1
+
+            blue_line  = matplotlib.lines.Line2D([], [], color='blue', label='Best Fit Distribution of Timestep')
+            blue_dot = matplotlib.lines.Line2D([], [], color='blue', marker = 'o', linestyle = 'None', label='Mean of Samples during Timestep')
+
+            ax.legend(handles = [blue_line, blue_dot])
+            ax.set_xlabel('timesteps')
+            ax.set_ylabel('Concentration')
+            plt.show()
+
+        else:
+            print('There is no time graph for steady state.')
+
 
 
 def closing():

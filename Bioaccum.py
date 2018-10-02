@@ -1,25 +1,32 @@
-# TODO for monday or tuesday...fix zooplankton steady state, and nonsteady state first thing...then try to do fish differential equation
-
 # Where we run the bioaccumlation model
 import matplotlib
+import numpy as np
 matplotlib.use("TkAgg")
 import Classes as obj
 import FR_Input_Output
 import prob as pr
 from copy import deepcopy
+import spatial
 
 def set_all_h_and_s(model_para, all_data):
 
+    count = 0
     for l in all_data:
         for item in l:
             for i in range(len(item)):
                 if type(item[i]) == pr.Var:
+                    count += 1
                     pr.set_hyper_samp_cube(model_para, item[i])
                 if type(item[i]) == list:
                     list_item = item[i]
                     for j in range(len(list_item)):
                         if (item[i][j]) == pr.Var:
+                            count += 1
                             pr.set_hyper_samp_cube(model_para, item[i][j])
+
+    if count > 1:
+        return True
+    return False
 
 
 def check_inst_non_st(inst, u_count, v_count):
@@ -45,7 +52,7 @@ def init_region(reg_data, temp, u_count, v_count):
     for i in range(len(reg_data)):
         region = reg_data[i]
         region = check_inst_non_st(region, u_count, v_count)
-        toadd = obj.Region(region[0], temp, region[1], region[2], region[3], region[4], region[5])
+        toadd = obj.Region(region[0], temp[i], region[1], region[2], region[3], region[4], region[5])
 
         # dealing with cox
         if region[6] != '':
@@ -75,6 +82,7 @@ def init_chems(chem_data, region, region_index, u_count, v_count):
     for i in range(len(chem_data)):
 
         chemical = chem_data[i]
+
         chemical = check_inst_non_st(chemical, u_count, v_count)
         toadd = obj.Chemical(chemical[0], chemical[1], chemical[2][region_index])
 
@@ -103,8 +111,6 @@ def init_phyto(phyto_data, chemicals, u_count, v_count, per_step=0):
     phyto = phyto_data[0]
     phyto = check_inst_non_st(phyto, u_count, v_count)
 
-    # Potential loop in the future
-
     toadd = obj.Pplank(phyto[0], phyto[1], len(chemicals), per_step)
 
     if phyto[2] != '':
@@ -113,7 +119,6 @@ def init_phyto(phyto_data, chemicals, u_count, v_count, per_step=0):
         toadd.set_vnp(phyto[3])
 
     toadd.calc_vwb()
-
     for i in range(len(chemicals)):
 
         kow = chemicals[i].Kow
@@ -182,6 +187,43 @@ def init_zoop(zoo_data, region, chemicals, phyto, u_count, v_count, per_step=0):
 
     return zoops
 
+def init_single_fish_pre_region(fish_data, region, chemicals, diet, u_count, v_count, per_step=0):
+
+    fish = check_inst_non_st(fish_data, u_count, v_count)
+    toadd = obj.Fish(fish[0], fish[1], fish[2], diet, fish[10], len(chemicals), per_step)
+    tempadd = obj.Fish(fish[0], fish[1], fish[2], diet, fish[10], len(chemicals), per_step)
+
+    if fish[3] != '':
+        toadd.set_vnb(fish[3])
+        tempadd.set_vnb(fish[3])
+
+    tempadd.calc_vwb()
+    toadd.calc_vwb()
+
+    # inital param
+    if fish[6] != '' and fish[7] != '' and fish[8] != '':
+        toadd.set_el_en_ew(fish[6], fish[7], fish[8])
+    if fish[8] != '':
+        toadd.set_gd(fish[8])
+    if fish[9] != '':
+        toadd.set_kg(fish[9])
+    if fish[4] != '':
+        toadd.set_mp(fish[4])
+
+    toadd.calc_mo()
+
+    toadd.calc_gv(region.Cox)
+    if toadd.gd_set == 0:
+        if toadd.flag == 0:
+            toadd.calc_gd_no_filter(region.T)
+        if toadd.flag == 1:
+            toadd.calc_gd_filter(region.Css)
+        if toadd.kg_set == 0:
+            toadd.calc_kg(region.T)
+
+
+    return toadd, tempadd
+
 
 def init_fish_pre_region(fish_data, region, chemicals, phyto, zoops, diet_data, u_count, v_count, per_step=0):
 
@@ -191,11 +233,9 @@ def init_fish_pre_region(fish_data, region, chemicals, phyto, zoops, diet_data, 
     tempfishs.append(phyto)
 
     fishs = []
-
     for fish in fish_data:
 
         fish = check_inst_non_st(fish, u_count, v_count)
-
         # setting up diets
         diet = diet_data[fish[0]]
         toadd = obj.Fish(fish[0], fish[1], fish[2], diet, fish[10], len(chemicals), per_step)
@@ -239,7 +279,8 @@ def init_fish_pre_region(fish_data, region, chemicals, phyto, zoops, diet_data, 
 
 def init_fish_post_region(fishs, tempfishs, region, chemicals):
 
-    # TODO Need to redo once spatial is ready specifically regions[0] will not necessarily be regions 0
+    #print(tempfishs)
+
     for i in range(len(fishs)):
 
         fishs[i].calc_diet_per(tempfishs, region)
@@ -257,6 +298,27 @@ def init_fish_post_region(fishs, tempfishs, region, chemicals):
             fishs[i].calc_kd(ed, j)
 
     return fishs
+
+
+
+def init_single_fish_post_region(fish, tempfishs, region, chemicals):
+
+    fish.calc_diet_per(tempfishs, region)
+    fish.calc_gut_per()
+    fish.calc_gf()
+
+    for j in range(len(chemicals)):
+        kow = chemicals[j].Kow
+        ed = chemicals[j].Ed
+        ew = chemicals[j].Ew
+        fish.calc_k1(ew, j)
+        fish.calc_k2(kow, j)
+        fish.calc_kgb(kow, j)
+        fish.calc_ke(ed, j)
+        fish.calc_kd(ed, j)
+
+    return fish
+
 
 
 def reorder_fish(fishs):
@@ -325,7 +387,7 @@ def find_next_fish(possible_fish, below):
     return nextfish
 
 
-def solve_steady(region, chemicals, phytos, zoops, fishs):
+def solve_steady(region, chemicals, phytos, zoops, inverts, fishs):
 
     # nested dictonary where can look up first by region then chemical then animal to find concentration
     conc_log = {}
@@ -357,6 +419,20 @@ def solve_steady(region, chemicals, phytos, zoops, fishs):
             zooplog[zoo.name][chemicals[i].name] = conc_in_zoops
 
         zoo.Cb = Cb
+    invertlog = conc_log[region.name]
+
+    for i in range(len(inverts)):
+        invertlog[inverts[i].name] = {}
+        Cb = []
+        for j in range(len(chemicals)):
+            phi = chemicals[j].phi
+            Cwp = chemicals[j].Cwp
+            Cwdo = chemicals[j].Cwdo
+            con_in_i = inverts[i].solve_steady_state(phi, j, Cwp, Cwdo, invertlog, chemicals[j])
+            Cb.append(con_in_i)
+            invertlog[inverts[i].name][chemicals[j].name] = con_in_i
+        inverts[i].Cb = Cb
+
 
     fishlog = conc_log[region.name]
 
@@ -375,26 +451,34 @@ def solve_steady(region, chemicals, phytos, zoops, fishs):
     return conc_log
 
 
-def init_prior_con_dic(regions, chems, phyto, zoops, fishs):
+def init_prior_con_dic(stat_check, monte_carlo_length,regions, chems, phyto, zoops, inverts, fishs, draws):
 
-    prior_con_dic = {}
-    for k in range(len(regions)):
-        prior_con_dic[regions[k][0]] = {}
-        for i in range(len(fishs)):
-            prior_con_dic[regions[k][0]][fishs[i][0]] = {}
+    prior_con_dic_nonfish_list = []
+    for p in range(monte_carlo_length):
+        prior_con_dic_nonfish = {}
+        for k in range(len(regions)):
+            prior_con_dic_nonfish[regions[k][0]] = {}
+            for i in range(len(zoops)):
+                prior_con_dic_nonfish[regions[k][0]][zoops[i][0]] = {}
+                for j in range(len(chems)):
+                    prior_con_dic_nonfish[regions[k][0]][zoops[i][0]][chems[j][0]] = 0
+            for s in range(len(inverts)):
+                prior_con_dic_nonfish[regions[k][0]][inverts[s][0]] = {}
+                for j in range(len(chems)):
+                    prior_con_dic_nonfish[regions[k][0]][inverts[s][0]][chems[j][0]] = 0
+            prior_con_dic_nonfish[regions[k][0]][phyto[0][0]] = {}
             for j in range(len(chems)):
-                prior_con_dic[regions[k][0]][fishs[i][0]][chems[j][0]] = 0
-        for i in range(len(zoops)):
-            prior_con_dic[regions[k][0]][zoops[i][0]] = {}
-            for j in range(len(chems)):
-                prior_con_dic[regions[k][0]][zoops[i][0]][chems[j][0]] = 0
-        prior_con_dic[regions[k][0]][phyto[0][0]] = {}
-        for j in range(len(chems)):
-            prior_con_dic[regions[k][0]][phyto[0][0]][chems[j][0]] = 0
-    return prior_con_dic
+                prior_con_dic_nonfish[regions[k][0]][phyto[0][0]][chems[j][0]] = 0
 
 
-def solve_zoop_phyto_time_period(region, chemicals, phytos, zoops, fishs, prior_chem_amounts, t):
+        prior_con_dic_nonfish_list.append(prior_con_dic_nonfish)
+
+    prior_con_dic_fish_list = [[[[0 for _ in range(len(chems))] for _ in range(draws)] for _ in range(len(fishs))] for _ in range(monte_carlo_length)]
+
+    return prior_con_dic_nonfish_list, prior_con_dic_fish_list
+
+
+def solve_zoop_phyto_invert_time_period(region, chemicals, phytos, zoops, fishs, prior_chem_amounts, days):
 
     new_chem_amounts = deepcopy(prior_chem_amounts)
 
@@ -404,7 +488,7 @@ def solve_zoop_phyto_time_period(region, chemicals, phytos, zoops, fishs, prior_
         # Phytos and zoops
         prior_C = prior_chem_amounts[region.name][phyto.name][chemicals[j].name]
         new_chem_amounts[region.name][phyto.name][chemicals[j].name] = phyto.solve_next_time_step(chemicals[j].Cwdo, j,
-                                                                                                  prior_C, t)
+                                                                                                  prior_C, days)
         for k in range(len(zoops)):
             prior_C = prior_chem_amounts[region.name][zoops[k].name][chemicals[j].name]
             phi = chemicals[j].phi
@@ -424,43 +508,271 @@ def solve_zoop_phyto_time_period(region, chemicals, phytos, zoops, fishs, prior_
             prior_C = prior_chem_amounts[region.name][fishs[i].name][chemicals[j].name]
             phi = chemicals[j].phi
             Cwdo = chemicals[j].Cwdo
-            Cwp = chemicals[i].Cwp
+            Cwp = chemicals[j].Cwp
             new_chem_amounts[region.name][fishs[i].name][chemicals[j].name] =\
-                fishs[i].solve_next_time_step(phi, j, Cwp, Cwdo, fishlog_new, fishlog_old, chemicals[j], prior_C)
+                fishs[i].solve_next_time_step(phi, j, Cwp, Cwdo, fishlog_new, fishlog_old, chemicals[j], prior_C, 0)
 
-    # print(new_chem_amounts['The Pond']['Pumpkinseed PC']['PCB52'], ', ')
     return new_chem_amounts
 
+def not_eating(predator):
 
-def bio_monte_carlo_loop(model_para, all_data, temp, reg_index, u_iter, v_iter, t, per_step=0, p_dic=None):
+    sum = 0
+    for i in range(len(predator.diet_frac)):
+        sum += predator.diet_frac[i][1]
 
-    p_dic_list = 0
-    # check if case is temporal and monte carlo
-    if type(p_dic) is list:
-        p_dic_list = 1
+    if sum == 0:
+        return True
+
+    return False
+
+def eats_fish(predator, non_fish_num, fish_names):
+    count = 0
+
+    for i in range(non_fish_num, len(predator.diet_frac)):
+        count += predator.diet_frac[i][1] == 0
+
+    if count > 0:
+        return True
+
+    return False
+
+
+def get_prey_con(predator, reg_index, len_chems, chem_names, fish_names, non_fish_num, locations, conc_fishs):
+
+    # There are no prior concentrations if fish doesn't eat
+    if not_eating(predator) == True:
+        return None
+
+    if eats_fish(predator,non_fish_num, fish_names) == False:
+        return None
+
+    # Otherwise find the populations in region previously and now and average there concentrations
     else:
-        prior_conc = p_dic
+        reg_check = 0
+        prior_conc_prey = {}
 
-    dictionaries = []
-    set_all_h_and_s(model_para, all_data)
+        #loop over prey
+        for i in range(len(predator.diet_frac)):
+            prey_chemicals = []
 
+            # if prey is being eaten, and is a fish
+            if predator.diet_frac[i][1] != 0 and predator.diet_frac[i][0] in fish_names:
+
+                # make prey section of dictionary
+                prior_conc_prey[predator.diet_frac[i][0]] = {}
+
+                fish_index = i - (non_fish_num)
+
+                # get prior prey locations
+                prior_prey_locations = locations[fish_index]
+
+                #loop over locations
+                for k in range(len(prior_prey_locations)):
+
+                    # if location is this region
+                    if prior_prey_locations[k] == reg_index:
+                        reg_check = 1
+                        old_concs = []
+                        #get chemicals from that region
+                        for j in range(len_chems):
+
+                            # make entry in dictionary
+                            prior_conc_prey[predator.diet_frac[i][0]][chem_names[j]] = 0
+
+                            #get prior chemicals
+                            old_concs.append(conc_fishs[fish_index][k][j])
+                        prey_chemicals.append(old_concs)
+
+            if len(prey_chemicals) != 0 :
+                prey_chemicals = np.asarray(prey_chemicals)
+                for j in range(len_chems):
+                    average_chemical_con = np.mean(prey_chemicals[:, j])
+                    prior_conc_prey[fish_names[fish_index]][chem_names[j]] = average_chemical_con
+
+        #print(prior_conc_prey)
+        if reg_check == 1:
+            return prior_conc_prey
+        else:
+            return None
+
+def solve_single_fish_single_region(region, chemicals, fish, days, prior_prey_cons, new_prey_cons, prior_C, out_check):
+
+    new_cons_by_chemical = []
+    for j in range(len(chemicals)):
+        prior_c = prior_C[j]
+        phi = chemicals[j].phi
+        Cwdo = chemicals[j].Cwdo
+        Cwp = chemicals[j].Cwp
+        new_con = fish.solve_next_time_step(phi, j, Cwp, Cwdo, new_prey_cons, prior_prey_cons, chemicals[j], prior_c, out_check) + prior_c
+        new_cons_by_chemical.append(new_con)
+    return new_cons_by_chemical
+
+def bio_monte_carlo_loop(model_para, all_data, t, time_per_step, old_fish_by_region ,fish_by_region, prior_locations, locations, stat_check, u_iter, v_iter, p_dic=None):
+
+    # renaming so the brain works
+    region_data = all_data[0]
+    temperatures = np.asarray(all_data[1])
+    temperatures = temperatures[: , t]
+    chem_data = all_data[2]
+    phyto_data = all_data[3]
+    zoop_data = all_data[4]
+    invert_data = all_data[5]
+    fish_data = all_data[6]
+    diet_data = all_data[7]
+    #print('diet data: ', diet_data)
+    f_names = [fish[0] for fish in fish_data]
+    # dictionaries will be appended to with the out come of very simulation in monte carlo
+    uv_results = [[],[]]
+    steady_state = []
+
+    # enter the monte carlo loops
     inner_count = 0
     u_count = 0
     while u_count < u_iter:
+
         u_count += 1
         v_count = 0
+
         while v_count < v_iter:
 
-            if p_dic_list == 1:
-                prior_conc = p_dic[inner_count]
 
-            concentration_log = single_bio_deterministic_iter(model_para, all_data, temp, reg_index, u_count,
-                                                              inner_count, t, per_step=per_step, p_dic=prior_conc)
-            v_count += 1
-            inner_count += 1
-            dictionaries.append(concentration_log)
+            if model_para[8] == 'NO':
+                # if there are distrubtions then we have many simulations per timestep so we need to get the correct
+                # prior concentrations dictionary for non_fish
+                prior_conc_nonfish = p_dic[0][inner_count]
+                new_concentrations_lower = deepcopy(prior_conc_nonfish)
+                # single_setup_bottom_web returns:
+                # - list of regions objects
+                # - 2d list chemicals objects by all regions
+                # - a phyto object
+                # - 2d list of zoop objects by all regions
+                # - 2d list of invert objects by all regions
 
-    return dictionaries
+                regions, r_chems, phytos, r_zoops, r_inverts = single_setup_bottom_web(region_data, temperatures, chem_data,
+                                                                                       phyto_data, zoop_data, invert_data,
+                                                                                       diet_data, u_count, v_count, time_per_step)
+
+                ############################################################################################################
+
+                # days that have passed used only for phyto cause we solve analytically
+                days = (t+1) * time_per_step
+                for i in range(len(regions)):
+                    new_concentrations_lower = solve_zoop_phyto_invert_time_period(regions[i], r_chems[i], phytos, r_zoops[i], r_inverts[i],
+                                                                             new_concentrations_lower, days)
+
+
+                p_dic[0][inner_count] = new_concentrations_lower
+                #################################### Bottom Feeds Done ######################################################
+
+                r_fish = [[] for _ in range(len(regions))]
+                r_tempfish = [[] for _ in range(len(regions))]
+                # start making the tempfish so that diet can work
+                for i in range(len(r_tempfish)):
+                    r_tempfish[i].append(phytos[0])
+                    for k in range(len(r_zoops[i])):
+                        r_tempfish[i].append(r_zoops[i][k])
+                    for p in range(len(r_inverts[i])):
+                        r_tempfish[i].append(r_inverts[i][p])
+
+                # loops over number of fish species... ie do all simulations for a single fish first
+                for i in range(len(all_data[6])):
+                    #loops over number of regions...do simulation for each region that fish is in
+                    for j in range(len(regions)):
+
+                        # #This if statement is don't bother doing simulation if fish isnt in region
+                        # if all_data[6][i][0] not in fish_by_region[j]:
+                        #     #if fish not in region at the time then concentration for that region is 0 for that timestep
+                        #     new_concentrations_higher[regions[j].name][all_data[6][i][0]] = 0
+
+                        #else:
+
+                         # The diet of the fish must be adjusted at this point to make sure that the fish doesn't
+                         # try to eat anything that isn't in the region
+                         # adj_fish_diet is the diet that is used for these iterations
+
+                         adj_fish_diet = spatial.adjust_diet_to_region(fish_data[i][0], j, diet_data,
+                                                                       fish_by_region, len(r_inverts[0]) + 2)
+
+                         #print(fish_data[i][0], regions[j].name, '\n', diet_data['BPumpkinseed'], adj_fish_diet, '\n',fish_by_region)
+                         # initates a single fish in a single region, before we know the foodweb of that region
+                         # returns tempfish so that we can by the end of this iteration know the food web, and solve for the
+                         # rest of fish that is foodweb dependent
+
+                         fish, tempfish = init_single_fish_pre_region(fish_data[i], regions[j], r_chems[j], adj_fish_diet
+                                                                      , u_count, v_count, time_per_step)
+
+                         r_fish[j].append(fish)
+                         r_tempfish[j].append(tempfish)
+
+
+                #now we can go back over each region, and solve things foodweb specific for that region
+                for i in range(len(r_fish)):
+                    for j in range(len(r_fish[i])):
+                        r_fish[i][j] = init_single_fish_post_region(r_fish[i][j], r_tempfish[i], regions[i], r_chems[i])
+
+
+                prior_conc_fishs = p_dic[1][inner_count]
+                new_concentrations_lower = p_dic[0][inner_count]
+                new_conc_fishs = deepcopy(prior_conc_fishs)
+                for i in range(len(fish_data)):
+                     for j in range(len(locations[i])):
+                         reg_index = locations[i][j]
+                         if reg_index != 1000:
+                            #print(fish_data[i][0], fish_by_region[reg_index], reg_index)
+                            if fish_data[i][0] in fish_by_region[reg_index]:
+                                prior_conc_fish_prey = get_prey_con(r_fish[reg_index][i], reg_index, len(chem_data), [chem[0] for chem in chem_data],f_names, 3 + len(invert_data), prior_locations, prior_conc_fishs)
+                                current_conc_fish_prey = get_prey_con(r_fish[reg_index][i], reg_index, len(chem_data), [chem[0] for chem in chem_data],f_names, 3 + len(invert_data), locations, new_conc_fishs)
+                                new_concentrations = [new_concentrations_lower[region_data[reg_index][0]], current_conc_fish_prey]
+                                prior_concentrations = [prior_conc_nonfish[region_data[reg_index][0]], prior_conc_fish_prey]
+                                this_fish_prior_con = prior_conc_fishs[i][j]
+                                calc_cons = solve_single_fish_single_region(regions[reg_index], r_chems[reg_index], r_fish[reg_index][i], time_per_step,
+                                                             prior_concentrations, new_concentrations, this_fish_prior_con, 0)
+
+                         else:
+                             reg_index = np.random.randint(0, len(regions))
+                             this_fish_prior_con = prior_conc_fishs[i][j]
+                             calc_cons = solve_single_fish_single_region(regions[reg_index], r_chems[reg_index], r_fish[reg_index][i], time_per_step,
+                                                             None, None, this_fish_prior_con, 1)
+
+                         new_conc_fishs[i][j] = calc_cons
+
+
+                uv_results[0].append(new_concentrations_lower)
+                uv_results[1].append(new_conc_fishs)
+                v_count += 1
+                inner_count += 1
+
+            if model_para[8] == 'YES':
+
+                temp = all_data[1][0]
+                reg_data = all_data[0]
+                chem_data = all_data[2]
+
+                regions = init_region(reg_data, temp, u_count, v_count)
+                chemicals = init_chems(chem_data, regions[0], 0, u_count, v_count)
+                phytos = init_phyto(all_data[3], chemicals, u_count, v_count)
+                zoops = init_zoop(all_data[4], regions[0], chemicals, phytos[0], u_count, v_count,)
+                inverts, tempinverts = init_fish_pre_region(invert_data, regions[0], chemicals, phytos[0], zoops,
+                                                            diet_data, u_count, v_count)
+                inverts = reorder_fish(inverts)
+                inverts = init_fish_post_region(inverts, tempinverts, regions[0], chemicals)
+                fishs, tempfishs = init_fish_pre_region(fish_data, regions[0], chemicals, phytos[0], zoops,
+                                                        diet_data, u_count, v_count)
+                fishs = reorder_fish(fishs)
+                fishs = init_fish_post_region(fishs, tempfishs, regions[0], chemicals)
+
+                conc_log = solve_steady(regions[0], chemicals, phytos, zoops, inverts, fishs)
+                steady_state.append(conc_log)
+
+                v_count += 1
+                inner_count += 1
+
+        #print('****** new uv loop')
+
+    if model_para[8] == 'YES':
+        return steady_state
+
+    return uv_results
 
 
 def pretty(d, indent=0):
@@ -485,37 +797,46 @@ def filter_stat_case(dictionaries):
     # if no statistical simulation
     if len(dictionaries) == 1:
 
-        print(dictionaries[0])
+        #print(dictionaries[0])
         return dictionaries[0]
 
     # if we ran bio monte carlo
     else:
         results_dic = pr.make_result_dist(dictionaries)
-        result_print(results_dic)
+        #result_print(results_dic)
         return results_dic
 
 
-def single_bio_deterministic_iter(model_para, all_data, temp, reg_index, u_count, v_count, t, per_step=0, p_dic=None):
+def single_setup_bottom_web(region_data, temperatures, chem_data, phyto_data, zoop_data, invert_data, diet_data, u_count, v_count, days_per_step):
+    #print(temperatures)
+    # return regions
+    regions = init_region(region_data, temperatures, u_count, v_count)
+    #print(regions)
 
-    reg_data = all_data[0]
-    chem_data = all_data[2]
+    # Dimensions of r_chems: regions by chemical
+    # Dimension of r_zoop and r_invert: regions by type of invert
+    r_chems = []
+    r_zoops = []
+    r_inverts = []
 
-    regions = init_region(reg_data, temp, u_count, v_count)
-    chemicals = init_chems(chem_data, regions[reg_index], reg_index, u_count, v_count)
-    phytos = init_phyto(all_data[3], chemicals, u_count, v_count, per_step=per_step)
-    zoops = init_zoop(all_data[4], regions[reg_index], chemicals, phytos[0], u_count, v_count, per_step=per_step)
-    fishs, tempfishs = init_fish_pre_region(all_data[5], regions[reg_index], chemicals, phytos[0], zoops, all_data[6],
-                                            u_count, v_count, per_step=per_step)
-    fishs = reorder_fish(fishs)
-    fishs = init_fish_post_region(fishs, tempfishs, regions[reg_index], chemicals)
 
-    if len(all_data[0]) == 1 and model_para[8] == 'YES':
+    # sets up all chemicals in all regions
+    for i in range(len(regions)):
+        chemicals = init_chems(chem_data, regions[i], i, u_count, v_count)
+        r_chems.append(chemicals)
 
-        conc_log = solve_steady(regions[0], chemicals, phytos, zoops, fishs)
-        return conc_log
 
-    if model_para[8] == 'NO':
+    phytos = init_phyto(phyto_data, r_chems[0], u_count, v_count, per_step=days_per_step)
 
-        new_concentrations = solve_zoop_phyto_time_period(regions[reg_index], chemicals, phytos, zoops, fishs, p_dic, t)
-        return new_concentrations
 
+    for i in range(len(regions)):
+        zoops = init_zoop(zoop_data, regions[i], r_chems[i], phytos[0], u_count, v_count, per_step=days_per_step)
+        r_zoops.append(zoops)
+
+        inverts, tempprey = init_fish_pre_region(invert_data, regions[i], r_chems[i], phytos[0], zoops, diet_data,
+                                                 u_count, v_count, per_step=days_per_step)
+        inverts = reorder_fish(inverts)
+        inverts = init_fish_post_region(inverts, tempprey, regions[i], r_chems[i])
+        r_inverts.append(inverts)
+
+    return regions, r_chems, phytos, r_zoops, r_inverts

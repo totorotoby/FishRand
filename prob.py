@@ -86,6 +86,7 @@ class ResultDist:
         self.chem = chemical
         self.animal = animal
         self.values = values
+        self.v_mean_std = [round(numpy.mean(values), 4), round(numpy.std(values), 4)]
         self.display = 4
         self.values.sort()
         self.init_guess = self.inital_guess()
@@ -221,7 +222,7 @@ class ResultDist:
         ax1[3].plot(x1, stats.gamma.pdf(x1, a=gamma_param[0], loc=gamma_param[1], scale=gamma_param[2]),
                     linewidth=2.0, color='g')
 
-    def plot_single(self, index):
+    def plot_single(self, temp_index):
 
         titles = ['CDF: With Normal Fit', 'CDF: With Log-Normal Fit', 'CDF: With Uniform Fit', 'CDF: With Gamma Fit']
         titles1 = ['PDF: With Normal Fit', 'PDF: With Log-Normal Fit', 'PDF: With Uniform Fit', 'PDF: With Gamma Fit']
@@ -230,56 +231,56 @@ class ResultDist:
 
         x1 = self.x1
         
-        best_param = self.cdfs[index][1]
+        temp_param = self.cdfs[temp_index][1]
 
         for i in range(len(ax)):
             ax[i].set_xlabel('(ng/g) of ' + self.chem + ' in ' + self.animal, size='large')
             
-        ax[0].title.set_text(titles1[index])
+        ax[0].title.set_text(titles1[temp_index])
         ax[0].set_ylabel('P(x)')
         ax[0].scatter(self.hist[1][:-1], self.hist[0], s=16)
         ax[0].set_ylim(min(self.hist[0]))
-        if len(best_param) == 2:
-            ax[0].plot(x1, self.pdfs[index](x1, scale=best_param[1], loc=best_param[0]), linewidth=2.0, color='g')
-        if len(best_param) == 3:
-            ax[0].plot(x1, self.pdfs[index](x1, best_param[0], loc=best_param[1], scale=best_param[2]),
+        if len(temp_param) == 2:
+            ax[0].plot(x1, self.pdfs[temp_index](x1, scale=temp_param[1], loc=temp_param[0]), linewidth=2.0, color='g')
+        if len(temp_param) == 3:
+            ax[0].plot(x1, self.pdfs[temp_index](x1, temp_param[0], loc=temp_param[1], scale=temp_param[2]),
                        linewidth=2.0, color='g')
 
-        ax[1].title.set_text(titles[index])
+        ax[1].title.set_text(titles[temp_index])
         ax[1].set_ylabel('P(X < x)')
         ax[1].plot(self.values, self.y, 'ro', color='r')
-        if len(best_param) == 2:
-            ax[1].plot(x1, self.cdf_list[index](x1, scale=best_param[1], loc=best_param[0]), linewidth=2.0, color='g')
-        if len(best_param) == 3:
-            ax[1].plot(x1, self.cdf_list[index](x1, best_param[0], loc=best_param[1], scale=best_param[2]),
+        if len(temp_param) == 2:
+            ax[1].plot(x1, self.cdf_list[temp_index](x1, scale=temp_param[1], loc=temp_param[0]), linewidth=2.0, color='g')
+        if len(temp_param) == 3:
+            ax[1].plot(x1, self.cdf_list[temp_index](x1, temp_param[0], loc=temp_param[1], scale=temp_param[2]),
                        linewidth=2.0, color='g')
 
-    def show(self):
+    def show(self, temp_index):
 
         if self.display == 0:
-            self.plot_pdf()
+            self.plot_cdf()
         elif self.display == 1:
-            self.plot_cdf()
+            self.plot_pdf()
         elif self.display == 2:
-            self.plot_single(self.index)
-        else:
             self.plot_pdf()
             self.plot_cdf()
+        else:
+            self.plot_single(temp_index)
         plt.show()
 
     def bestparam(self):
 
         params = []
         self.count += 1
-        string = str(self.animal) + ' ' + str(self.chem) + ' '
+        string = ''
         string += str(self.dist_types[self.index] + '(')
 
         for i in range(len(self.cdfs[self.index][1])-1):
             params.append(self.cdfs[self.index][1][i])
-            string += str(self.cdfs[self.index][1][i])
+            string += str("{0:.4f}".format(self.cdfs[self.index][1][i]))
             string += ', '
         params.append(self.cdfs[self.index][1][i+1])
-        string += str(self.cdfs[self.index][1][i+1])
+        string += str("{0:.4f}".format(self.cdfs[self.index][1][i+1]))
         string += ')'
         return [string, params]
 

@@ -2,9 +2,13 @@ from scipy.spatial import Voronoi, voronoi_plot_2d
 import numpy as np
 import matplotlib.pyplot as plt
 from shapely.geometry import Polygon, LineString
-
+from copy import deepcopy
 
 class HotSpot:
+
+    # Potential point of confusion:
+    # When hot spots are defined by fraction, these are fractions of regional areas
+    # NOT  what fraction of the hotspot is region x.
 
     def __init__(self, name, deftype, assos_fish, attraction, list):
 
@@ -12,40 +16,49 @@ class HotSpot:
         self.deftype = deftype
         self.fish = assos_fish
         self.attraction = attraction
-        self.defintion = list
+        self.definition = list
         self.parse_list()
         self.polygon = None
         self.weights = []
+        self.area = 0
 
     def parse_list(self):
 
         if self.deftype == 'Polygon':
 
-            for i in range(len(self.defintion)):
-                self.defintion[i] = [float(j) for j in self.defintion[i].replace(' ', '').split(',')]
+            for i in range(len(self.definition)):
+                self.definition[i] = [float(j) for j in self.definition[i].replace(' ', '').split(',')]
+
 
     def addpoly(self, polygon):
 
         self.polygon = polygon
 
     def calcweights(self, reg_polys):
-
-        for poly in reg_polys:
-            area_of_intersect = poly[1].intersection(self.polygon).area
-            self.weights.append([poly[0], area_of_intersect])
+        if self.deftype == 'Polygon':
+            for poly in reg_polys:
+                area_of_intersect = poly[1].intersection(self.polygon).area
+                self.weights.append([poly[0], area_of_intersect])
+        else:
+            for i in range(len(reg_polys)):
+                area_reg = reg_polys[i][1].area
+                frac_reg = self.definition[i]
+                part_area = area_reg*frac_reg
+                self.area += part_area
+                self.weights.append([reg_polys[i][0], part_area])
 
         weight_sum = sum(row[1] for row in self.weights)
 
         for i in range(len(self.weights)):
             unnormed_prob = self.weights[i][1]
-            self.weights[i][1] = unnormed_prob/weight_sum
+            self.weights[i][1] = unnormed_prob / weight_sum
 
     def get_chem_region(self):
 
         names = [row[0] for row in self.weights]
         prob = [row[1] for row in self.weights]
 
-        return np.random.choice(names, p=prob)
+        return np.random.choice([i for i in range(len(prob))], p=prob)
 
 
 
@@ -175,8 +188,10 @@ def plot_vor(vor, boundary, hotspots):
     plt.ylim(((y_min, y_max)))
 
     for hotspot in hotspots:
-        x_h, y_h = hotspot.polygon.exterior.xy
-        plt.plot(x_h, y_h, color='g', linewidth=3, solid_capstyle='round', zorder=2)
+        #print(hotspot.polygon)
+        if hotspot.polygon is not None:
+            x_h, y_h = hotspot.polygon.exterior.xy
+            plt.plot(x_h, y_h, color='g', linewidth=3, solid_capstyle='round', zorder=2)
     plt.show()
 
 
@@ -205,30 +220,48 @@ def setup(site_data):
     attract_poly = site_data[2]
     for hotspot in attract_poly:
         if hotspot.deftype == 'Polygon':
-            polygon = Polygon(hotspot.defintion)
+            polygon = Polygon(hotspot.definition)
             hotspot.addpoly(polygon)
+            hotspot.calcweights(reg_polygons)
+        else:
             hotspot.calcweights(reg_polygons)
 
 
     # Use to see regions
-    # plot_polygons(vor,reg_polygons,vertices, points)
-    # plot_vor(vor, boundary, attract_poly)
+    #plot_vor(vor, boundary, attract_poly)
 
     return boundary, reg_polygons, attract_poly
 
 # returns probability of being in each hotspot, and probability of being outside of hotspots
-def hotspot_prob(boundary, attraction_polys):
+def hotspot_prob(boundary, attraction_polys, regions):
 
     probs = []
 
-    outside = boundary
-    for poly in attraction_polys:
-        outside = outside.difference(poly.polygon)
-        probs.append(poly.polygon.area * poly.attraction)
+    if attraction_polys[0].deftype == 'Polygon':
+        outside = boundary
+        for poly in attraction_polys:
+            outside = outside.difference(poly.polygon)
+            attraction_factor = poly.attraction
+            probs.append(poly.polygon.area * attraction_factor)
 
-    probs.append(outside.area)
+        probs.append(outside.area)
+
+    else:
+        outside = 'Out'
+        bound_area = boundary.area
+        for poly in attraction_polys:
+            area = poly.area
+            probs.append(area * poly.attraction)
+
+        prob_outside = bound_area - sum(probs)
+        if prob_outside > 0:
+            probs.append(bound_area - sum(probs))
+        else:
+            probs.append(0)
+
     total_probs = sum(probs)
     probs[:] = [i / total_probs for i in probs]
+
 
     return probs, outside
 
@@ -236,31 +269,58 @@ def hotspot_prob(boundary, attraction_polys):
 def trim_regpoly(reg_poly, attraction_polys):
 
     trimmed = []
-    for reg in reg_poly:
-        trim = reg[1]
-        for hotspot in attraction_polys:
-            trim = trim.difference(hotspot.polygon)
-        trimmed.append(trim)
 
-    trimmed_area = [trim.area for trim in trimmed]
-    summed = sum(trimmed_area)
-    trimmed_prob = [area/summed for area in trimmed_area]
+    if attraction_polys[0].deftype == 'Polygon':
+
+        for reg in reg_poly:
+            trim = reg[1]
+            for hotspot in attraction_polys:
+                trim = trim.difference(hotspot.polygon)
+            trimmed.append(trim)
+
+        trimmed_area = [trim.area for trim in trimmed]
+
+        summed = sum(trimmed_area)
+        trimmed_prob = [area / summed for area in trimmed_area]
+
+    else:
+
+        trimmed_prob = []
+
+        for i in range(len(reg_poly)):
+            cur_area = reg_poly[i][1].area
+            total_area = reg_poly[i][1].area
+            for hotspot in attraction_polys:
+                frac_m = hotspot.definition[i]
+                cur_area -= (frac_m * total_area)
+            trimmed_prob.append(cur_area)
+
+        summed = sum(trimmed_prob)
+        trimmed_normed_prob = [area / summed for area in trimmed_prob]
+        trimmed_prob = trimmed_normed_prob
+
 
     return trimmed_prob
 
 # Returns array of locations give probabilities calculated from areas and attraction factors
-def get_location(boundary, reg_poly, attraction_polys, fish, fish_num):
+def location_step(boundary, reg_poly, attraction_polys, fish, draw_num):
 
     fish_spec_polys = []
 
     for poly in attraction_polys:
         if poly.fish == fish:
             fish_spec_polys.append(poly)
-
-    probs, outside = hotspot_prob(boundary, fish_spec_polys)
+    probs, outside = hotspot_prob(boundary, fish_spec_polys, reg_poly)
 
     outside_reg_prob = trim_regpoly(reg_poly, attraction_polys)
-    in_region = np.random.choice(fish_spec_polys + [outside], size=fish_num, p=probs)
+
+
+    return fish_spec_polys + [outside], probs, [ i for i in range(len(reg_poly))], outside_reg_prob
+
+
+def new_draw(hotspotnames, probs, regnames, outside_reg_prob, draw_num):
+
+    in_region = np.random.choice(hotspotnames, size=draw_num, p=probs)
 
     locations = []
     for region in in_region:
@@ -268,8 +328,27 @@ def get_location(boundary, reg_poly, attraction_polys, fish, fish_num):
         if type(region) == HotSpot:
             locations.append(region.get_chem_region())
 
-        if type(region) == Polygon:
-            locations.append(np.random.choice([row[0] for row in reg_poly], p=outside_reg_prob))
-
+        if type(region) == Polygon or region == 'Out':
+            locations.append(np.random.choice(regnames, p=outside_reg_prob))
 
     return locations
+
+
+def adjust_diet_to_region(fishname, fish_loc, diet_data, fish_by_region, number_others):
+
+    new_diet = deepcopy(diet_data[fishname])
+
+    fish_in_region = fish_by_region[fish_loc]
+    for i in range(number_others + 1, len(new_diet)):
+        if new_diet[i][0] not in fish_in_region:
+            new_diet[i][1] = 0
+
+
+    fracs = [row[1] for row in new_diet]
+    sum_frac = sum(fracs)
+
+    if sum_frac != 0:
+        for entry in new_diet:
+            entry[1] = entry[1]/sum_frac
+
+    return new_diet

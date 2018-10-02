@@ -1,4 +1,5 @@
 import math
+import Bioaccum
 
 class Zooplank:
 
@@ -77,7 +78,7 @@ class Zooplank:
 
     def calc_kg(self, T):
 
-        if T < 15:
+        if T <= 15:
             self.Kg = .0005 * math.pow(self.Wb, -.2)
         if T > 15:
             self.Kg = .00251 * math.pow(self.Wb, -.2)
@@ -188,7 +189,7 @@ class Zooplank:
 # noinspection PyMethodOverriding,PyMethodOverriding
 class Fish(Zooplank):
 
-    def __init__(self, name, weight, vlb, diet_data, flag, num_chemicals, per_step,vnb=.2, e_l=.75, e_n=.75, e_w=.5):
+    def __init__(self, name, weight, vlb, diet_data, flag, num_chemicals, per_step, vnb=.2, e_l=.75, e_n=.75, e_w=.5):
         Zooplank.__init__(self, name, weight, vlb, flag, num_chemicals, per_step, vnb, e_l, e_n, e_w)
         self.diet_frac = diet_data
         self.Vndc = 0  # nonlip fraction of diet from dirt
@@ -304,37 +305,72 @@ class Fish(Zooplank):
 
         return (f_num + l_num)/denom
 
-    def solve_next_time_step(self, phi, chem_index, Cwp, Cwds, fishlog_new, fishlog_old, chemical, pre_step):
+    def solve_next_time_step(self, phi, chem_index, Cwp, Cwds, fishlog_new, fishlog_old, chemical, pre_step, out_check):
 
-        k = self.k_2[chem_index] + self.k_e[chem_index]
+        if out_check == 0:
 
-        q1 = (self.k_1[chem_index] * self.Mo * Cwds) + (self.k_1[chem_index] * self.Mp * Cwp)
+            k = self.k_2[chem_index] + self.k_e[chem_index]
 
-        q2 = 0
+            q1 = (self.k_1[chem_index] * self.Mo * Cwds) + (self.k_1[chem_index] * self.Mp * Cwp)
 
-        for j in range(len(self.diet_frac)):
+            q2 = 0
 
-            if self.diet_frac[j][1] > 0:
+            if Bioaccum.not_eating(self) == True:
 
-                if self.diet_frac[j][0] == 'Sediment/Detritus':
+                q2 = 0
 
-                    concentration = chemical.Cs
-                    q2 += (self.diet_frac[j][1]*concentration)
 
-                else:
-                    old_conc = fishlog_old[self.diet_frac[j][0]][chemical.name]
-                    new_conc = fishlog_new[self.diet_frac[j][0]][chemical.name]
-                    concentration = (old_conc + new_conc)/2
-                    q2 += (self.diet_frac[j][1]*concentration)
+            else:
+                for j in range(len(self.diet_frac)):
 
-        q2 = q2 * self.k_d[chem_index]
+                    if self.diet_frac[j][1] > 0:
 
-        q = q1 + q2
-        top = (pre_step * ((1 / self.days_per_step) - (k / 2)) + q)
-        bottom = (1 / self.days_per_step) + (k / 2)
-        # print('Fish:\n','q: ', q, 'k: ', k, 'concentration: ', top/bottom)
+                        if self.diet_frac[j][0] == 'Sediment/Detritus':
 
-        return top/bottom
+                            concentration = chemical.Cs
+                            q2 += (self.diet_frac[j][1]*concentration)
+
+                        else:
+                            if type(fishlog_old) == list:
+                                #print('scale prior prey in classes in loop:', fishlog_old[1])
+                                try:
+                                    old_conc = fishlog_old[0][self.diet_frac[j][0]][chemical.name]
+                                    new_conc = fishlog_new[0][self.diet_frac[j][0]][chemical.name]
+
+                                except:
+                                    if fishlog_old[1] == None:
+                                        old_conc = 0
+                                    else:
+                                        old_conc = fishlog_old[1][self.diet_frac[j][0]][chemical.name]
+                                    new_conc = fishlog_new[1][self.diet_frac[j][0]][chemical.name]
+                            else:
+                                old_conc = fishlog_old[self.diet_frac[j][0]][chemical.name]
+                                new_conc = fishlog_new[self.diet_frac[j][0]][chemical.name]
+
+                            if old_conc == 0:
+                                concentration = new_conc
+                            else:
+                                concentration = (old_conc + new_conc)/2
+                            q2 += (self.diet_frac[j][1]*concentration)
+
+            q2 = q2 * self.k_d[chem_index]
+
+
+            q = q1 + q2
+            #print('prestep? ', pre_step)
+            top = (pre_step * ((1 / self.days_per_step) - (k / 2)) + q)
+            bottom = (1 / self.days_per_step) + (k / 2)
+            # print('Fish:\n','q: ', q, 'k: ', k, 'concentration: ', top/bottom)
+            change = ((top/bottom) - pre_step)
+
+        # outside of pond so only take the subtraction part
+        else:
+            if pre_step == 0:
+                change = 0
+            else:
+                change = (self.k_2[chem_index] + self.k_e[chem_index]) * pre_step
+
+        return change
 
 
 class Pplank:
@@ -416,13 +452,8 @@ class Pplank:
 
         analytic = (q/k) + math.exp(-k*t) * (0-(q/k))
 
-        # print(analytic)
-
         top = (pre_step * ((1/self.days_per_step)-(k/2))+ q)
         bottom = (1/self.days_per_step) + (k/2)
-
-        # print(top / bottom, ',')
-        # print('Phyto: \n', 'q: ', q, 'k: ', k, 'concentration: ', top / bottom, 'previous step: ', pre_step, '\n\n')
 
         return analytic
 
