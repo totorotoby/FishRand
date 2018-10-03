@@ -6,7 +6,7 @@ import Time_parser
 import numpy as np
 from spatial import HotSpot
 
-
+#TODO Fix output parameters
 
 # Reads in all data from spread sheets
 

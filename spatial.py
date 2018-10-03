@@ -61,7 +61,6 @@ class HotSpot:
         return np.random.choice([i for i in range(len(prob))], p=prob)
 
 
-
 # From Sergii Nechuiviter https://gist.github.com/Sklavit/e05f0b61cb12ac781c93442fbea4fb55
 def voronoi_finite_polygons_2d(vor, radius=None):
 

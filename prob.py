@@ -193,6 +193,8 @@ class ResultDist:
         ax[2].plot(x1, stats.uniform.cdf(x1, scale=uniform_param[1], loc=uniform_param[0]), linewidth=2.0, color='g')
         ax[3].plot(x1, stats.gamma.cdf(x1, a=gamma_param[0], loc=gamma_param[1], scale=gamma_param[2]),
                    linewidth=2.0, color='g')
+
+        fig.tight_layout()
         
     def plot_pdf(self):
 
@@ -221,6 +223,8 @@ class ResultDist:
         ax1[2].plot(x1, stats.uniform.pdf(x1, scale=uniform_param[1], loc=uniform_param[0]), linewidth=2.0, color='g')
         ax1[3].plot(x1, stats.gamma.pdf(x1, a=gamma_param[0], loc=gamma_param[1], scale=gamma_param[2]),
                     linewidth=2.0, color='g')
+
+        fig1.tight_layout()
 
     def plot_single(self, temp_index):
 
@@ -254,6 +258,8 @@ class ResultDist:
         if len(temp_param) == 3:
             ax[1].plot(x1, self.cdf_list[temp_index](x1, temp_param[0], loc=temp_param[1], scale=temp_param[2]),
                        linewidth=2.0, color='g')
+
+        fig.tight_layout()
 
     def show(self, temp_index):
 

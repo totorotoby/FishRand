@@ -29,11 +29,12 @@ class app(tk.Frame):
 
     def add_widg(self):
         ###Top Labels###
-        tk.Label(self, text="Input:", font=("Times New Roman", 18), height= 2).grid(row=2,column=0, columnspan=1)
-        tk.Label(self, text="View Distributions", font=("Times New Roman", 18), height= 2).grid(row=2,column=2, columnspan=1, sticky=tk.W)
-        tk.Label(self, text="Save Results", font=("Times New Roman", 18), height= 2).grid(row=2,column=5, columnspan=1, sticky=tk.W)
-        ttk.Separator(self, orient="horizontal").grid(row=1, column=0, columnspan=8, sticky= 'ew')
+        tk.Label(self, text="Input:", font=("Times New Roman", 18), height= 2).grid(row=4,column=0, columnspan=1)
+        tk.Label(self, text="View Distributions", font=("Times New Roman", 18), height= 2).grid(row=4,column=2, columnspan=1, sticky=tk.W)
+        tk.Label(self, text= "Other Info", font=("Times New Roman", 18), height=2).grid(row=0, column=2, columnspan=1, sticky=tk.SW)
+        tk.Label(self, text="Save Results", font=("Times New Roman", 18), height= 2).grid(row=4,column=5, columnspan=1, sticky=tk.W)
         ttk.Separator(self, orient="horizontal").grid(row=3, column=0, columnspan=8, sticky= 'ew')
+        ttk.Separator(self, orient="horizontal").grid(row=5, column=0, columnspan=8, sticky= 'ew')
 
         ###getting reference to region animal chemical###
 
@@ -44,12 +45,12 @@ class app(tk.Frame):
         chemicals = ["None"]
         options = [time, 0, fishs, 0,chemicals]
 
-        for i in range (3,9,2):
+        for i in range (5,11,2):
 
-            tk.Label(self, text=ident[i-3]).grid(row=i+1, column=2, sticky=tk.W)
+            tk.Label(self, text=ident[i-5]).grid(row=i+1, column=2, sticky=tk.W)
             optvar = tk.StringVar(self)
             optvar.set("None")
-            opt = tk.OptionMenu(self, optvar, *options[i-3])
+            opt = tk.OptionMenu(self, optvar, *options[i-5])
             opt.grid(row=i+2, column=2, sticky=tk.W)
             self.viewdict.append(opt)
             self.dictvars.append(optvar)
@@ -57,11 +58,11 @@ class app(tk.Frame):
             
         ###choosing what graphs to view###
         
-        tk.Label(self, text="Graph Options:").grid(column=3,row=4, sticky=tk.W)
+        tk.Label(self, text="Graph Options:").grid(column=3,row=6, sticky=tk.W)
         options = [("CDFs with all fits", 0), ("PDFs with all fits", 1),
                    ("Both with all fits", 2), ("CDF and PDF of selected fit:", 3)
                    ]
-        count = 4
+        count = 6
         self.viewopt = tk.IntVar()
         for text, option in options:
             button = tk.Radiobutton(self, text=text, variable=self.viewopt, value=option)
@@ -69,33 +70,40 @@ class app(tk.Frame):
             count +=1
 
         self.optvar1 = tk.StringVar(self)
-        self.optvar1.set("None")
-        tk.OptionMenu(self, self.optvar1, "Normal", 'Lognormal', 'Uniform', 'Gamma').grid(row=8, column=3, sticky=tk.E)
-        tk.Button(self, text="Show Distributions", command=self.show_dist).grid(row=9, column=3, sticky=tk.SW)
-        tk.Button(self, text="Show Time Graph", command=self.show_time_graph).grid(row=10, column=3, sticky=tk.SW)
+        self.optvar1.set("Normal")
+        tk.OptionMenu(self, self.optvar1, "Normal", 'Lognormal', 'Uniform', 'Gamma').grid(row=10, column=3, sticky=tk.E)
+        tk.Button(self, text="Show Distributions", command=self.show_dist).grid(row=11, column=3, sticky=tk.SW)
+        tk.Button(self, text="Show Time Graph", command=self.show_time_graph).grid(row=12, column=3, sticky=tk.SW)
 
         
-        ttk.Separator(self,orient=tk.VERTICAL).grid(row=1, column=1 , rowspan=10, sticky='ns')
-        ttk.Separator(self, orient=tk.VERTICAL).grid(row=1, column=4 , rowspan=10, sticky='ns')
+        ttk.Separator(self,orient=tk.VERTICAL).grid(row=3, column=1 , rowspan=10, sticky='ns')
+        ttk.Separator(self, orient=tk.VERTICAL).grid(row=3, column=4 , rowspan=10, sticky='ns')
+
+
+        ###Other info####
+
+        tk.Button(self, text='Show Regions', command=self.show_regions).grid(row=1, column=2, columnspan=1, sticky=tk.NW)
+        tk.Button(self, text='Show Foodweb').grid(row=2, column=2, columnspan=1, sticky=tk.NW)
+
 
         ###saving data###
         
-        tk.Label(self, text="Timesteps to Save and Display:").grid(column=0,row=6, padx=20)
+        tk.Label(self, text="Timesteps to Save and Display:").grid(column=0,row=8, padx=20)
         self.timeentry = tk.Entry(self)
-        self.timeentry.grid(column=0,row=7, padx=20, pady=2)
-        tk.Label(self, text="Filename:").grid(column=5, row=4, padx=20, pady=2)
+        self.timeentry.grid(column=0,row=9, padx=20, pady=2)
+        tk.Label(self, text="Filename:").grid(column=5, row=6, padx=20, pady=2)
         self.filenameentry = tk.Entry(self)
-        self.filenameentry.grid(column=5,row=5, padx=20,pady=2)
+        self.filenameentry.grid(column=5,row=7, padx=20,pady=2)
         direcbutton = tk.Button(self, text="Choose Directory", command=self.askdirectory, width = 18)
-        direcbutton.grid(column=5,row=6,padx=20,pady=2)
+        direcbutton.grid(column=5,row=8,padx=20,pady=2)
         savebutton = tk.Button(self, text="Save", command=self.save_to_excel, width=18)
-        savebutton.grid(column=5, row=7, padx=20,pady=2)
+        savebutton.grid(column=5, row=9, padx=20,pady=2)
 
         ###inputs###
 
         inputbutton = tk.Button(self, text="Choose File", command=self.askfile, width=18)
-        inputbutton.grid(column=0, row=5)
-        tk.Button(self, text="Run", command=self.run_model).grid(column=0, row=8)
+        inputbutton.grid(column=0, row=7)
+        tk.Button(self, text="Run", command=self.run_model).grid(column=0, row=10)
 
 
          ###Fish Image###                                                                                                                         
@@ -144,6 +152,9 @@ class app(tk.Frame):
                 self.stat_check = self.output[2]
                 self.region_areas = self.output[3]
                 self.graph_data = self.output[4]
+                self.timescale = self.output[5]
+                self.region_info = self.output[6]
+
 
             ########### TO SET UP INDIVDUAL GRAPHS ###########################
 
@@ -257,16 +268,53 @@ class app(tk.Frame):
                 ax.annotate(str(count), xy=(time, mean_std[0]), xytext=(time, max(y_plot) + (max(y_plot)*.05)))
                 count += 1
 
-            blue_line  = matplotlib.lines.Line2D([], [], color='blue', label='Best Fit Distribution of Timestep')
+            blue_line  = matplotlib.lines.Line2D([], [], color='blue', label='Distrubtion of Best Fit during Timestep')
             blue_dot = matplotlib.lines.Line2D([], [], color='blue', marker = 'o', linestyle = 'None', label='Mean of Samples during Timestep')
 
             ax.legend(handles = [blue_line, blue_dot])
-            ax.set_xlabel('timesteps')
-            ax.set_ylabel('Concentration')
+            ax.set_xlabel('Timesteps (' + self.timescale + ')')
+            ax.set_ylabel('Concentration of ' + chemical + ' in ' + fish + ' (ng/g)')
+            ax.set_title('Distrubtions of Best Fit over Time')
+            fig.tight_layout()
             plt.show()
 
         else:
             print('There is no time graph for steady state.')
+
+
+    def show_regions(self):
+
+        b_xy = self.region_info[0].exterior.xy
+
+        reg_xys = []
+        rep_point = []
+        for reg in self.region_info[1]:
+            rep_point.append(reg[1].centroid.coords)
+            reg_xys.append(reg[1].exterior.xy)
+
+        hotspot_xys=[]
+        hotspot_point = []
+        for hotspot in self.region_info[2]:
+            hotspot_point.append(hotspot.polygon.centroid.coords)
+            hotspot_xys.append(hotspot.polygon.exterior.xy)
+
+        fig = plt.figure(1)
+        ax = fig.add_subplot(111)
+        ax.plot(b_xy[0], b_xy[1],color='#6699cc', alpha=0.7, linewidth=3, solid_capstyle='round', zorder=2)
+        count = 0
+        for pair in reg_xys:
+            ax.plot(pair[0], pair[1],color='#6699cc', alpha=0.7, linewidth=3, solid_capstyle='round', zorder=2)
+            ax.annotate(self.region_info[1][count][0],  xy=(rep_point[count][0][0],rep_point[count][0][1]), xytext=(rep_point[count][0][0],rep_point[count][0][1]), ha='center')
+            count += 1
+
+        count = 0
+        for pair in hotspot_xys:
+            ax.plot(pair[0], pair[1], color='green', alpha=0.7, linewidth=3, solid_capstyle='round', zorder=2)
+            ax.annotate(self.region_info[2][count].name, xy=(hotspot_point[count][0][0], hotspot_point[count][0][1]), xytext=(hotspot_point[count][0][0], hotspot_point[count][0][1]), ha='center')
+            count += 1
+
+        fig.tight_layout()
+        plt.show()
 
 
     def save_to_excel(self):

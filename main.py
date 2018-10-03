@@ -227,7 +227,7 @@ def filter_cases(filename, stops, output_name):
             # • getting number of draws per fish per timestep from the input
             # • Making the prior concentrations dictionary for all the animals
 
-        boundary, regions, hotspots = spatial.setup(site_data)
+        boundary, regions, hotspots= spatial.setup(site_data)
         region_areas = [region[1].area for region in regions]
         loc_setups, f_names = loc_setup(all_data[6], boundary, regions, hotspots, site_data[3])
         draws = site_data[3]
@@ -291,7 +291,7 @@ def filter_cases(filename, stops, output_name):
 
     if model_para[8] == 'NO':
 
-        return [model_para[8], writing_info, stat_check, region_areas, graph_data]
+        return [model_para[8], writing_info, stat_check, region_areas, graph_data, model_para[6], [boundary,regions,hotspots]]
 
     ################### TIME GRAPHING OPTION ###############################
 
