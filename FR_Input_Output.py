@@ -1,9 +1,9 @@
 import xlrd, xlsxwriter
-import datetime
-#import Classes as cs
+import networkx as nx
 import prob as pr
 import Time_parser
 import numpy as np
+from matplotlib import pyplot as plt
 from spatial import HotSpot
 
 #TODO Fix output parameters
@@ -25,7 +25,7 @@ def convert_to_lists(filename):
     para_col = model_sheet.col(1)
 
     get_model_para(para_col, model_para)
-    #print(model_para)
+
     reg_sheet = all_sheets.sheet_by_index(1)
 
     entry_col = reg_sheet.col(1)
@@ -77,6 +77,8 @@ def convert_to_lists(filename):
     entrysize = len(fish_data) + len(invert_data) + 5
     diet_sheet = all_sheets.sheet_by_index(5)
     get_diet_data(diet_sheet, diet_data, entrysize)
+    #Used to visualize foodweb
+    foodweb_graph = foodweb_to_network_struc(diet_data)
 
     mig_data = {}
     mig_sheet = all_sheets.sheet_by_index(6)
@@ -87,7 +89,7 @@ def convert_to_lists(filename):
 
     total = [region_data, temp_data, chem_data, phyto_data, zoop_data, invert_data, fish_data, diet_data, mig_data]
 
-    return model_para, total, num_timestep, time_per_step, sites_data
+    return model_para, total, num_timestep, time_per_step, sites_data, foodweb_graph
 
 
 def get_model_para(para_col, model_para):
@@ -145,7 +147,6 @@ def data_get_helper(preentry, dist, new_entry):
     dist_par = dist.value
     if entry == '' and type(dist_par) == str and dist_par != '':
         print('You must specify a distribution where you provide ' + dist_par)
-        exit(0)
     elif type(entry) == float and dist_par == '':
         new_entry.append(entry)
     elif type(dist_par) == str and entry != '':
@@ -159,7 +160,6 @@ def data_get_helper(preentry, dist, new_entry):
             dist_par = [float(i) for i in dist_par]
         except ValueError:
             print('In ' + str(new_entry[0]) + ', ' + str(list(dist_par)) + ' something is wrong with format.')
-            exit(0)
 
         to_add = pr.Var(ty, dist_name, dist_par)
         new_entry.append(to_add)
@@ -218,6 +218,31 @@ def get_mig_data(mig_data, mig_sheet):
         mig_data[row[0].value] = [row[i].value for i in range(1, len(row))]
 
 
+def foodweb_to_network_struc(foodweb):
+
+    network_struc = {}
+    nodes = [entry for entry in list(foodweb.values())[0]]
+
+    for node in nodes:
+            network_struc[node[0]] = []
+    # for key in network_struc.keys():
+    #     for node in nodes:
+    #         network_struc[key][node[0]] = 0
+
+    no_eat = ['Sediment/Detritus', 'Zooplankton', 'Phytoplankton']
+    network_struc['Zooplankton'].append('Phytoplankton')
+    for predator, prey in network_struc.items():
+        if predator not in no_eat:
+            lookup = foodweb[predator]
+            for entry in lookup:
+                if entry[1] != 0:
+                    prey.append(entry[0])
+
+
+    foodweb_graph = nx.DiGraph(network_struc)
+
+    return foodweb_graph
+
 def get_sites_data(sites_sheet):
 
     boundary = []
@@ -258,14 +283,16 @@ def get_sites_data(sites_sheet):
     return [boundary, sites, hotspots, draws]
 
 
-def write_output_steady(total_cons, output_name, stop):
-    #print(total_cons, output_name, stop)
+def write_output_steady(total_cons, output_name, stop, dist_type):
+
+
+    types = ["Normal", 'Lognormal', 'Uniform', 'Gamma', "KS Best"]
+    index = types.index(dist_type)
+
     workbook = xlsxwriter.Workbook(output_name)
     bold = workbook.add_format({'bold': True})
     sheet = workbook.add_worksheet(stop)
 
-    # becasue non-statistical
-    total_cons = total_cons[0]
     org_list = []
     for region, animals in total_cons.items():
 
@@ -284,17 +311,17 @@ def write_output_steady(total_cons, output_name, stop):
     for i in range(org_len):
         sheet.write(i+1, 0, org_list[i])
 
-    # if nonstatstical
-    if type(chem_list[0][1]) == np.float64:
-        for i in range(org_len):
-            for j in range(chem_len):
-                sheet.write(i+1,j+1, total_cons[region][org_list[i]][chem_list[j][0]])
 
     # if statstical
     if type(chem_list[0][1]) == pr.ResultDist:
         for i in range(org_len):
             for j in range(chem_len):
-                sheet.write(i + 1, j + 1, total_cons[region][org_list[i]][chem_list[j][0]].best_para[0])
+                if index != 4:
+                    total_cons[region][org_list[i]][chem_list[j][0]].index = index
+                    to_print = total_cons[region][org_list[i]][chem_list[j][0]].bestparam()
+                    sheet.write(i + 1, j + 1, to_print[0])
+                else:
+                    sheet.write(i + 1, j + 1, total_cons[region][org_list[i]][chem_list[j][0]].best_para[0])
 
         sheet.write(org_len + 1, 0, 'Unfitted Mean and Std of Simulations', bold)
         for k in range(org_len):
@@ -302,9 +329,19 @@ def write_output_steady(total_cons, output_name, stop):
                 sheet.write(org_len+(k+2),0,org_list[k])
                 sheet.write(org_len+(k+2), j+1, str(total_cons[region][org_list[k]][chem_list[j][0]].v_mean_std))
 
+    # if nonstatstical
+    else:
+        for i in range(org_len):
+            for j in range(chem_len):
+                sheet.write(i+1,j+1, total_cons[region][org_list[i]][chem_list[j][0]])
 
 
-def write_temporal_excel(array, output_name, stops, stat_flag, regional_areas):
+
+def write_temporal_excel(array, output_name, stops, stat_flag, regional_areas, dist_type):
+
+    types = ["Normal", 'Lognormal', 'Uniform', 'Gamma', "KS Best"]
+    index = types.index(dist_type)
+
 
     workbook = xlsxwriter.Workbook(output_name)
     bold = workbook.add_format({'bold': True})
@@ -320,7 +357,7 @@ def write_temporal_excel(array, output_name, stops, stat_flag, regional_areas):
         for animal, chems in array[0][2].items():
             upper_org_list.append(animal)
         chem_list = list(list(array[0][1].values())[0].keys())
-        #print(array[0][0])
+
         reg_list =list(array[0][0][0].keys())
         #write down region which is dic
 
@@ -350,7 +387,7 @@ def write_temporal_excel(array, output_name, stops, stat_flag, regional_areas):
                     for k in range(len(chem_list)):
                         #if
                         sheet.write(count1 + 2 + (i + j) + (len(lower_non_avg) * i), k+1, lower_non_avg[reg_list[i]][lower_org_list[j]][chem_list[k]])
-                        #print()
+
 
 
             sheet.write(0, len(chem_list) + 1, 'Lower Food Web Concentrations Average Concentrations Weighted by Regional Area', big)
@@ -403,9 +440,13 @@ def write_temporal_excel(array, output_name, stops, stat_flag, regional_areas):
                 count1 += 1
                 for j in range(len(lower_org_list)):
                     for k in range(len(chem_list)):
-                        # if
-                        sheet.write(count1 + 2 + (i + j) + (len(lower_dists) * i), k + 1,
-                                    lower_dists[reg_list[i]][lower_org_list[j]][chem_list[k]].best_para[0])
+                        if index != 4:
+                            lower_dists[reg_list[i]][lower_org_list[j]][chem_list[k]].index = index
+                            toprint = lower_dists[reg_list[i]][lower_org_list[j]][chem_list[k]].bestparam()
+                            sheet.write(count1 + 2 + (i + j) + (len(lower_dists) * i), k + 1, toprint[0])
+                        else:
+                            sheet.write(count1 + 2 + (i + j) + (len(lower_dists) * i), k + 1,
+                                        lower_dists[reg_list[i]][lower_org_list[j]][chem_list[k]].best_para[0])
 
             sheet.write(0, len(chem_list) + 1, 'Lower Food Web Mean Concentrations Weighted by Regional Area', big)
             sheet.write(1, len(chem_list) + 1, 'All Regions', bold)
@@ -428,7 +469,12 @@ def write_temporal_excel(array, output_name, stops, stat_flag, regional_areas):
             for i in range(len(upper_org_list)):
                 sheet.write(count + 1 + i, 0,upper_org_list[i])
                 for j in range(len(chem_list)):
-                    sheet.write(count + 1 + i, j+1, upper_dists[upper_org_list[i]][chem_list[j]].best_para[0])
+                    if index != 4:
+                        upper_dists[upper_org_list[i]][chem_list[j]].index = index
+                        toprint = upper_dists[upper_org_list[i]][chem_list[j]].bestparam()
+                        sheet.write(count + 1 + i, j+1, toprint[0])
+                    else:
+                        sheet.write(count + 1 + i, j + 1, upper_dists[upper_org_list[i]][chem_list[j]].best_para[0])
 
             sheet.write(count, 1 + len(chem_list), 'Upper Food Web Concentrations (Mean and standard Deviation of Samples)', big)
 
@@ -443,52 +489,4 @@ def write_temporal_excel(array, output_name, stops, stat_flag, regional_areas):
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+convert_to_lists('/Users/toby/Desktop/FishRand/sheets/input/tests/testy_test.xlsx')

@@ -60,7 +60,6 @@ class Var:
         else:
             print(self.dist)
             print('There is a unknown distribution called ', '\'' + self.dist + '\'')
-            exit(0)
 
 
 class Loguniform:
@@ -324,11 +323,9 @@ def lognorm_to_scipyinput(M_y,Sig_y):
     scale = math.exp(m_x)
 
     sigma2 = -2 * math.log(M_y) + math.log(math.pow(Sig_y, 2) + math.pow(M_y, 2))
-    try:
-        s = math.sqrt(sigma2)
-    except:
-        print('normal to log normal bug', sigma2, M_y, Sig_y)
-        exit(0)
+
+    s = math.sqrt(sigma2)
+
 
     return s, scale
 

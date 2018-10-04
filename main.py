@@ -9,23 +9,6 @@ from matplotlib import pyplot as plt
 # TODO talk to phil about running without sedimate concentrations
 # TODO Make min and max on Normal
 
-def install_package(package):
-    import importlib
-    try:
-        importlib.import_module(package)
-    except ImportError:
-        import pip
-        pip.main(['install', package])
-
-
-def install():
-
-    install_package('pyDOE')
-    install_package('numpy')
-    install_package('scipy')
-    install_package('tkinter')
-    install_package('shapely')
-    install_package('matplotlib')
 
 def loc_setup(fishs, boundary, regions, hotspots, draw_num):
 
@@ -67,7 +50,6 @@ def get_locs_matrix(loc_setups, draws, mig_data, timestep):
 
 def get_fish_dic(fish_cons, lower_cons, chem_name, fish_name, region_areas):
 
-    print('\nNEW TIME STEP\n')
     fish_dic = {}
     lower_avg_dic = copy.deepcopy(list(lower_cons[0].items())[0][1])
     if len(fish_cons) == 1:
@@ -128,16 +110,13 @@ def graph_by_time(data, fish_name, chem_name, time_interval):
     values = []
     times = [i for i in range(time_steps)]
     for i in range(len(data)):
-        try:
-            con_at_t = data[i][1][fish_name][chem_name]
-        except:
-            con_at_t = data[i][2][fish_name][chem_name]
+        con_at_t = data[i][fish_name][chem_name]
         values.append(con_at_t)
 
     plt.plot(times, values, 'ro', )
     plt.xlabel('Timesteps (' + time_interval + ')')
     plt.ylabel('Concentration of ' + chem_name + ' in ' + fish_name + ' (ng/g)')
-    #plt.show()
+    plt.show()
 
 
 def get_fish_in_region(locations, fish_names, reg_len):
@@ -196,7 +175,7 @@ def niceprint(prior_total_cons, locations):
 # are we solving steady state on single region, solving with time on single region, or time on multiple regions
 def filter_cases(filename, stops, output_name):
 
-    model_para, all_data, time_steps, time_per_step, site_data = FR_Input_Output.convert_to_lists(filename)
+    model_para, all_data, time_steps, time_per_step, site_data, foodweb_graph = FR_Input_Output.convert_to_lists(filename)
     # set up for
     u_iter = int(model_para[0])
     v_iter = int(model_para[1])
@@ -216,6 +195,10 @@ def filter_cases(filename, stops, output_name):
 
         stat_check = Bioaccum.set_all_h_and_s(model_para, all_data)
         total_cons = Bioaccum.bio_monte_carlo_loop(model_para, all_data, 0, time_per_step, old_fish_by_region ,fish_by_region, prior_locations, locations, stat_check, u_iter, v_iter)
+
+        if stat_check == True:
+            total_cons = pr.make_result_dist(total_cons)
+
 
     elif model_para[8] == 'NO':
 
@@ -282,55 +265,33 @@ def filter_cases(filename, stops, output_name):
     else:
 
         print('Need to set steady state in the Sample and Time Input tab to YES or NO.')
-        exit(0)
+
 
 
     if model_para[8] == 'YES':
 
-        return [model_para[8], total_cons, stat_check]
+        return [model_para[8], total_cons, stat_check, foodweb_graph]
 
     if model_para[8] == 'NO':
 
-        return [model_para[8], writing_info, stat_check, region_areas, graph_data, model_para[6], [boundary,regions,hotspots]]
-
-    ################### TIME GRAPHING OPTION ###############################
-
-
-    # if model_para[8] == 'NO':
-    #     print(f_names)
-    #     for f in f_names:
-    #         for i in range(len(all_data[2])):
-    #             graph_by_time(writing_info, f, all_data[2][i][0], model_para[6])
-
+        return [model_para[8], writing_info, stat_check, region_areas, graph_data, model_para[6], [boundary,regions,hotspots], foodweb_graph]
 
 
     #################### STEADY STATE EXCEL WRITING ########################
 
 
-def steady_state_output(total_cons, stat_check, output_name):
+def steady_state_output(total_cons, stat_check, output_name, dist_type):
 
-    #steady-statistical
-    if stat_check == True:
+        FR_Input_Output.write_output_steady(total_cons[0], output_name, 'Steady State Simulation', dist_type)
 
-        results_dict = pr.make_result_dist(total_cons)
-        FR_Input_Output.write_output_steady([results_dict], output_name, 'Steady State Simulation')
-
-
-    #steady-Non-statistical
-    else:
-
-        FR_Input_Output.write_output_steady(total_cons, output_name, 'Steady State Simulation')
-
-
-
-def temporal_output(stat_check, to_write, output_name, stops, region_areas):
+def temporal_output(stat_check, to_write, output_name, stops, region_areas, dist_type):
 
         #Non-statistical
         if stat_check == False:
-            FR_Input_Output.write_temporal_excel(to_write, output_name, stops, 0, region_areas)
+            FR_Input_Output.write_temporal_excel(to_write, output_name, stops, 0, region_areas, dist_type)
         #statistical
         else:
-            FR_Input_Output.write_temporal_excel(to_write, output_name, stops, 1, region_areas)
+            FR_Input_Output.write_temporal_excel(to_write, output_name, stops, 1, region_areas, dist_type)
 
 
 

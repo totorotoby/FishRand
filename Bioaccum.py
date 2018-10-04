@@ -1,9 +1,7 @@
-# Where we run the bioaccumlation model
 import matplotlib
 import numpy as np
 matplotlib.use("TkAgg")
 import Classes as obj
-import FR_Input_Output
 import prob as pr
 from copy import deepcopy
 import spatial
@@ -24,7 +22,7 @@ def set_all_h_and_s(model_para, all_data):
                             count += 1
                             pr.set_hyper_samp_cube(model_para, item[i][j])
 
-    if count > 1:
+    if count >= 1:
         return True
     return False
 
@@ -69,7 +67,6 @@ def init_region(reg_data, temp, u_count, v_count):
             regions.append(toadd)
         else:
             print("Something is wrong with your ", i, " Regional Entry")
-            exit(0)
 
     return regions
 
@@ -129,7 +126,7 @@ def init_phyto(phyto_data, chemicals, u_count, v_count, per_step=0):
         phytos.append(toadd)
     else:
         print("Something is wrong with your ", 1,  "st Phyto Entry")
-        exit(0)
+
 
     return phytos
 
@@ -279,8 +276,6 @@ def init_fish_pre_region(fish_data, region, chemicals, phyto, zoops, diet_data, 
 
 def init_fish_post_region(fishs, tempfishs, region, chemicals):
 
-    #print(tempfishs)
-
     for i in range(len(fishs)):
 
         fishs[i].calc_diet_per(tempfishs, region)
@@ -395,7 +390,7 @@ def solve_steady(region, chemicals, phytos, zoops, inverts, fishs):
 
     phytolog = conc_log[region.name]
 
-    # assuming one phyto
+    # assuming one phytoƒƒ
     phyto = phytos[0]
     phytolog[phyto.name] = {}
     for i in range(len(chemicals)):
@@ -435,7 +430,6 @@ def solve_steady(region, chemicals, phytos, zoops, inverts, fishs):
 
 
     fishlog = conc_log[region.name]
-
     for i in range(len(fishs)):
         fishlog[fishs[i].name] = {}
         Cb = []
@@ -589,7 +583,6 @@ def get_prey_con(predator, reg_index, len_chems, chem_names, fish_names, non_fis
                     average_chemical_con = np.mean(prey_chemicals[:, j])
                     prior_conc_prey[fish_names[fish_index]][chem_names[j]] = average_chemical_con
 
-        #print(prior_conc_prey)
         if reg_check == 1:
             return prior_conc_prey
         else:
@@ -619,7 +612,7 @@ def bio_monte_carlo_loop(model_para, all_data, t, time_per_step, old_fish_by_reg
     invert_data = all_data[5]
     fish_data = all_data[6]
     diet_data = all_data[7]
-    #print('diet data: ', diet_data)
+
     f_names = [fish[0] for fish in fish_data]
     # dictionaries will be appended to with the out come of very simulation in monte carlo
     uv_results = [[],[]]
@@ -693,7 +686,6 @@ def bio_monte_carlo_loop(model_para, all_data, t, time_per_step, old_fish_by_reg
                          adj_fish_diet = spatial.adjust_diet_to_region(fish_data[i][0], j, diet_data,
                                                                        fish_by_region, len(r_inverts[0]) + 2)
 
-                         #print(fish_data[i][0], regions[j].name, '\n', diet_data['BPumpkinseed'], adj_fish_diet, '\n',fish_by_region)
                          # initates a single fish in a single region, before we know the foodweb of that region
                          # returns tempfish so that we can by the end of this iteration know the food web, and solve for the
                          # rest of fish that is foodweb dependent
@@ -718,7 +710,6 @@ def bio_monte_carlo_loop(model_para, all_data, t, time_per_step, old_fish_by_reg
                      for j in range(len(locations[i])):
                          reg_index = locations[i][j]
                          if reg_index != 1000:
-                            #print(fish_data[i][0], fish_by_region[reg_index], reg_index)
                             if fish_data[i][0] in fish_by_region[reg_index]:
                                 prior_conc_fish_prey = get_prey_con(r_fish[reg_index][i], reg_index, len(chem_data), [chem[0] for chem in chem_data],f_names, 3 + len(invert_data), prior_locations, prior_conc_fishs)
                                 current_conc_fish_prey = get_prey_con(r_fish[reg_index][i], reg_index, len(chem_data), [chem[0] for chem in chem_data],f_names, 3 + len(invert_data), locations, new_conc_fishs)
@@ -754,22 +745,19 @@ def bio_monte_carlo_loop(model_para, all_data, t, time_per_step, old_fish_by_reg
                 zoops = init_zoop(all_data[4], regions[0], chemicals, phytos[0], u_count, v_count,)
                 inverts, tempinverts = init_fish_pre_region(invert_data, regions[0], chemicals, phytos[0], zoops,
                                                             diet_data, u_count, v_count)
-                inverts = reorder_fish(inverts)
+
                 inverts = init_fish_post_region(inverts, tempinverts, regions[0], chemicals)
                 fishs, tempfishs = init_fish_pre_region(fish_data, regions[0], chemicals, phytos[0], zoops,
                                                         diet_data, u_count, v_count)
-                fishs = reorder_fish(fishs)
-                fishs = init_fish_post_region(fishs, tempfishs, regions[0], chemicals)
 
+                fishs = init_fish_post_region(fishs, tempfishs, regions[0], chemicals)
                 conc_log = solve_steady(regions[0], chemicals, phytos, zoops, inverts, fishs)
                 steady_state.append(conc_log)
-
                 v_count += 1
                 inner_count += 1
 
-        #print('****** new uv loop')
-
     if model_para[8] == 'YES':
+
         return steady_state
 
     return uv_results
@@ -797,21 +785,19 @@ def filter_stat_case(dictionaries):
     # if no statistical simulation
     if len(dictionaries) == 1:
 
-        #print(dictionaries[0])
+
         return dictionaries[0]
 
     # if we ran bio monte carlo
     else:
         results_dic = pr.make_result_dist(dictionaries)
-        #result_print(results_dic)
         return results_dic
 
 
 def single_setup_bottom_web(region_data, temperatures, chem_data, phyto_data, zoop_data, invert_data, diet_data, u_count, v_count, days_per_step):
-    #print(temperatures)
+
     # return regions
     regions = init_region(region_data, temperatures, u_count, v_count)
-    #print(regions)
 
     # Dimensions of r_chems: regions by chemical
     # Dimension of r_zoop and r_invert: regions by type of invert

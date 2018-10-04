@@ -179,7 +179,6 @@ class Zooplank:
         q = f_num + l_num
         k = self.k_2[chem_index] + self.k_e[chem_index]
 
-        # print('zoop: ', q, k)
         top = (pre_step * ((1 / self.days_per_step) - (k / 2)) + q)
         bottom = (1 / self.days_per_step) + (k / 2)
 
@@ -332,7 +331,7 @@ class Fish(Zooplank):
 
                         else:
                             if type(fishlog_old) == list:
-                                #print('scale prior prey in classes in loop:', fishlog_old[1])
+
                                 try:
                                     old_conc = fishlog_old[0][self.diet_frac[j][0]][chemical.name]
                                     new_conc = fishlog_new[0][self.diet_frac[j][0]][chemical.name]
@@ -357,10 +356,10 @@ class Fish(Zooplank):
 
 
             q = q1 + q2
-            #print('prestep? ', pre_step)
+
             top = (pre_step * ((1 / self.days_per_step) - (k / 2)) + q)
             bottom = (1 / self.days_per_step) + (k / 2)
-            # print('Fish:\n','q: ', q, 'k: ', k, 'concentration: ', top/bottom)
+
             change = ((top/bottom) - pre_step)
 
         # outside of pond so only take the subtraction part

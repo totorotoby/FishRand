@@ -1,7 +1,7 @@
 from scipy.spatial import Voronoi, voronoi_plot_2d
 import numpy as np
 import matplotlib.pyplot as plt
-from shapely.geometry import Polygon, LineString
+from shapely.geometry import Polygon
 from copy import deepcopy
 
 class HotSpot:
@@ -187,7 +187,7 @@ def plot_vor(vor, boundary, hotspots):
     plt.ylim(((y_min, y_max)))
 
     for hotspot in hotspots:
-        #print(hotspot.polygon)
+
         if hotspot.polygon is not None:
             x_h, y_h = hotspot.polygon.exterior.xy
             plt.plot(x_h, y_h, color='g', linewidth=3, solid_capstyle='round', zorder=2)
@@ -209,9 +209,6 @@ def setup(site_data):
         if len(regions[i]) != 0:
             poly_u = Polygon(vertices[regions[i]])
             poly = poly_u.intersection(boundary)
-
-            # use to see intersections
-            #print_intersections(poly_u,boundary, poly)
 
             reg_polygons.append([site_data[1][i][0],poly])
 
