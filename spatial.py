@@ -46,7 +46,6 @@ class HotSpot:
                 part_area = area_reg*frac_reg
                 self.area += part_area
                 self.weights.append([reg_polys[i][0], part_area])
-
         weight_sum = sum(row[1] for row in self.weights)
 
         for i in range(len(self.weights)):
@@ -200,17 +199,20 @@ def setup(site_data):
     # get boundary polygon
     boundary = Polygon(site_data[0])
 
-    # get regional polygons...takes some messing around with Voronoi function...
-    points = np.array([row[1] for row in site_data[1]])
-    vor = Voronoi(points)
-    regions, vertices = voronoi_finite_polygons_2d(vor, radius=boundary.length * 2)
     reg_polygons = []
-    for i in range(len(regions)):
-        if len(regions[i]) != 0:
-            poly_u = Polygon(vertices[regions[i]])
-            poly = poly_u.intersection(boundary)
+    if len(site_data[1]) > 1:
+        # get regional polygons...takes some messing around with Voronoi function...
+        points = np.array([row[1] for row in site_data[1]])
+        vor = Voronoi(points)
+        regions, vertices = voronoi_finite_polygons_2d(vor, radius=boundary.length * 2)
+        for i in range(len(regions)):
+            if len(regions[i]) != 0:
+                poly_u = Polygon(vertices[regions[i]])
+                poly = poly_u.intersection(boundary)
 
-            reg_polygons.append([site_data[1][i][0],poly])
+                reg_polygons.append([site_data[1][i][0],poly])
+    else:
+        reg_polygons.append([site_data[1][0][0], boundary])
 
 
     attract_poly = site_data[2]
@@ -306,6 +308,7 @@ def location_step(boundary, reg_poly, attraction_polys, fish, draw_num):
     for poly in attraction_polys:
         if poly.fish == fish:
             fish_spec_polys.append(poly)
+
     probs, outside = hotspot_prob(boundary, fish_spec_polys, reg_poly)
 
     outside_reg_prob = trim_regpoly(reg_poly, attraction_polys)

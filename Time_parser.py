@@ -1,6 +1,5 @@
 from datetime import datetime
 
-#TODO make output not just in time steps but in date on excel tabs
 def num_steps(start_string, end_string, step):
 
     start = datetime.strptime(start_string, '%m,%d,%Y').date()

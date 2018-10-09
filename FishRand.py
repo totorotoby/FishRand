@@ -115,9 +115,8 @@ class app(tk.Frame):
         label_image0.grid(row=0,column=0, sticky=tk.W)
 
     def askfile(self):
-
+        self.filebox.delete(0, tk.END)
         filename = filedialog.askopenfilename()
-        print(type(self.filebox))
         self.filebox.insert(tk.END, filename)
 
     def askdirectory(self):
@@ -143,16 +142,14 @@ class app(tk.Frame):
             # get timesteps
 
             time_entry = self.timeentry.get().split(",")
-            print(time_entry)
-            if time_entry[0] == '':
-                print('Need at least 1 Timestep.')
-
-            else:
+            #print(time_entry)
+            try:
                 self.time_entry = [int(i) for i in time_entry]
+            except:
+                self.time_entry = [0]
 
             # run the code
-
-            self.output = filter_cases(self.filename, self.time_entry, 'output_test.xlsx')
+            self.output = filter_cases(self.filename, self.time_entry)
 
             if self.output[0] == 'YES':
 
@@ -165,6 +162,7 @@ class app(tk.Frame):
             if self.output[0] == 'NO':
 
                 self.to_write = self.output[1]
+                print(self.to_write)
                 self.stat_check = self.output[2]
                 self.region_areas = self.output[3]
                 self.graph_data = self.output[4]
@@ -189,7 +187,7 @@ class app(tk.Frame):
             elif self.stat_check == True and self.output[0] == 'YES':
                 fishs = list(list(self.to_write.values())[0].keys())
                 chemicals = list(list(list(self.to_write.values())[0].values())[0].keys())
-                conut = 1
+                count = 1
 
 
             if count == 1:
@@ -218,7 +216,7 @@ class app(tk.Frame):
 
     def show_dist(self):
 
-        print(self.to_write)
+
         if self.stat_check == True:
 
             type_index_list = ['Normal', 'Lognormal', 'Uniform', 'Gamma']

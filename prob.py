@@ -29,7 +29,17 @@ class Var:
         if self.dist == 'Normal':
             mean = self.param[0]
             std = self.param[1]
-            self.values = st.norm(loc=mean, scale=std).ppf(self.lhs)
+            if len(self.param) > 2:
+                min = self.param[2]
+                max = self.param[3]
+                if min == '':
+                    min = -numpy.inf
+                if max == '':
+                    max = -numpy.inf
+                self.values = st.truncnorm(a=min, loc=mean, scale= std, b=max).ppf(self.lhs)
+            else:
+                self.values = st.norm(loc=mean, scale=std).ppf(self.lhs)
+
         elif self.dist == 'Uniform':
             a = self.param[0]
             b = self.param[1]
@@ -104,6 +114,7 @@ class ResultDist:
         Sig_y = numpy.std(self.values)
 
         # guess for lognormal
+        print(M_y, Sig_y, self.animal, self.chem)
         s, scale = lognorm_to_scipyinput(M_y, Sig_y)
         m_x = math.log(scale)
         sig_x = s

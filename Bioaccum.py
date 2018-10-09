@@ -12,16 +12,20 @@ def set_all_h_and_s(model_para, all_data):
     for l in all_data:
         for item in l:
             for i in range(len(item)):
+                #print(item)
                 if type(item[i]) == pr.Var:
                     count += 1
                     pr.set_hyper_samp_cube(model_para, item[i])
                 if type(item[i]) == list:
                     list_item = item[i]
                     for j in range(len(list_item)):
-                        if (item[i][j]) == pr.Var:
+                        if type(list_item[j]) == pr.Var:
                             count += 1
-                            pr.set_hyper_samp_cube(model_para, item[i][j])
-
+                            pr.set_hyper_samp_cube(model_para, list_item[j])
+                        # if type(item[i][j]) == list:
+                        #     new_item = item[i][j]
+                        #     for k in range(len(new_item)):
+                        #         if (new_item[k] ==)
     if count >= 1:
         return True
     return False
@@ -31,14 +35,28 @@ def check_inst_non_st(inst, u_count, v_count):
     u_count = int(u_count)
     v_count = int(v_count)
     new_entry = []
-    for j in range(len(inst)):
-        if type(inst[j]) == pr.Var:
-            if inst[j].type == 'U':
-                new_entry.append(inst[j].values[u_count])
-            if inst[j].type == 'V':
-                new_entry.append(inst[j].values[v_count])
+    for i in range(len(inst)):
+        if type(inst[i]) is pr.Var:
+            if inst[i].type == 'U':
+                new_entry.append(inst[i].values[u_count])
+            if inst[i].type == 'V':
+                new_entry.append(inst[i].values[v_count])
+        elif type(inst[i]) == list:
+            new_sub_entry = []
+            for j in range(len(inst[i])):
+                if type(inst[i][j]) == str or type(inst[i][j]) == float:
+                    new_sub_entry.append(inst[i][j])
+                if type(inst[i][j]) == pr.Var:
+                    if inst[i][j].type == 'U':
+                        new_sub_entry.append(inst[i][j].values[u_count])
+                    if inst[i][j].type == 'V':
+                        new_sub_entry.append(inst[i][j].values[v_count])
+
+            new_entry.append(new_sub_entry)
+
         else:
-            new_entry.append(inst[j])
+
+            new_entry.append(inst[i])
 
     return new_entry
 
@@ -67,7 +85,6 @@ def init_region(reg_data, temp, u_count, v_count):
             regions.append(toadd)
         else:
             print("Something is wrong with your ", i, " Regional Entry")
-
     return regions
 
 # initiates chemicals for a specific single region
@@ -84,18 +101,31 @@ def init_chems(chem_data, region, region_index, u_count, v_count):
         toadd = obj.Chemical(chemical[0], chemical[1], chemical[2][region_index])
 
         # dealing with ddoc and dpoc
-        if chemical[5] and chemical[6] != '':
-            toadd.set_ddoc_dpoc(chemical[5], chemical[6])
+        if chemical[6] and chemical[7] != '':
+            toadd.set_ddoc_dpoc(chemical[6], chemical[7])
+        if chemical[8] and chemical[9] != '':
+            toadd.set_betas(chemical[8], chemical[9])
 
         # dealing with cwto and cwdo
-        if chemical[3][i] != '':
+        if chemical[3][region_index] != '':
             toadd.set_cwto(chemical[3][region_index])
-        if chemical[4][i] != '':
+        if chemical[4][region_index] != '':
             toadd.set_cwdo(chemical[4][region_index])
+        if chemical[5][region_index] != '':
+            toadd.set_cwp(chemical[5][region_index])
 
-    # calculating Phi
-        toadd.calc_phi_and_cwdo(region)
-        toadd.calc_pore_water(region.Ocs)
+        if toadd.Cwp != -1 and toadd.Cwdo != -1 and toadd.Cs == '' and region.Ocs != '':
+            toadd.calc_cs(region)
+        if toadd.Cwp != -1 and toadd.Cwdo == -1 and toadd.Cs == '' and toadd.Cwto != -1:
+            toadd.calc_cs(region)
+        if toadd.Cwdo == -1 and toadd.Cwto != -1 and region.adoc and region.apoc and region.Xdoc and region.Xpoc != '':
+            toadd.calc_phi_and_cwdo(region)
+        if toadd.Cwdo == -1 and (toadd.Cwto == -1 or region.adoc or region.apoc or region.Xdoc or region.Xpoc == ''):
+            print('Not enough parameters to solve for Cwdo in ' + chemical[0])
+        if toadd.Cwp == -1 and region.Ocs != '':
+            toadd.calc_pore_water(region.Ocs)
+        if toadd.Cwp == -1 and (region.Ocs == '' or toadd.Cs == ''):
+            print('Not enough parameters to solve for Cwp in' + chemical[0])
 
         chemicals.append(toadd)
 
@@ -119,8 +149,10 @@ def init_phyto(phyto_data, chemicals, u_count, v_count, per_step=0):
     for i in range(len(chemicals)):
 
         kow = chemicals[i].Kow
+        betal = chemicals[i].betal
+        betan = chemicals[i].betan
         toadd.calc_k1(kow, i)
-        toadd.calc_k2(kow, i)
+        toadd.calc_k2(kow, i, betal, betan)
 
     if toadd.init_check():
         phytos.append(toadd)
@@ -174,9 +206,12 @@ def init_zoop(zoo_data, region, chemicals, phyto, u_count, v_count, per_step=0):
             kow = chemicals[j].Kow
             ed = chemicals[j].Ed
             ew = chemicals[j].Ew
+            betal = chemicals[j].betal
+            betan = chemicals[j].betan
+
             toadd.calc_k1(ew, j)
-            toadd.calc_k2(kow, j)
-            toadd.calc_kgb(kow, j)
+            toadd.calc_k2(kow, j, betal, betan)
+            toadd.calc_kgb(kow, j, betal, betan)
             toadd.calc_ke(ed, j)
             toadd.calc_kd(ed, j)
 
@@ -286,9 +321,11 @@ def init_fish_post_region(fishs, tempfishs, region, chemicals):
             kow = chemicals[j].Kow
             ed = chemicals[j].Ed
             ew = chemicals[j].Ew
+            betal = chemicals[j].betal
+            betan = chemicals[j].betan
             fishs[i].calc_k1(ew, j)
-            fishs[i].calc_k2(kow, j)
-            fishs[i].calc_kgb(kow, j)
+            fishs[i].calc_k2(kow, j, betal, betan)
+            fishs[i].calc_kgb(kow, j, betal, betan)
             fishs[i].calc_ke(ed, j)
             fishs[i].calc_kd(ed, j)
 
@@ -306,9 +343,11 @@ def init_single_fish_post_region(fish, tempfishs, region, chemicals):
         kow = chemicals[j].Kow
         ed = chemicals[j].Ed
         ew = chemicals[j].Ew
+        betal = chemicals[j].betal
+        betan = chemicals[j].betan
         fish.calc_k1(ew, j)
-        fish.calc_k2(kow, j)
-        fish.calc_kgb(kow, j)
+        fish.calc_k2(kow, j, betal, betan)
+        fish.calc_kgb(kow, j, betal, betan)
         fish.calc_ke(ed, j)
         fish.calc_kd(ed, j)
 
@@ -406,10 +445,10 @@ def solve_steady(region, chemicals, phytos, zoops, inverts, fishs):
             # since single region all chemical properties index by 0
             phi = chemicals[i].phi
             Cwdo = chemicals[i].Cwdo
-            Cwto = chemicals[i].Cwto
+            Cwp = chemicals[i].Cwp
             phyto_con = conc_log[region.name]['Phytoplankton'][chemicals[i].name]
 
-            conc_in_zoops = zoo.solve_steady_state(phi, i, Cwto, Cwdo, phyto_con)
+            conc_in_zoops = zoo.solve_steady_state(phi, i, Cwp, Cwdo, phyto_con)
             Cb.append(conc_in_zoops)
             zooplog[zoo.name][chemicals[i].name] = conc_in_zoops
 
@@ -472,7 +511,7 @@ def init_prior_con_dic(stat_check, monte_carlo_length,regions, chems, phyto, zoo
     return prior_con_dic_nonfish_list, prior_con_dic_fish_list
 
 
-def solve_zoop_phyto_invert_time_period(region, chemicals, phytos, zoops, fishs, prior_chem_amounts, days):
+def solve_zoop_phyto_invert_time_period(region, chemicals, phytos, zoops, inverts, prior_chem_amounts, days):
 
     new_chem_amounts = deepcopy(prior_chem_amounts)
 
@@ -487,24 +526,25 @@ def solve_zoop_phyto_invert_time_period(region, chemicals, phytos, zoops, fishs,
             prior_C = prior_chem_amounts[region.name][zoops[k].name][chemicals[j].name]
             phi = chemicals[j].phi
             Cwdo = chemicals[j].Cwdo
-            Cwto = chemicals[j].Cwto
+            Cwp = chemicals[j].Cwp
 
             phyto_con = (new_chem_amounts[region.name][phyto.name][chemicals[j].name] +
                          prior_chem_amounts[region.name][phyto.name][chemicals[j].name])/2
-            new_chem_amounts[region.name][zoops[k].name][chemicals[j].name] =\
-                zoops[k].solve_next_time_step(phi, j, Cwto, Cwdo, phyto_con, prior_C)
 
-        # Fishes!
+            new_chem_amounts[region.name][zoops[k].name][chemicals[j].name] =\
+                zoops[k].solve_next_time_step(phi, j, Cwp, Cwdo, phyto_con, prior_C)
+
 
         fishlog_new = new_chem_amounts[region.name]
         fishlog_old = prior_chem_amounts[region.name]
-        for i in range(len(fishs)):
-            prior_C = prior_chem_amounts[region.name][fishs[i].name][chemicals[j].name]
+        for i in range(len(inverts)):
+            prior_C = prior_chem_amounts[region.name][inverts[i].name][chemicals[j].name]
             phi = chemicals[j].phi
             Cwdo = chemicals[j].Cwdo
             Cwp = chemicals[j].Cwp
-            new_chem_amounts[region.name][fishs[i].name][chemicals[j].name] =\
-                fishs[i].solve_next_time_step(phi, j, Cwp, Cwdo, fishlog_new, fishlog_old, chemicals[j], prior_C, 0)
+            new_chem_amounts[region.name][inverts[i].name][chemicals[j].name] =\
+                inverts[i].solve_next_time_step(phi, j, Cwp, Cwdo, fishlog_old, fishlog_new, chemicals[j], prior_C, 0) + prior_C
+
 
     return new_chem_amounts
 
@@ -641,7 +681,7 @@ def bio_monte_carlo_loop(model_para, all_data, t, time_per_step, old_fish_by_reg
                 # - 2d list of zoop objects by all regions
                 # - 2d list of invert objects by all regions
 
-                regions, r_chems, phytos, r_zoops, r_inverts = single_setup_bottom_web(region_data, temperatures, chem_data,
+                regions, r_chems, r_phytos, r_zoops, r_inverts = single_setup_bottom_web(region_data, temperatures, chem_data,
                                                                                        phyto_data, zoop_data, invert_data,
                                                                                        diet_data, u_count, v_count, time_per_step)
 
@@ -650,7 +690,7 @@ def bio_monte_carlo_loop(model_para, all_data, t, time_per_step, old_fish_by_reg
                 # days that have passed used only for phyto cause we solve analytically
                 days = (t+1) * time_per_step
                 for i in range(len(regions)):
-                    new_concentrations_lower = solve_zoop_phyto_invert_time_period(regions[i], r_chems[i], phytos, r_zoops[i], r_inverts[i],
+                    new_concentrations_lower = solve_zoop_phyto_invert_time_period(regions[i], r_chems[i], r_phytos[i], r_zoops[i], r_inverts[i],
                                                                              new_concentrations_lower, days)
 
 
@@ -661,7 +701,7 @@ def bio_monte_carlo_loop(model_para, all_data, t, time_per_step, old_fish_by_reg
                 r_tempfish = [[] for _ in range(len(regions))]
                 # start making the tempfish so that diet can work
                 for i in range(len(r_tempfish)):
-                    r_tempfish[i].append(phytos[0])
+                    r_tempfish[i].append(r_phytos[i][0])
                     for k in range(len(r_zoops[i])):
                         r_tempfish[i].append(r_zoops[i][k])
                     for p in range(len(r_inverts[i])):
@@ -803,6 +843,7 @@ def single_setup_bottom_web(region_data, temperatures, chem_data, phyto_data, zo
     # Dimension of r_zoop and r_invert: regions by type of invert
     r_chems = []
     r_zoops = []
+    r_phytos = []
     r_inverts = []
 
 
@@ -812,17 +853,15 @@ def single_setup_bottom_web(region_data, temperatures, chem_data, phyto_data, zo
         r_chems.append(chemicals)
 
 
-    phytos = init_phyto(phyto_data, r_chems[0], u_count, v_count, per_step=days_per_step)
-
-
     for i in range(len(regions)):
-        zoops = init_zoop(zoop_data, regions[i], r_chems[i], phytos[0], u_count, v_count, per_step=days_per_step)
+        phyto = init_phyto(phyto_data, r_chems[i], u_count, v_count, per_step=days_per_step)
+        r_phytos.append(phyto)
+        zoops = init_zoop(zoop_data, regions[i], r_chems[i], phyto[0], u_count, v_count, per_step=days_per_step)
         r_zoops.append(zoops)
 
-        inverts, tempprey = init_fish_pre_region(invert_data, regions[i], r_chems[i], phytos[0], zoops, diet_data,
+        inverts, tempprey = init_fish_pre_region(invert_data, regions[i], r_chems[i], phyto[0], zoops, diet_data,
                                                  u_count, v_count, per_step=days_per_step)
-        inverts = reorder_fish(inverts)
         inverts = init_fish_post_region(inverts, tempprey, regions[i], r_chems[i])
         r_inverts.append(inverts)
 
-    return regions, r_chems, phytos, r_zoops, r_inverts
+    return regions, r_chems, r_phytos, r_zoops, r_inverts

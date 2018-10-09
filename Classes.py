@@ -88,9 +88,9 @@ class Zooplank:
         self.k_1[chem_index] = chem_ew * (self.Gv / self.Wb)
 
     # returns k_2 of chemical for this zooplank
-    def calc_k2(self, chem_kow, chem_index, beta=.035, density_lip=.9, density_w=1):
+    def calc_k2(self, chem_kow, chem_index, betal, betan, density_lip=.9, density_w=1):
 
-        k_bw = (self.Vlb * chem_kow)/density_lip + (self.Vnb * beta * chem_kow) + (self.Vwb/density_w)
+        k_bw = (self.Vlb * betal * chem_kow)/density_lip + (self.Vnb * betan * chem_kow) + (self.Vwb/density_w)
         self.k_2[chem_index] = self.k_1[chem_index] / k_bw
 
     # returns k_d of chemical for this zooplank
@@ -120,10 +120,12 @@ class Zooplank:
 
     # returns K_gb for certian chemical
 
-    def calc_kgb(self, chem_kow, chem_index, beta1=.35, beta2=.035, density_lip=.9, density_w=1, z_water=.05):
-        top = ((self.Vlg * (z_water*chem_kow))/density_lip) + (self.Vng * beta1 * (z_water*chem_kow)) +\
+    def calc_kgb(self, chem_kow, chem_index, betal, betan, density_lip=.9, density_w=1, z_water=.05):
+
+        top = ((self.Vlg * (z_water*betal*chem_kow))/density_lip) + (self.Vng * betan * (z_water*chem_kow)) +\
               (z_water*self.Vwg/density_w)
-        bottom = ((self.Vlb * (z_water*chem_kow))/density_lip) + (self.Vnb * beta2 * z_water * chem_kow) +\
+
+        bottom = ((self.Vlb * (z_water*betal*chem_kow))/density_lip) + (self.Vnb * betan * z_water * chem_kow) +\
                  (z_water*self.Vwb/density_w)
         k_gb = top/bottom
         self.k_gb[chem_index] = k_gb
@@ -157,11 +159,11 @@ class Zooplank:
         return False
 
     # Where log is the dictonary of chemical concentrations
-    def solve_steady_state(self, phi, chem_index, Cwto, Cwds, phyto_con):
+    def solve_steady_state(self, phi, chem_index, Cwp, Cwdo, phyto_con):
 
         denom = self.k_2[chem_index] + self.k_e[chem_index] + self.Kg
 
-        f_num = self.k_1[chem_index] * (self.Mo * phi * Cwto + self.Mp * Cwds)
+        f_num = (self.k_1[chem_index] * self.Mo * Cwdo) + (self.k_1[chem_index] * self.Mp * Cwp)
         f_num = f_num/1000
 
         l_num = phyto_con * self.k_d[chem_index]
@@ -169,9 +171,9 @@ class Zooplank:
         return (f_num + l_num) / denom
 
 
-    def solve_next_time_step(self, phi, chem_index, Cwto, Cwds, phyto_con, pre_step):
+    def solve_next_time_step(self, phi, chem_index, Cwp, Cwdo, phyto_con, pre_step):
 
-        f_num = self.k_1[chem_index] * (self.Mo * phi * Cwto + self.Mp * Cwds)
+        f_num = (self.k_1[chem_index] * self.Mo * Cwdo) + (self.k_1[chem_index] * self.Mp * Cwp)
         f_num = f_num / 1000
 
         l_num = phyto_con * self.k_d[chem_index]
@@ -201,9 +203,9 @@ class Fish(Zooplank):
         self.k_1[chem_index] = chem_ew * (self.Gv / self.Wb)
 
     # returns k_2 of chemical for this zooplank
-    def calc_k2(self, chem_kow, chem_index, beta=.035, density_lip=.9, density_w=1):
+    def calc_k2(self, chem_kow, chem_index, betal, betan, density_lip=.9, density_w=1):
 
-        k_bw = (self.Vlb * chem_kow)/density_lip + (self.Vnb * beta * chem_kow) + (self.Vwb/density_w)
+        k_bw = (self.Vlb * betal *chem_kow)/density_lip + (self.Vnb * betan * chem_kow) + (self.Vwb/density_w)
         self.k_2[chem_index] = self.k_1[chem_index] / k_bw
 
     # returns k_d of chemical for this zooplank
@@ -241,7 +243,7 @@ class Fish(Zooplank):
                     total_nonlip_m += nl_toadd
                     total_lip += l_toadd
 
-                elif self.diet_frac[j][0] == 'Sediment/Detritus' and count == 0:
+                elif self.diet_frac[j][0] == 'Sediment/Detritus' and self.diet_frac[j][1] > 0  and count == 0:
 
                     total_nonlip_c += self.diet_frac[j][1] * region.Ocs
                     count += 1
@@ -270,21 +272,22 @@ class Fish(Zooplank):
                    ((1-self.e_w) * self.Vwd)) * self.Gd
 
     # returns K_gb for certian chemical
-    def calc_kgb(self, chem_kow, chem_index, beta1=.35, beta2=.035, density_lip=.9, density_w=1, z_water=.05):
+    def calc_kgb(self, chem_kow, chem_index, betal, betan, density_lip=.9, density_w=1, z_water=.05):
 
-        top = ((self.Vlg * (z_water*chem_kow))/density_lip) + (self.Vngc * beta1 * (z_water*chem_kow)) +\
-              (self.Vngm * beta2 * (z_water*chem_kow)) + (z_water*self.Vwg/density_w)
-        bottom = ((self.Vlb * (z_water*chem_kow))/density_lip) + (self.Vnb * beta2 * z_water * chem_kow) +\
+        top = ((self.Vlg * (z_water*betal*chem_kow))/density_lip) + (self.Vngc * betan * (z_water*chem_kow)) +\
+              (self.Vngm * betan * (z_water*chem_kow)) + (z_water*self.Vwg/density_w)
+        bottom = ((self.Vlb * (z_water*betal*chem_kow))/density_lip) + (self.Vnb * betan * z_water * chem_kow) +\
                  (z_water*self.Vwb/density_w)
         k_gb = top/bottom
         self.k_gb[chem_index] = k_gb
 
 
     #Where log is the dictonary of chemical concentrations for region
-    def solve_steady_state(self, phi, chem_index, Cwp, Cwds, log, chemical):
+    def solve_steady_state(self, phi, chem_index, Cwp, Cwdo, log, chemical):
+
 
         denom = self.k_2[chem_index] + self.k_e[chem_index] + self.Kg
-        f_num = (self.k_1[chem_index] * self.Mo * Cwds) + (self.k_1[chem_index] * self.Mp * Cwp)
+        f_num = (self.k_1[chem_index] * self.Mo * Cwdo) + (self.k_1[chem_index] * self.Mp * Cwp)
 
         l_num = 0
 
@@ -304,13 +307,14 @@ class Fish(Zooplank):
 
         return (f_num + l_num)/denom
 
-    def solve_next_time_step(self, phi, chem_index, Cwp, Cwds, fishlog_new, fishlog_old, chemical, pre_step, out_check):
+    def solve_next_time_step(self, phi, chem_index, Cwp, Cwdo, fishlog_new, fishlog_old, chemical, pre_step, out_check):
 
         if out_check == 0:
 
+            #print(self.name, self.k_2, self.k_e)
             k = self.k_2[chem_index] + self.k_e[chem_index]
 
-            q1 = (self.k_1[chem_index] * self.Mo * Cwds) + (self.k_1[chem_index] * self.Mp * Cwp)
+            q1 = (self.k_1[chem_index] * self.Mo * Cwdo) + (self.k_1[chem_index] * self.Mp * Cwp)
 
             q2 = 0
 
@@ -412,8 +416,8 @@ class Pplank:
         self.k_1[chem_index] = 1/(self.A + (self.B/chem_kow))
 
     # returns k_2 of chemical for this pplank
-    def calc_k2(self, chem_kow, chem_index, density_lip=.9, density_w=1):
-        k_pw = (self.Vlb * chem_kow) / density_lip + (self.Vnb * .35 * chem_kow) + (self.Vwb / density_w)
+    def calc_k2(self, chem_kow, chem_index, betal, betan, density_lip=.9, density_w=1):
+        k_pw = (self.Vlb * betal * chem_kow) / density_lip + (self.Vnb * betan * chem_kow) + (self.Vwb / density_w)
         self.k_2[chem_index] = self.k_1[chem_index] / k_pw
 
     def init_check(self):
@@ -446,7 +450,7 @@ class Pplank:
     def solve_next_time_step(self, Cwd, chem_index, pre_step, t):
 
         q = self.k_1[chem_index] * Cwd
-        k = (self.k_2[chem_index])
+        k = (self.k_2[chem_index]) + self.Kg
 
 
         analytic = (q/k) + math.exp(-k*t) * (0-(q/k))
@@ -469,6 +473,8 @@ class Chemical:
         self.Cwdo = -1
         self.Ddoc = -1
         self.Dpoc = 0
+        self.betal = 1
+        self.betan = .35
         self.Ew = self.calc_ew()
         self.Ed = self.calc_ed()
 
@@ -481,9 +487,18 @@ class Chemical:
     def set_cwdo(self, cwdo):
             self.Cwdo = cwdo
 
+    def set_cwp(self, cwp):
+
+        self.Cwp = cwp
+
     def set_ddoc_dpoc(self, ddoc, dpoc):
         self.Ddoc = ddoc
         self.Dpoc = dpoc
+
+    def set_betas(self, betal, betan):
+
+        self.betal = betal
+        self.betan = betan
 
     def calc_ew(self):
         Ew = 1/(1.85 + (155/self.Kow))
@@ -493,14 +508,18 @@ class Chemical:
         Ed = math.pow((0.0000003*self.Kow + 2), -1)
         return Ed
 
+    def calc_cs(self, region):
+
+        self.Cs = region.Ocs * .35 * self.Kow * self.Cwp
+
     def calc_pore_water(self, Ocs):
         self.Cwp = self.Cs/(Ocs * .35 * self.Kow)
 
+
     def calc_phi_and_cwdo(self, region):
 
-        if self.Cwto != -1 and self.Cwdo != -1:
-            self.phi = self.Cwdo/self.Cwto
-        else:
+        if self.Cwdo == -1 and self.Cwto != -1:
+
             adoc = region.adoc
             apoc = region.apoc
             xdoc = region.Xdoc
@@ -508,7 +527,6 @@ class Chemical:
 
             self.phi = 1/((1+xpoc*self.Dpoc*apoc*self.Kow)+(xdoc*self.Ddoc*adoc*self.Kow))
 
-        if self.Cwdo == -1 and self.Cwto != -1:
             self.Cwdo = (self.Cwto/1000) * self.phi
 
     def init_check(self):
@@ -547,7 +565,6 @@ class Region:
         self.apoc = apoc
 
     def set_cox(self, cox):
-
             self.Cox = cox
 
     def calc_cox(self):

@@ -6,7 +6,6 @@ import numpy as np
 from matplotlib import pyplot as plt
 from spatial import HotSpot
 
-#TODO Fix output parameters
 
 # Reads in all data from spread sheets
 
@@ -42,7 +41,7 @@ def convert_to_lists(filename):
     num_timestep = num_timestep + 1
     get_temp_data(temp_data, temp_sheet, len(region_data))
 
-    chem_len = 5 + (len(region_data)*3)
+    chem_len = 7 + (len(region_data)*4)
 
     chem_sheet = all_sheets.sheet_by_index(3)
 
@@ -191,24 +190,31 @@ def get_chem_data(entry_col, dist_col, chem_len, chem_data, num_regions):
             sed_con = []
             total_con = []
             dis_con = []
+            por_con = []
         if i % chem_len == 1:
             new_chem.append(entry_col[i].value)
             data_get_helper(entry_col[i+1], dist_col[i+1], new_chem)
         if i % chem_len == 3:
-            for j in range(i, i+num_regions*3):
-                if (j-i) % 3 == 0:
+            for j in range(i, i+num_regions*4):
+                if (j-i) % 4 == 0:
                     data_get_helper(entry_col[j], dist_col[j], sed_con)
-                if (j - i) % 3 == 1:
+                if (j - i) % 4 == 1:
                     data_get_helper(entry_col[j], dist_col[j], total_con)
-                if (j - i) % 3 == 2:
+                if (j - i) % 4 == 2:
                     data_get_helper(entry_col[j], dist_col[j], dis_con)
+                if (j - i) % 4 == 3:
+                    data_get_helper(entry_col[j], dist_col[j], por_con)
             new_chem.append(sed_con)
             new_chem.append(total_con)
             new_chem.append(dis_con)
-        if i % chem_len == chem_len-2:
+            new_chem.append(por_con)
+        if i % chem_len == chem_len-4:
             data_get_helper(entry_col[i], dist_col[i], new_chem)
             data_get_helper(entry_col[i+1], dist_col[i+1], new_chem)
+            data_get_helper(entry_col[i + 2], dist_col[i + 2], new_chem)
+            data_get_helper(entry_col[i + 3], dist_col[i + 3], new_chem)
             chem_data.append(new_chem)
+
 
 
 def get_mig_data(mig_data, mig_sheet):
@@ -367,7 +373,7 @@ def write_temporal_excel(array, output_name, stops, stat_flag, regional_areas, d
             lower_non_avg = data_at_time[0][0]
             lower_avg = data_at_time[1]
             upper_avg = data_at_time[2]
-            sheet.write(0,0, 'Lower Food Web Concentrations by Region', big)
+            sheet.write(0,0, 'Lower Food Web Concentrations by Region (ng/g)', big)
             # write chemicals at the top
             for j in range(len(chem_list)):
                 sheet.write(0, j + 1, chem_list[j])
@@ -390,7 +396,7 @@ def write_temporal_excel(array, output_name, stops, stat_flag, regional_areas, d
 
 
 
-            sheet.write(0, len(chem_list) + 1, 'Lower Food Web Concentrations Average Concentrations Weighted by Regional Area', big)
+            sheet.write(0, len(chem_list) + 1, 'Lower Food Web Concentrations Average Concentrations Weighted by Regional Area (ng/g)', big)
             for j in range(len(chem_list)):
                 sheet.write(0, len(chem_list) + 1 + (j + 1), chem_list[j])
 
@@ -399,7 +405,7 @@ def write_temporal_excel(array, output_name, stops, stat_flag, regional_areas, d
                 for j in range(len(chem_list)):
                     sheet.write(1 + i, 2 + len(chem_list) + j, lower_avg[lower_org_list[i]][chem_list[j]])
 
-            sheet.write(count + 1, 0, 'Upper Food Web Concentrations Averaged over Populations', big)
+            sheet.write(count + 1, 0, 'Upper Food Web Concentrations Averaged over Populations (ng/g)', big)
             for i in range(len(upper_org_list)):
                 sheet.write(count + 2 + i, 0, upper_org_list[i])
                 for j in range (len(chem_list)):
@@ -422,7 +428,7 @@ def write_temporal_excel(array, output_name, stops, stat_flag, regional_areas, d
             upper_org_list = list(upper_dists.keys())
             chem_list = list(list(upper_dists.values())[0].keys())
 
-            sheet.write(0, 0, 'Lower Food Web Concentrations by Region', big)
+            sheet.write(0, 0, 'Lower Food Web Concentrations by Region (ng/g)', big)
 
             for j in range(len(chem_list)):
                 sheet.write(0, j + 1, chem_list[j])
@@ -448,7 +454,7 @@ def write_temporal_excel(array, output_name, stops, stat_flag, regional_areas, d
                             sheet.write(count1 + 2 + (i + j) + (len(lower_dists) * i), k + 1,
                                         lower_dists[reg_list[i]][lower_org_list[j]][chem_list[k]].best_para[0])
 
-            sheet.write(0, len(chem_list) + 1, 'Lower Food Web Mean Concentrations Weighted by Regional Area', big)
+            sheet.write(0, len(chem_list) + 1, 'Lower Food Web Mean Concentrations Weighted by Regional Area (ng/g)', big)
             sheet.write(1, len(chem_list) + 1, 'All Regions', bold)
 
             for j in range(len(chem_list)):
@@ -463,7 +469,7 @@ def write_temporal_excel(array, output_name, stops, stat_flag, regional_areas, d
 
                     sheet.write(2 + j, 2 + len(chem_list) + i, weight_avg)
 
-            sheet.write(count + 1, 0, 'Upper Food Web Concentrations', big)
+            sheet.write(count + 1, 0, 'Upper Food Web Concentrations (ng/g)', big)
             count += 1
 
             for i in range(len(upper_org_list)):
@@ -476,7 +482,7 @@ def write_temporal_excel(array, output_name, stops, stat_flag, regional_areas, d
                     else:
                         sheet.write(count + 1 + i, j + 1, upper_dists[upper_org_list[i]][chem_list[j]].best_para[0])
 
-            sheet.write(count, 1 + len(chem_list), 'Upper Food Web Concentrations (Mean and standard Deviation of Samples)', big)
+            sheet.write(count, 1 + len(chem_list), 'Upper Food Web Concentrations (ng/g) (Mean and standard Deviation of Samples)', big)
 
             for i in range(len(upper_org_list)):
                 for j in range(len(chem_list)):
@@ -484,9 +490,3 @@ def write_temporal_excel(array, output_name, stops, stat_flag, regional_areas, d
 
             workbook.close()
 
-
-
-
-
-
-convert_to_lists('/Users/toby/Desktop/FishRand/sheets/input/tests/testy_test.xlsx')

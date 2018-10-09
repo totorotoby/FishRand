@@ -6,9 +6,6 @@ import numpy as np
 import copy
 from matplotlib import pyplot as plt
 
-# TODO talk to phil about running without sedimate concentrations
-# TODO Make min and max on Normal
-
 
 def loc_setup(fishs, boundary, regions, hotspots, draw_num):
 
@@ -173,7 +170,7 @@ def niceprint(prior_total_cons, locations):
 
 
 # are we solving steady state on single region, solving with time on single region, or time on multiple regions
-def filter_cases(filename, stops, output_name):
+def filter_cases(filename, stops):
 
     model_para, all_data, time_steps, time_per_step, site_data, foodweb_graph = FR_Input_Output.convert_to_lists(filename)
     # set up for
@@ -241,7 +238,7 @@ def filter_cases(filename, stops, output_name):
             # get all locations for each fish... locations matrix is fish number by list of region numbers draws long
             prior_locations = locations
             locations = get_locs_matrix(loc_setups, draws, mig_data, t)
-
+            print(locations)
             # fish_by loc is for each region there is list of names of fish that are in that region at this time step
             old_fish_by_region = fish_by_region
             fish_by_region = get_fish_in_region(locations, f_names, len(all_data[0]))
@@ -251,7 +248,6 @@ def filter_cases(filename, stops, output_name):
                                                          p_dic=total_cons)
 
             total_cons = uv_single
-
 
             lower_cons, fish_dic = get_fish_dic(total_cons[1], total_cons[0], [chem[0] for chem in all_data[2]], [fish[0] for fish in all_data[6]], region_areas)
             graph_data.append(fish_dic)
@@ -265,7 +261,6 @@ def filter_cases(filename, stops, output_name):
     else:
 
         print('Need to set steady state in the Sample and Time Input tab to YES or NO.')
-
 
 
     if model_para[8] == 'YES':
@@ -292,6 +287,4 @@ def temporal_output(stat_check, to_write, output_name, stops, region_areas, dist
         #statistical
         else:
             FR_Input_Output.write_temporal_excel(to_write, output_name, stops, 1, region_areas, dist_type)
-
-
 
