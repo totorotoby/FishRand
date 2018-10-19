@@ -6,13 +6,15 @@ import prob as pr
 from copy import deepcopy
 import spatial
 
+
+# once all the model parameters taken in and are lists, this function loops through them, and
+# does all the sampling for each statistical value
 def set_all_h_and_s(model_para, all_data):
 
     count = 0
     for l in all_data:
         for item in l:
             for i in range(len(item)):
-                #print(item)
                 if type(item[i]) == pr.Var:
                     count += 1
                     pr.set_hyper_samp_cube(model_para, item[i])
@@ -22,15 +24,12 @@ def set_all_h_and_s(model_para, all_data):
                         if type(list_item[j]) == pr.Var:
                             count += 1
                             pr.set_hyper_samp_cube(model_para, list_item[j])
-                        # if type(item[i][j]) == list:
-                        #     new_item = item[i][j]
-                        #     for k in range(len(new_item)):
-                        #         if (new_item[k] ==)
+
     if count >= 1:
         return True
     return False
 
-
+# Goes into a statistical parameter and sets it as a single value according the the u_count or v_count index of the sample array
 def check_inst_non_st(inst, u_count, v_count):
     u_count = int(u_count)
     v_count = int(v_count)
@@ -61,12 +60,13 @@ def check_inst_non_st(inst, u_count, v_count):
     return new_entry
 
 
-# initiates all regions
+# initiates all regions for a single monte carlo sample in a single time period
 def init_region(reg_data, temp, u_count, v_count):
 
     regions = []
     for i in range(len(reg_data)):
         region = reg_data[i]
+        print(region)
         region = check_inst_non_st(region, u_count, v_count)
         toadd = obj.Region(region[0], temp[i], region[1], region[2], region[3], region[4], region[5])
 
@@ -87,9 +87,7 @@ def init_region(reg_data, temp, u_count, v_count):
             print("Something is wrong with your ", i, " Regional Entry")
     return regions
 
-# initiates chemicals for a specific single region
-
-
+# initiates chemicals for a specific single region in a single monte carlo sample in a time period
 def init_chems(chem_data, region, region_index, u_count, v_count):
 
     chemicals = []
@@ -98,21 +96,21 @@ def init_chems(chem_data, region, region_index, u_count, v_count):
         chemical = chem_data[i]
 
         chemical = check_inst_non_st(chemical, u_count, v_count)
-        toadd = obj.Chemical(chemical[0], chemical[1], chemical[2][region_index])
+        toadd = obj.Chemical(chemical[0], chemical[1], chemical[6][region_index])
 
         # dealing with ddoc and dpoc
-        if chemical[6] and chemical[7] != '':
-            toadd.set_ddoc_dpoc(chemical[6], chemical[7])
-        if chemical[8] and chemical[9] != '':
-            toadd.set_betas(chemical[8], chemical[9])
+        if chemical[2] and chemical[3] != '':
+            toadd.set_ddoc_dpoc(chemical[2], chemical[3])
+        if chemical[4] and chemical[5] != '':
+            toadd.set_betas(chemical[4], chemical[5])
 
         # dealing with cwto and cwdo
-        if chemical[3][region_index] != '':
-            toadd.set_cwto(chemical[3][region_index])
-        if chemical[4][region_index] != '':
-            toadd.set_cwdo(chemical[4][region_index])
-        if chemical[5][region_index] != '':
-            toadd.set_cwp(chemical[5][region_index])
+        if chemical[7][region_index] != '':
+            toadd.set_cwto(chemical[7][region_index])
+        if chemical[8][region_index] != '':
+            toadd.set_cwdo(chemical[8][region_index])
+        if chemical[9][region_index] != '':
+            toadd.set_cwp(chemical[9][region_index])
 
         if toadd.Cwp != -1 and toadd.Cwdo != -1 and toadd.Cs == '' and region.Ocs != '':
             toadd.calc_cs(region)
@@ -132,6 +130,7 @@ def init_chems(chem_data, region, region_index, u_count, v_count):
     return chemicals
 
 
+# same as chemicals and regions but for phytos
 def init_phyto(phyto_data, chemicals, u_count, v_count, per_step=0):
 
     phytos = []
@@ -218,6 +217,7 @@ def init_zoop(zoo_data, region, chemicals, phyto, u_count, v_count, per_step=0):
         zoops.append(toadd)
 
     return zoops
+
 
 def init_single_fish_pre_region(fish_data, region, chemicals, diet, u_count, v_count, per_step=0):
 
@@ -332,7 +332,6 @@ def init_fish_post_region(fishs, tempfishs, region, chemicals):
     return fishs
 
 
-
 def init_single_fish_post_region(fish, tempfishs, region, chemicals):
 
     fish.calc_diet_per(tempfishs, region)
@@ -354,7 +353,7 @@ def init_single_fish_post_region(fish, tempfishs, region, chemicals):
     return fish
 
 
-
+# Function to reorder fish *has not been tested*
 def reorder_fish(fishs):
 
     new_order = []
@@ -421,6 +420,7 @@ def find_next_fish(possible_fish, below):
     return nextfish
 
 
+
 def solve_steady(region, chemicals, phytos, zoops, inverts, fishs):
 
     # nested dictonary where can look up first by region then chemical then animal to find concentration
@@ -484,7 +484,7 @@ def solve_steady(region, chemicals, phytos, zoops, inverts, fishs):
     return conc_log
 
 
-def init_prior_con_dic(stat_check, monte_carlo_length,regions, chems, phyto, zoops, inverts, fishs, draws):
+def init_prior_con_dic(monte_carlo_length,regions, chems, phyto, zoops, inverts, fishs, draws):
 
     prior_con_dic_nonfish_list = []
     for p in range(monte_carlo_length):
@@ -559,7 +559,7 @@ def not_eating(predator):
 
     return False
 
-def eats_fish(predator, non_fish_num, fish_names):
+def eats_fish(predator, non_fish_num):
     count = 0
 
     for i in range(non_fish_num, len(predator.diet_frac)):
@@ -571,13 +571,14 @@ def eats_fish(predator, non_fish_num, fish_names):
     return False
 
 
+# when solving for a fish this function gets the concentrations in the prey of the fish
 def get_prey_con(predator, reg_index, len_chems, chem_names, fish_names, non_fish_num, locations, conc_fishs):
 
     # There are no prior concentrations if fish doesn't eat
     if not_eating(predator) == True:
         return None
 
-    if eats_fish(predator,non_fish_num, fish_names) == False:
+    if eats_fish(predator,non_fish_num) == False:
         return None
 
     # Otherwise find the populations in region previously and now and average there concentrations
@@ -628,6 +629,7 @@ def get_prey_con(predator, reg_index, len_chems, chem_names, fish_names, non_fis
         else:
             return None
 
+
 def solve_single_fish_single_region(region, chemicals, fish, days, prior_prey_cons, new_prey_cons, prior_C, out_check):
 
     new_cons_by_chemical = []
@@ -640,7 +642,7 @@ def solve_single_fish_single_region(region, chemicals, fish, days, prior_prey_co
         new_cons_by_chemical.append(new_con)
     return new_cons_by_chemical
 
-def bio_monte_carlo_loop(model_para, all_data, t, time_per_step, old_fish_by_region ,fish_by_region, prior_locations, locations, stat_check, u_iter, v_iter, p_dic=None):
+def bio_monte_carlo_loop(model_para, all_data, t, time_per_step, fish_by_region, prior_locations, locations, u_iter, v_iter, p_dic=None):
 
     # renaming so the brain works
     region_data = all_data[0]

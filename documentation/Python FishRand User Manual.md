@@ -26,7 +26,7 @@ The beginning, and end times for the simulation are entered under the sampling i
 
 #### Steady State
 
-Lastly if the beginning and the ending times are the same, and only a single sample site is defined, one can set the Steady State option to "YES" which will give a steady state solution for the model. Otherwise set Steady State to "NO".
+Lastly if the beginning and the ending times are the same, and only a single sample site is defined (if more than one is defined it will only take the first one), one can set the Steady State option to "YES" which will give a steady state solution for the model. Otherwise set Steady State to "NO". If you would like to solve for steady state with more sample sites, you can always run the number of time steps out long enough with multiple sites. 
 
 ### Parameter input formatting
 In the next four input tabs, both non-statistical and statistical parameters are accepted. 
@@ -53,7 +53,7 @@ Distribution Parameters examples:
 #### Distribution Table
 
 | Name        | Parameterization        |
-| ----------- | ----------------------- |
+| :---------- | :---------------------- |
 | Normal      | μ, σ                    |
 | Uniform     | beginning, length       |
 | Triangle    | beginning, ending, peak |
@@ -117,6 +117,8 @@ Each fish must have at least one corresponding hotspot. This is a downside, but 
 • If any orginisims diet is partly made up of sediment, then both the Fraction of Organic Carbon Content in Sediment, and Concentration in Sediment (ng/g) must be definied.
 
 • Some parameters in the excel spreadsheet take are labelled with deafult values that they will take on if nothing is entered.
+
+• The model current assumes unfiltered water.
 
 ## FishRand App
 

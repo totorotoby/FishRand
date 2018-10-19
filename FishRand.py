@@ -7,6 +7,9 @@ from tkinter import filedialog
 from tkinter import messagebox
 import networkx as nx
 from main import *
+import subprocess
+import sys
+import os
 
 
 exitflag = False
@@ -108,8 +111,9 @@ class app(tk.Frame):
         tk.Button(self, text="Run", command=self.run_model).grid(column=0, row=11)
 
 
-         ###Fish Image###                                                                                                                         
-        fish_image = tk.PhotoImage(file="fishrand.gif")
+         ###Fish Image###
+        mypath = os.path.dirname(os.path.abspath(__file__))
+        fish_image = tk.PhotoImage(file= mypath + "/fishrand.gif")
         label_image0 = tk.Label(self, image=fish_image)
         label_image0.image = fish_image
         label_image0.grid(row=0,column=0, sticky=tk.W)
@@ -142,7 +146,6 @@ class app(tk.Frame):
             # get timesteps
 
             time_entry = self.timeentry.get().split(",")
-            #print(time_entry)
             try:
                 self.time_entry = [int(i) for i in time_entry]
             except:
@@ -156,13 +159,11 @@ class app(tk.Frame):
                 self.to_write = self.output[1]
                 self.stat_check = self.output[2]
                 self.foodweb_graph = self.output[3]
-                #print(self.to_write)
 
 
             if self.output[0] == 'NO':
-
+                #print(self.output)
                 self.to_write = self.output[1]
-                print(self.to_write)
                 self.stat_check = self.output[2]
                 self.region_areas = self.output[3]
                 self.graph_data = self.output[4]
@@ -362,7 +363,6 @@ class app(tk.Frame):
 
         pos = nx.spectral_layout(self.foodweb_graph)
 
-        # print(pos)
         pos_higher = {}
         for k, v in pos.items():
             pos_higher[k] = (v[0] + .15, v[1])
@@ -390,29 +390,12 @@ def closing():
         exitflag = True
         root.destroy()
 
-def install_package(package):
-    import importlib
-    try:
-        importlib.import_module(package)
-    except ImportError:
-        from pip._internal import main as pip
-        pip(['install', '--user', package])
 
+def install(package):
 
-def install():
-
-    install_package('pyDOE')
-    install_package('numpy')
-    install_package('scipy')
-    install_package('tkinter')
-    install_package('shapely')
-    install_package('matplotlib')
-    install_package('networkx')
-
+    subprocess.call([sys.executable, "-m", "pip", "install", package])
 
 def main():
-
-    install()
 
     global exitflag
 

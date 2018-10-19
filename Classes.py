@@ -448,7 +448,7 @@ class Pplank:
         return (self.k_1[i] * Cwd) / (self.k_2[i] + self.Kg)
 
     def solve_next_time_step(self, Cwd, chem_index, pre_step, t):
-
+        print(self.Kg, self.k_1)
         q = self.k_1[chem_index] * Cwd
         k = (self.k_2[chem_index]) + self.Kg
 

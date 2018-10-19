@@ -3,7 +3,6 @@ import networkx as nx
 import prob as pr
 import Time_parser
 import numpy as np
-from matplotlib import pyplot as plt
 from spatial import HotSpot
 
 
@@ -42,7 +41,6 @@ def convert_to_lists(filename):
     get_temp_data(temp_data, temp_sheet, len(region_data))
 
     chem_len = 7 + (len(region_data)*4)
-
     chem_sheet = all_sheets.sheet_by_index(3)
 
     entry_col = chem_sheet.col(1)
@@ -132,8 +130,10 @@ def get_data(entry_col, dist_col, instance_len, new_list):
                 break
         else:
             if i % (instance_len + 1) == 1:
-                new_entry.append(entry_col[i].value)
-
+                if entry_col[i].value == '':
+                    break
+                else:
+                    new_entry.append(entry_col[i].value)
             else:
                 data_get_helper(entry_col[i], dist_col[i], new_entry)
     if len(new_entry) != 0:
@@ -175,15 +175,14 @@ def get_diet_data(diet_sheet, diet_data, entrysize):
         if i % entrysize == 0:
             continue
         if i % entrysize == 1:
-            new_name = diet_sheet.row(i)[1].value
+            new_name = diet_sheet.row(i)[0].value
             diet_data[new_name] = []
         else:
-            new_prey_data = [diet_sheet.row(i)[1].value, float(diet_sheet.row(i)[2].value)]
+            new_prey_data = [diet_sheet.row(i)[0].value, float(diet_sheet.row(i)[1].value)]
             diet_data[new_name].append(new_prey_data)
 
 
 def get_chem_data(entry_col, dist_col, chem_len, chem_data, num_regions):
-
     for i in range(len(entry_col)):
         if i % chem_len == 0:
             new_chem = []
@@ -194,7 +193,11 @@ def get_chem_data(entry_col, dist_col, chem_len, chem_data, num_regions):
         if i % chem_len == 1:
             new_chem.append(entry_col[i].value)
             data_get_helper(entry_col[i+1], dist_col[i+1], new_chem)
-        if i % chem_len == 3:
+            data_get_helper(entry_col[i + 2], dist_col[i + 2], new_chem)
+            data_get_helper(entry_col[i + 3], dist_col[i + 3], new_chem)
+            data_get_helper(entry_col[i + 4], dist_col[i + 4], new_chem)
+            data_get_helper(entry_col[i + 5], dist_col[i + 5], new_chem)
+        if i % chem_len == 7:
             for j in range(i, i+num_regions*4):
                 if (j-i) % 4 == 0:
                     data_get_helper(entry_col[j], dist_col[j], sed_con)
@@ -208,12 +211,7 @@ def get_chem_data(entry_col, dist_col, chem_len, chem_data, num_regions):
             new_chem.append(total_con)
             new_chem.append(dis_con)
             new_chem.append(por_con)
-        if i % chem_len == chem_len-4:
-            data_get_helper(entry_col[i], dist_col[i], new_chem)
-            data_get_helper(entry_col[i+1], dist_col[i+1], new_chem)
-            data_get_helper(entry_col[i + 2], dist_col[i + 2], new_chem)
-            data_get_helper(entry_col[i + 3], dist_col[i + 3], new_chem)
-            chem_data.append(new_chem)
+        chem_data.append(new_chem)
 
 
 
@@ -342,7 +340,7 @@ def write_output_steady(total_cons, output_name, stop, dist_type):
                 sheet.write(i+1,j+1, total_cons[region][org_list[i]][chem_list[j][0]])
 
 
-
+# TODO nonstat output messed up
 def write_temporal_excel(array, output_name, stops, stat_flag, regional_areas, dist_type):
 
     types = ["Normal", 'Lognormal', 'Uniform', 'Gamma', "KS Best"]
@@ -386,30 +384,29 @@ def write_temporal_excel(array, output_name, stops, stat_flag, regional_areas, d
                     sheet.write(count + 1, 0, animal)
                     count +=1
 
+            print(lower_non_avg)
             count1 = -1
             for i in range(len(reg_list)):
                 count1 += 1
                 for j in range(len(lower_org_list)):
                     for k in range(len(chem_list)):
-                        #if
-                        sheet.write(count1 + 2 + (i + j) + (len(lower_non_avg) * i), k+1, lower_non_avg[reg_list[i]][lower_org_list[j]][chem_list[k]])
+
+                        sheet.write(count1 + 2 + (i + j) + (len(lower_non_avg) * i), k+1, round(lower_non_avg[reg_list[i]][lower_org_list[j]][chem_list[k]]), 3)
 
 
 
             sheet.write(0, len(chem_list) + 1, 'Lower Food Web Concentrations Average Concentrations Weighted by Regional Area (ng/g)', big)
             for j in range(len(chem_list)):
                 sheet.write(0, len(chem_list) + 1 + (j + 1), chem_list[j])
-
-
             for i in range(len(lower_org_list)):
                 for j in range(len(chem_list)):
-                    sheet.write(1 + i, 2 + len(chem_list) + j, lower_avg[lower_org_list[i]][chem_list[j]])
+                    sheet.write(1 + i, 2 + len(chem_list) + j, round(lower_avg[lower_org_list[i]][chem_list[j]]),3)
 
             sheet.write(count + 1, 0, 'Upper Food Web Concentrations Averaged over Populations (ng/g)', big)
             for i in range(len(upper_org_list)):
                 sheet.write(count + 2 + i, 0, upper_org_list[i])
                 for j in range (len(chem_list)):
-                    sheet.write(count + 2 + i, j+1, upper_avg[upper_org_list[i]][chem_list[j]])
+                    sheet.write(count + 2 + i, j+1, round(upper_avg[upper_org_list[i]][chem_list[j]]),3)
 
 
     if stat_flag == 1:

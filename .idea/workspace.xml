@@ -4,105 +4,126 @@
     <option name="SCOPE_TYPE" value="3" />
   </component>
   <component name="BookmarkManager">
-    <bookmark url="file://$PROJECT_DIR$/FR_Input_Output.py" description="write_zoop = ((write_region + write_phyto + 1) + j..." line="223" />
+    <bookmark url="file://$PROJECT_DIR$/FR_Input_Output.py" description="write_zoop = ((write_region + write_phyto + 1) + j..." line="221" />
+    <bookmark url="file://$PROJECT_DIR$/FishRand.py" description="&#10;mypath = Path().absolute()" line="11" />
   </component>
   <component name="ChangeListManager">
     <list default="true" id="32e81eb3-a9b7-4cb8-a9cd-bcc8c2ebfb39" name="Default" comment="determinstic and bio monte loop both seem to be stable, after redoing dimensions">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Classes1.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/fish.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/zoop.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/sheets/input/tests/FR_Input_st_small_Var.xlsx" afterPath="$PROJECT_DIR$/sheets/input/tests/FR_Input_st_small_Var.xlsx" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/sheets/input/tests/testy_test.xlsx" afterPath="$PROJECT_DIR$/sheets/input/tests/testy_test.xlsx" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/sheets/other/AQUAWEBv1.2.xls" afterPath="$PROJECT_DIR$/sheets/other/AQUAWEBv1.2.xls" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Bioaccum.py" afterPath="$PROJECT_DIR$/Bioaccum.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Classes.py" afterPath="$PROJECT_DIR$/Classes.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/FR_Input_Output.py" afterPath="$PROJECT_DIR$/FR_Input_Output.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Time_parser.py" afterPath="$PROJECT_DIR$/Time_parser.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/prob.py" afterPath="$PROJECT_DIR$/prob.py" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Bioaccum.py" beforeDir="false" afterPath="$PROJECT_DIR$/Bioaccum.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Classes.py" beforeDir="false" afterPath="$PROJECT_DIR$/Classes.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FR_Input_Output.py" beforeDir="false" afterPath="$PROJECT_DIR$/FR_Input_Output.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FishRand.py" beforeDir="false" afterPath="$PROJECT_DIR$/FishRand.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/documentation/Python FishRand User Manual.md" beforeDir="false" afterPath="$PROJECT_DIR$/documentation/Python FishRand User Manual.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/prob.py" beforeDir="false" afterPath="$PROJECT_DIR$/prob.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sheets/input/Blank_Input.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/sheets/input/Blank_Input.xlsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sheets/input/example.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/sheets/input/example.xlsx" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
-    <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
-  <component name="DockManager">
-    <window id="3">
-      <content type="file-editors">
-        <state>
-          <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-            <file leaf-file-name="Classes.py" pinned="false" current-in-tab="true">
-              <entry file="file://$PROJECT_DIR$/Classes.py">
-                <provider selected="true" editor-type-id="text-editor">
-                  <state relative-caret-position="248">
-                    <caret line="503" column="64" lean-forward="false" selection-start-line="503" selection-start-column="64" selection-end-line="503" selection-end-column="64" />
-                    <folding />
-                  </state>
-                </provider>
-              </entry>
-            </file>
-          </leaf>
-        </state>
-      </content>
-    </window>
+  <component name="FUSProjectUsageTrigger">
+    <session id="-1953109061">
+      <usages-collector id="statistics.lifecycle.project">
+        <counts>
+          <entry key="project.closed" value="1" />
+          <entry key="project.open.time.0" value="2" />
+          <entry key="project.opened" value="2" />
+        </counts>
+      </usages-collector>
+      <usages-collector id="statistics.file.extensions.open">
+        <counts>
+          <entry key="py" value="3" />
+        </counts>
+      </usages-collector>
+      <usages-collector id="statistics.file.types.open">
+        <counts>
+          <entry key="Python" value="3" />
+        </counts>
+      </usages-collector>
+      <usages-collector id="statistics.file.extensions.edit">
+        <counts>
+          <entry key="py" value="1488" />
+        </counts>
+      </usages-collector>
+      <usages-collector id="statistics.file.types.edit">
+        <counts>
+          <entry key="Python" value="1488" />
+        </counts>
+      </usages-collector>
+    </session>
   </component>
-  <component name="ExecutionTargetManager" SELECTED_TARGET="default_target" />
   <component name="FavoritesManager">
     <favorites_list name="TobyFishRand" />
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="gui.py" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/gui.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-298">
-              <caret line="106" column="0" lean-forward="false" selection-start-line="106" selection-start-column="0" selection-end-line="106" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="main.py" pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/main.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="75">
-              <caret line="5" column="56" lean-forward="false" selection-start-line="5" selection-start-column="56" selection-end-line="5" selection-end-column="56" />
+            <state relative-caret-position="345">
+              <caret line="23" lean-forward="true" selection-start-line="23" selection-end-line="23" />
               <folding>
-                <marker date="1536072608736" expanded="true" signature="29:60" ph="..." />
+                <element signature="e#0#15#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="prob.py" pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/FishRand.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="284">
+              <caret line="114" column="17" selection-start-line="114" selection-start-column="17" selection-end-line="114" selection-end-column="17" />
+              <folding>
+                <element signature="e#0#20#0" expanded="true" />
+                <marker date="1539893788948" expanded="true" signature="14818:14819" ph="..." />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/prob.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-4378">
-              <caret line="56" column="28" lean-forward="false" selection-start-line="56" selection-start-column="28" selection-end-line="56" selection-end-column="28" />
+            <state relative-caret-position="284">
+              <caret line="343" column="1" selection-start-line="343" selection-start-column="1" selection-end-line="343" selection-end-column="1" />
               <folding>
-                <element signature="e#0#29#0" expanded="true" />
+                <marker date="1539879313001" expanded="true" signature="11449:11453" ph="..." />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Time_parser.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Time_parser.py">
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/spatial.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="255">
-              <caret line="17" column="43" lean-forward="false" selection-start-line="17" selection-start-column="43" selection-end-line="17" selection-end-column="43" />
-              <folding />
+            <state>
+              <folding>
+                <element signature="e#0#50#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="FR_Input_Output.py" pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Time_parser.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="195">
+              <caret line="13" column="25" selection-start-line="13" selection-start-column="15" selection-end-line="13" selection-end-column="25" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/FR_Input_Output.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-958">
-              <caret line="136" column="62" lean-forward="false" selection-start-line="136" selection-start-column="62" selection-end-line="136" selection-end-column="62" />
+            <state relative-caret-position="181">
+              <caret line="342" column="2" selection-start-line="342" selection-start-column="2" selection-end-line="342" selection-end-column="2" />
               <folding>
                 <element signature="e#0#23#0" expanded="true" />
               </folding>
@@ -110,22 +131,25 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Bioaccum.py" pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Bioaccum.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-3643">
-              <caret line="63" column="17" lean-forward="false" selection-start-line="63" selection-start-column="12" selection-end-line="63" selection-end-column="17" />
+            <state relative-caret-position="1380">
+              <caret line="92" column="18" selection-start-line="92" selection-start-column="18" selection-end-line="92" selection-end-column="18" />
               <folding>
-                <element signature="e#358#806#0" expanded="false" />
-                <element signature="e#860#1258#0" expanded="false" />
-                <element signature="e#2210#2951#0" expanded="false" />
-                <element signature="e#3750#5192#0" expanded="false" />
-                <element signature="e#5312#6656#0" expanded="false" />
-                <element signature="e#6784#7416#0" expanded="false" />
-                <element signature="e#7448#8150#0" expanded="false" />
-                <element signature="e#8185#8557#0" expanded="false" />
-                <element signature="e#8621#8882#0" expanded="false" />
-                <element signature="e#13745#13937#0" expanded="false" />
+                <element signature="e#0#17#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Classes.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="285">
+              <caret line="19" column="8" selection-start-line="19" selection-start-column="8" selection-end-line="19" selection-end-column="8" />
+              <folding>
+                <element signature="e#0#11#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -142,22 +166,10 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>take_samples</find>
-      <find>in</find>
-      <find>set_hy</find>
-      <find>zooplank</find>
-      <find>calc_cox</find>
-      <find>Gv</find>
-      <find>phyto</find>
-      <find>\n\n</find>
-      <find>set_mp</find>
-      <find>\n</find>
-      <find>VNdc</find>
       <find>self.Vnd</find>
       <find>calc_gf</find>
       <find>cwdo</find>
       <find>self.vnd</find>
-      <find>k_d</find>
       <find>diet_frac</find>
       <find>cs</find>
       <find>normal</find>
@@ -170,15 +182,24 @@
       <find>best_para</find>
       <find>best_param</find>
       <find>T</find>
-      <find>print</find>
       <find>something is</find>
+      <find>init_prior_con</find>
+      <find>eats_fish</find>
+      <find>solve_single_fish_single_region</find>
+      <find>stat_check</find>
+      <find>bio_monte</find>
+      <find>Ed</find>
+      <find>k_d</find>
+      <find>diet</find>
+      <find>not</find>
+      <find>get_data</find>
+      <find>chemical</find>
+      <find>init_chems</find>
+      <find>print</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
-    <push-targets>
-      <push-target-info target-remote="origin" target-branch="master" repo="$PROJECT_DIR$" source="spatial" />
-    </push-targets>
   </component>
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
@@ -196,73 +217,46 @@
         <option value="$PROJECT_DIR$/approach_mean.py" />
         <option value="$PROJECT_DIR$/lognorm_test.py" />
         <option value="$PROJECT_DIR$/gui.py" />
-        <option value="$PROJECT_DIR$/main.py" />
         <option value="$PROJECT_DIR$/possibly_useful_junk.py" />
         <option value="$PROJECT_DIR$/zoop.py" />
         <option value="$PROJECT_DIR$/fish.py" />
         <option value="$PROJECT_DIR$/Classes1.py" />
         <option value="$PROJECT_DIR$/Time_parser.py" />
-        <option value="$PROJECT_DIR$/Classes.py" />
+        <option value="$PROJECT_DIR$/main.py" />
         <option value="$PROJECT_DIR$/Bioaccum.py" />
-        <option value="$PROJECT_DIR$/prob.py" />
+        <option value="$PROJECT_DIR$/Classes.py" />
         <option value="$PROJECT_DIR$/FR_Input_Output.py" />
+        <option value="$PROJECT_DIR$/prob.py" />
+        <option value="$PROJECT_DIR$/FishRand.py" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="26" />
+    <option name="x" value="189" />
     <option name="y" value="23" />
-    <option name="width" value="729" />
+    <option name="width" value="1224" />
     <option name="height" value="877" />
   </component>
   <component name="ProjectLevelVcsManager">
     <ConfirmationsSetting value="2" id="Add" />
   </component>
   <component name="ProjectView">
-    <navigator currentView="ProjectPane" proportions="" version="1">
-      <flattenPackages />
-      <showMembers />
-      <showModules />
-      <showLibraryContents />
-      <hideEmptyPackages />
-      <abbreviatePackageNames />
-      <autoscrollToSource />
-      <autoscrollFromSource />
-      <sortByType />
-      <manualOrder />
+    <navigator proportions="" version="1">
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
-      <pane id="Scratches" />
       <pane id="ProjectPane">
         <subPane>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="FishRand" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="External Libraries" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ExternalLibrariesNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="&lt; Python 3.5.2 (/Library/Frameworks/Python.framework/Versions/3.5/bin/python3.5) &gt;" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.NamedLibraryElementNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="FishRand" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="FishRand" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
+          <expand>
+            <path>
+              <item name="FishRand" type="b2602c69:ProjectViewProjectNode" />
+              <item name="FishRand" type="462c0819:PsiDirectoryNode" />
+            </path>
+          </expand>
+          <select />
         </subPane>
       </pane>
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -291,7 +285,29 @@
     </option>
   </component>
   <component name="RunManager" selected="Python.Bioaccum">
+    <configuration name="Bioaccum" type="PythonConfigurationType" factoryName="Python">
+      <module name="TobyFishRand" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/Bioaccum.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <configuration default="true" type="PythonConfigurationType" factoryName="Python">
+      <module name="FishRand" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <envs>
@@ -302,35 +318,56 @@
       <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <module name="FishRand" />
       <option name="SCRIPT_NAME" value="" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
-      <method />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="approach" type="PythonConfigurationType" factoryName="Python">
+      <module name="TobyFishRand" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/approach_mean.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
     </configuration>
     <configuration default="true" type="Tox" factoryName="Tox">
+      <module name="FishRand" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
-      <envs />
       <option name="SDK_HOME" value="" />
       <option name="WORKING_DIRECTORY" value="" />
       <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <module name="FishRand" />
-      <method />
+      <method v="2" />
     </configuration>
     <configuration default="true" type="tests" factoryName="Doctests">
+      <module name="FishRand" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
-      <envs />
       <option name="SDK_HOME" value="" />
       <option name="WORKING_DIRECTORY" value="" />
       <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <module name="FishRand" />
       <option name="SCRIPT_NAME" value="" />
       <option name="CLASS_NAME" value="" />
       <option name="METHOD_NAME" value="" />
@@ -338,70 +375,33 @@
       <option name="TEST_TYPE" value="TEST_SCRIPT" />
       <option name="PATTERN" value="" />
       <option name="USE_PATTERN" value="false" />
-      <method />
+      <method v="2" />
     </configuration>
     <configuration default="true" type="tests" factoryName="Nosetests">
+      <module name="FishRand" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
-      <envs />
       <option name="SDK_HOME" value="" />
       <option name="WORKING_DIRECTORY" value="" />
       <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <module name="FishRand" />
       <option name="_new_regexPattern" value="&quot;&quot;" />
       <option name="_new_additionalArguments" value="&quot;&quot;" />
       <option name="_new_target" value="&quot;.&quot;" />
       <option name="_new_targetType" value="&quot;PATH&quot;" />
-      <method />
+      <method v="2" />
     </configuration>
-    <configuration default="false" name="approach" type="PythonConfigurationType" factoryName="Python">
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <module name="TobyFishRand" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/approach_mean.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <method />
-    </configuration>
-    <configuration default="false" name="Bioaccum" type="PythonConfigurationType" factoryName="Python">
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <module name="TobyFishRand" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/Bioaccum.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <method />
-    </configuration>
-    <list size="2">
-      <item index="0" class="java.lang.String" itemvalue="Python.approach" />
-      <item index="1" class="java.lang.String" itemvalue="Python.Bioaccum" />
+    <list>
+      <item itemvalue="Python.approach" />
+      <item itemvalue="Python.Bioaccum" />
     </list>
-  </component>
-  <component name="ShelveChangesManager" show_recycled="false">
-    <option name="remove_strategy" value="false" />
   </component>
   <component name="StructureViewFactory">
     <option name="ACTIVE_ACTIONS" value=",SHOW_INHERITED" />
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
   </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
@@ -474,48 +474,48 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="26" y="23" width="729" height="877" extended-state="0" />
+    <frame x="189" y="23" width="1224" height="877" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.09412232" sideWeight="0.49376947" order="0" side_tool="false" content_ui="combo" />
-      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.21019109" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.29808918" sideWeight="0.115656964" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.03686636" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32866243" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
-      <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.18726115" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
-      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.15159756" sideWeight="0.49550563" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.18089172" sideWeight="0.884343" order="9" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.01614143" sideWeight="0.76872426" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.29007635" sideWeight="0.50623053" order="2" side_tool="true" content_ui="tabs" />
-      <window_info id="Data View" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.14378029" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
-      <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
-      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
-      <window_info id="Inspection Results" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32974634" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.34649682" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.49376947" weight="0.2295673" />
+      <window_info id="Structure" order="1" sideWeight="0.49550563" weight="0.15159756" />
+      <window_info id="Favorites" order="2" sideWeight="0.50623053" side_tool="true" weight="0.29007635" />
+      <window_info anchor="bottom" id="Message" order="0" />
+      <window_info anchor="bottom" id="Find" order="1" weight="0.34649682" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.03686636" />
+      <window_info anchor="bottom" id="Debug" order="3" sideWeight="0.76872426" weight="0.01614143" />
+      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
+      <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
+      <window_info active="true" anchor="bottom" id="TODO" order="6" visible="true" weight="0.21019109" />
+      <window_info anchor="bottom" id="Event Log" order="7" sideWeight="0.115656964" side_tool="true" weight="0.29808918" />
+      <window_info anchor="bottom" id="Python Console" order="8" weight="0.18726115" />
+      <window_info anchor="bottom" id="Terminal" order="9" sideWeight="0.884343" weight="0.18089172" />
+      <window_info anchor="bottom" id="Version Control" order="10" weight="0.32866243" />
+      <window_info anchor="bottom" id="Inspection Results" order="11" weight="0.32974634" />
+      <window_info anchor="right" id="Commander" order="0" weight="0.4" />
+      <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
+      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
+      <window_info anchor="right" id="Data View" order="3" weight="0.14378029" />
     </layout>
     <layout-to-restore>
-      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.21019109" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
-      <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.29808918" sideWeight="0.115656964" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.03686636" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32866243" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
-      <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.18726115" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.18089172" sideWeight="0.884343" order="9" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.09412232" sideWeight="0.49376947" order="0" side_tool="false" content_ui="combo" />
-      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.34649682" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.15159756" sideWeight="0.49550563" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.01614143" sideWeight="0.76872426" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.29007635" sideWeight="0.50623053" order="2" side_tool="true" content_ui="tabs" />
-      <window_info id="Data View" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.1449381" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.49376947" weight="0.09412232" />
+      <window_info id="Structure" order="1" sideWeight="0.49550563" weight="0.15159756" />
+      <window_info id="Favorites" order="2" sideWeight="0.50623053" side_tool="true" weight="0.29007635" />
+      <window_info anchor="bottom" id="Message" order="0" />
+      <window_info anchor="bottom" id="Find" order="1" weight="0.34649682" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.03686636" />
+      <window_info anchor="bottom" id="Debug" order="3" sideWeight="0.76872426" visible="true" weight="0.01614143" />
+      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
+      <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
+      <window_info anchor="bottom" id="TODO" order="6" weight="0.21019109" />
+      <window_info anchor="bottom" id="Event Log" order="7" sideWeight="0.115656964" side_tool="true" weight="0.29808918" />
+      <window_info anchor="bottom" id="Python Console" order="8" weight="0.18726115" />
+      <window_info anchor="bottom" id="Terminal" order="9" sideWeight="0.884343" weight="0.18089172" />
+      <window_info anchor="bottom" id="Version Control" order="10" weight="0.32866243" />
+      <window_info anchor="right" id="Commander" order="0" weight="0.4" />
+      <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
+      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
+      <window_info anchor="right" id="Data View" order="3" weight="0.1449381" />
     </layout-to-restore>
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -558,216 +558,44 @@
     <MESSAGE value="determinstic and bio monte loop both seem to be stable, after redoing dimensions" />
     <option name="LAST_COMMIT_MESSAGE" value="determinstic and bio monte loop both seem to be stable, after redoing dimensions" />
   </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <option name="time" value="92" />
-    </breakpoint-manager>
-    <watches-manager />
-  </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/Bioaccum.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="604">
-          <caret line="504" column="0" lean-forward="false" selection-start-line="504" selection-start-column="0" selection-end-line="504" selection-end-column="0" />
-          <folding>
-            <element signature="e#358#806#0" expanded="false" />
-            <element signature="e#860#1258#0" expanded="false" />
-            <element signature="e#2210#2951#0" expanded="false" />
-            <element signature="e#3750#5192#0" expanded="false" />
-            <element signature="e#5312#6656#0" expanded="false" />
-            <element signature="e#6784#7416#0" expanded="false" />
-            <element signature="e#7448#8150#0" expanded="false" />
-            <element signature="e#8185#8557#0" expanded="false" />
-            <element signature="e#8621#8882#0" expanded="false" />
-            <element signature="e#13745#13937#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/FR_Input_Output.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="139">
-          <caret line="105" column="108" lean-forward="false" selection-start-line="105" selection-start-column="108" selection-end-line="105" selection-end-column="108" />
-          <folding>
-            <element signature="e#0#23#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Bioaccum.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding>
-            <element signature="e#358#806#0" expanded="false" />
-            <element signature="e#860#1258#0" expanded="false" />
-            <element signature="e#2210#2951#0" expanded="false" />
-            <element signature="e#3750#5192#0" expanded="false" />
-            <element signature="e#5312#6656#0" expanded="false" />
-            <element signature="e#6784#7416#0" expanded="false" />
-            <element signature="e#7448#8150#0" expanded="false" />
-            <element signature="e#8185#8557#0" expanded="false" />
-            <element signature="e#8621#8882#0" expanded="false" />
-            <element signature="e#13745#13937#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Classes.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1125">
-          <caret line="75" column="31" lean-forward="true" selection-start-line="75" selection-start-column="31" selection-end-line="75" selection-end-column="31" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/prob.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="540">
-          <caret line="43" column="9" lean-forward="false" selection-start-line="43" selection-start-column="9" selection-end-line="43" selection-end-column="9" />
-          <folding>
-            <element signature="e#0#29#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/FR_Input_Output.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1245">
-          <caret line="86" column="21" lean-forward="true" selection-start-line="86" selection-start-column="21" selection-end-line="86" selection-end-column="21" />
-          <folding>
-            <element signature="e#0#23#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Bioaccum.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="5550">
-          <caret line="370" column="34" lean-forward="false" selection-start-line="370" selection-start-column="34" selection-end-line="370" selection-end-column="34" />
-          <folding>
-            <element signature="e#358#806#0" expanded="false" />
-            <element signature="e#860#1258#0" expanded="false" />
-            <element signature="e#2210#2951#0" expanded="false" />
-            <element signature="e#3750#5192#0" expanded="false" />
-            <element signature="e#5312#6656#0" expanded="false" />
-            <element signature="e#6784#7416#0" expanded="false" />
-            <element signature="e#7448#8150#0" expanded="false" />
-            <element signature="e#8185#8557#0" expanded="false" />
-            <element signature="e#8621#8882#0" expanded="false" />
-            <element signature="e#13745#13937#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Classes.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3360">
-          <caret line="224" column="0" lean-forward="false" selection-start-line="224" selection-start-column="0" selection-end-line="224" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/FR_Input_Output.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1425">
-          <caret line="95" column="18" lean-forward="false" selection-start-line="95" selection-start-column="18" selection-end-line="95" selection-end-column="18" />
-          <folding>
-            <element signature="e#0#23#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Pplank.py" />
-    <entry file="file://$PROJECT_DIR$/Invertebrate.py" />
-    <entry file="file://$PROJECT_DIR$/fish.py" />
-    <entry file="file://$APPLICATION_HOME_DIR$/helpers/python-skeletons/math.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="5415">
-          <caret line="362" column="11" lean-forward="true" selection-start-line="362" selection-start-column="11" selection-end-line="362" selection-end-column="11" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Sample_Input.csv" />
-    <entry file="file://$PROJECT_DIR$/Org_Input.csv" />
-    <entry file="file://$PROJECT_DIR$/xlrd/Run.py" />
-    <entry file="file://$PROJECT_DIR$/test.py" />
-    <entry file="file://$USER_HOME$/Library/Caches/PyCharmCE2017.1/python_stubs/776880377/scipy/sampler.py" />
     <entry file="file://$APPLICATION_HOME_DIR$/helpers/pydev/_pydev_imps/_pydev_execfile.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="255">
-          <caret line="17" column="0" lean-forward="false" selection-start-line="17" selection-start-column="0" selection-end-line="17" selection-end-column="0" />
+          <caret line="17" selection-start-line="17" selection-end-line="17" />
         </state>
       </provider>
     </entry>
     <entry file="file://$APPLICATION_HOME_DIR$/helpers/pydev/pydevd.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="504">
-          <caret line="1584" column="0" lean-forward="false" selection-start-line="1584" selection-start-column="0" selection-end-line="1584" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/FR_Input_Output.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="705">
-          <caret line="95" column="18" lean-forward="false" selection-start-line="95" selection-start-column="18" selection-end-line="95" selection-end-column="18" />
-          <folding>
-            <element signature="e#0#23#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Classes.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="479">
-          <caret line="224" column="0" lean-forward="true" selection-start-line="224" selection-start-column="0" selection-end-line="224" selection-end-column="0" />
-          <folding />
+          <caret line="1584" selection-start-line="1584" selection-end-line="1584" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/Pplank.py" />
     <entry file="file://$PROJECT_DIR$/Invertebrate.py" />
-    <entry file="file://$APPLICATION_HOME_DIR$/helpers/python-skeletons/math.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="5415">
-          <caret line="362" column="11" lean-forward="true" selection-start-line="362" selection-start-column="11" selection-end-line="362" selection-end-column="11" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$APPLICATION_HOME_DIR$/helpers/python-skeletons/math.py" />
     <entry file="file://$PROJECT_DIR$/Sample_Input.csv" />
     <entry file="file://$PROJECT_DIR$/Org_Input.csv" />
     <entry file="file://$PROJECT_DIR$/xlrd/Run.py" />
     <entry file="file://$USER_HOME$/Library/Caches/PyCharmCE2017.1/python_stubs/776880377/scipy/sampler.py" />
     <entry file="file://$PROJECT_DIR$/test.py" />
     <entry file="file://$APPLICATION_CONFIG_DIR$/scratches/scratch_2.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
+      <provider selected="true" editor-type-id="text-editor" />
     </entry>
     <entry file="file://$PROJECT_DIR$/mods/pyDOE/__init__.py" />
-    <entry file="file://$PROJECT_DIR$/FR_Input_Output.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1560">
-          <caret line="104" column="29" lean-forward="false" selection-start-line="104" selection-start-column="24" selection-end-line="104" selection-end-column="29" />
-          <folding>
-            <element signature="e#0#23#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file:///Library/Frameworks/Python.framework/Versions/3.5/lib/python3.5/codecs.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="226">
-          <caret line="308" column="0" lean-forward="false" selection-start-line="308" selection-start-column="0" selection-end-line="308" selection-end-column="0" />
+          <caret line="308" selection-start-line="308" selection-end-line="308" />
         </state>
       </provider>
     </entry>
     <entry file="file://$USER_HOME$/Library/Python/3.5/lib/python/site-packages/scipy/stats/_distn_infrastructure.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="213">
-          <caret line="432" column="0" lean-forward="false" selection-start-line="432" selection-start-column="0" selection-end-line="432" selection-end-column="0" />
+          <caret line="432" selection-start-line="432" selection-end-line="432" />
         </state>
       </provider>
     </entry>
@@ -784,108 +612,89 @@
     <entry file="file://$USER_HOME$/Library/Caches/PyCharmCE2017.1/python_stubs/776880377/builtins.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="198">
-          <caret line="4124" column="8" lean-forward="false" selection-start-line="4124" selection-start-column="8" selection-end-line="4124" selection-end-column="8" />
+          <caret line="4124" column="8" selection-start-line="4124" selection-start-column="8" selection-end-line="4124" selection-end-column="8" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/possibly_useful_junk.py">
+    <entry file="file://$PROJECT_DIR$/possibly_useful_junk.py" />
+    <entry file="file://$PROJECT_DIR$/zoop.py" />
+    <entry file="file://$PROJECT_DIR$/Classes1.py" />
+    <entry file="file://$PROJECT_DIR$/fish.py" />
+    <entry file="file://$PROJECT_DIR$/gui.py" />
+    <entry file="file://$PROJECT_DIR$/main.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="823">
-          <caret line="223" column="21" lean-forward="false" selection-start-line="223" selection-start-column="21" selection-end-line="223" selection-end-column="21" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/zoop.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1201">
-          <caret line="164" column="38" lean-forward="true" selection-start-line="2" selection-start-column="0" selection-end-line="164" selection-end-column="38" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Classes1.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="6645">
-          <caret line="443" column="24" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="461" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/fish.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="152">
-          <caret line="48" column="0" lean-forward="true" selection-start-line="48" selection-start-column="0" selection-end-line="48" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/FR_Input_Output.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-958">
-          <caret line="136" column="62" lean-forward="false" selection-start-line="136" selection-start-column="62" selection-end-line="136" selection-end-column="62" />
+        <state relative-caret-position="345">
+          <caret line="23" lean-forward="true" selection-start-line="23" selection-end-line="23" />
           <folding>
-            <element signature="e#0#23#0" expanded="true" />
+            <element signature="e#0#15#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Bioaccum.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1380">
+          <caret line="92" column="18" selection-start-line="92" selection-start-column="18" selection-end-line="92" selection-end-column="18" />
+          <folding>
+            <element signature="e#0#17#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/Classes.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="248">
-          <caret line="503" column="64" lean-forward="false" selection-start-line="503" selection-start-column="64" selection-end-line="503" selection-end-column="64" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Bioaccum.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-3643">
-          <caret line="63" column="17" lean-forward="false" selection-start-line="63" selection-start-column="12" selection-end-line="63" selection-end-column="17" />
+        <state relative-caret-position="285">
+          <caret line="19" column="8" selection-start-line="19" selection-start-column="8" selection-end-line="19" selection-end-column="8" />
           <folding>
-            <element signature="e#358#806#0" expanded="false" />
-            <element signature="e#860#1258#0" expanded="false" />
-            <element signature="e#2210#2951#0" expanded="false" />
-            <element signature="e#3750#5192#0" expanded="false" />
-            <element signature="e#5312#6656#0" expanded="false" />
-            <element signature="e#6784#7416#0" expanded="false" />
-            <element signature="e#7448#8150#0" expanded="false" />
-            <element signature="e#8185#8557#0" expanded="false" />
-            <element signature="e#8621#8882#0" expanded="false" />
-            <element signature="e#13745#13937#0" expanded="false" />
+            <element signature="e#0#11#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/Time_parser.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="255">
-          <caret line="17" column="43" lean-forward="false" selection-start-line="17" selection-start-column="43" selection-end-line="17" selection-end-column="43" />
-          <folding />
+        <state relative-caret-position="195">
+          <caret line="13" column="25" selection-start-line="13" selection-start-column="15" selection-end-line="13" selection-end-column="25" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/FR_Input_Output.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="181">
+          <caret line="342" column="2" selection-start-line="342" selection-start-column="2" selection-end-line="342" selection-end-column="2" />
+          <folding>
+            <element signature="e#0#23#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/prob.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-4378">
-          <caret line="56" column="28" lean-forward="false" selection-start-line="56" selection-start-column="28" selection-end-line="56" selection-end-column="28" />
+        <state relative-caret-position="284">
+          <caret line="343" column="1" selection-start-line="343" selection-start-column="1" selection-end-line="343" selection-end-column="1" />
           <folding>
-            <element signature="e#0#29#0" expanded="true" />
+            <marker date="1539879313001" expanded="true" signature="11449:11453" ph="..." />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/main.py">
+    <entry file="file://$PROJECT_DIR$/spatial.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="75">
-          <caret line="5" column="56" lean-forward="false" selection-start-line="5" selection-start-column="56" selection-end-line="5" selection-end-column="56" />
+        <state>
           <folding>
-            <marker date="1536072608736" expanded="true" signature="29:60" ph="..." />
+            <element signature="e#0#50#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/gui.py">
+    <entry file="file://$PROJECT_DIR$/FishRand.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-298">
-          <caret line="106" column="0" lean-forward="false" selection-start-line="106" selection-start-column="0" selection-end-line="106" selection-end-column="0" />
-          <folding />
+        <state relative-caret-position="284">
+          <caret line="114" column="17" selection-start-line="114" selection-start-column="17" selection-end-line="114" selection-end-column="17" />
+          <folding>
+            <element signature="e#0#20#0" expanded="true" />
+            <marker date="1539893788948" expanded="true" signature="14818:14819" ph="..." />
+          </folding>
         </state>
       </provider>
     </entry>

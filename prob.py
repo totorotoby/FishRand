@@ -114,7 +114,6 @@ class ResultDist:
         Sig_y = numpy.std(self.values)
 
         # guess for lognormal
-        print(M_y, Sig_y, self.animal, self.chem)
         s, scale = lognorm_to_scipyinput(M_y, Sig_y)
         m_x = math.log(scale)
         sig_x = s
@@ -337,12 +336,16 @@ def lognorm_to_scipyinput(M_y,Sig_y):
 
     s = math.sqrt(sigma2)
 
-
     return s, scale
 
 
-# overarching loop methods
+#TODO add in scipy to output functions
 
+#def scipyinput_to_lognormal(s, loc, scale):
+
+
+
+# overarching loop methods
 def set_hyper_samp_cube(model_para, Var):
 
     u_iter = int(model_para[0])
