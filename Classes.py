@@ -116,24 +116,32 @@ class Zooplank:
     # sets Gf for this zooplank
 
     def calc_gf(self):
+
         self.Gf = (((1-self.e_l)*self.Vld) + ((1-self.e_n)*self.Vnd)+((1-self.e_w)*self.Vwd))*self.Gd
 
     # returns K_gb for certian chemical
 
     def calc_kgb(self, chem_kow, chem_index, betal, betan, density_lip=.9, density_w=1, z_water=.05):
 
-        top = ((self.Vlg * (z_water*betal*chem_kow))/density_lip) + (self.Vng * betan * (z_water*chem_kow)) +\
+        print(self.Vlg, self.Vng, betal, betan, self.Vwg)
+
+        top = ((self.Vlg * (z_water*betal*chem_kow))/density_lip) + (self.Vng * .35 * (z_water*chem_kow)) +\
               (z_water*self.Vwg/density_w)
 
-        bottom = ((self.Vlb * (z_water*betal*chem_kow))/density_lip) + (self.Vnb * betan * z_water * chem_kow) +\
+        bottom = ((self.Vlb * (z_water*betal*chem_kow))/density_lip) + (self.Vnb * .35 * z_water * chem_kow) +\
                  (z_water*self.Vwb/density_w)
+
         k_gb = top/bottom
+
         self.k_gb[chem_index] = k_gb
+
+        print(self.k_gb)
 
     # returns k_e for certain chemical
     def calc_ke(self, chem_ed, chem_index):
         k_e = (self.k_gb[chem_index]/self.Wb) * chem_ed * self.Gf
         self.k_e[chem_index] = k_e
+        #print('kgb:' + str(self.k_gb),'ed: ' +  str(chem_ed), 'Gf: ' + str(self.Gf))
 
     def init_check(self):
 
@@ -167,6 +175,11 @@ class Zooplank:
         f_num = f_num/1000
 
         l_num = phyto_con * self.k_d[chem_index]
+
+        print("top " + str(f_num + l_num))
+        print('bottom ' + str(denom))
+        print("k2: " + str(self.k_2[0]))
+        print('ke: ' + str(self.k_e[0]))
 
         return (f_num + l_num) / denom
 
@@ -474,7 +487,7 @@ class Chemical:
         self.Ddoc = -1
         self.Dpoc = 0
         self.betal = 1
-        self.betan = .35
+        self.betan = .035
         self.Ew = self.calc_ew()
         self.Ed = self.calc_ed()
 

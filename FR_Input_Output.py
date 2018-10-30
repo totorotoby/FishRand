@@ -183,7 +183,10 @@ def get_diet_data(diet_sheet, diet_data, entrysize):
 
 
 def get_chem_data(entry_col, dist_col, chem_len, chem_data, num_regions):
+
     for i in range(len(entry_col)):
+        if entry_col[i].value == "END":
+            break
         if i % chem_len == 0:
             new_chem = []
             sed_con = []

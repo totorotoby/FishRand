@@ -170,7 +170,6 @@ def init_zoop(zoo_data, region, chemicals, phyto, u_count, v_count, per_step=0):
         zoop = zoo_data[i]
         zoop = check_inst_non_st(zoop, u_count, v_count)
         # Potential loop in the future
-
         toadd = obj.Zooplank(zoop[0], zoop[1], zoop[2], zoop[10], len(chemicals), per_step)
 
         # inital set
