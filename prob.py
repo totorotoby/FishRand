@@ -90,8 +90,8 @@ class ResultDist:
     dist_types = ['norm', 'lognorm', 'uniform', 'gamma']
 
     def __init__(self, values, chemical, animal):
-        self.count = 0
 
+        self.count = 0
         self.chem = chemical
         self.animal = animal
         self.values = values

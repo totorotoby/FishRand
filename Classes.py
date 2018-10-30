@@ -187,7 +187,7 @@ class Zooplank:
         return top/bottom
 
 
-# noinspection PyMethodOverriding,PyMethodOverriding
+
 class Fish(Zooplank):
 
     def __init__(self, name, weight, vlb, diet_data, flag, num_chemicals, per_step, vnb=.2, e_l=.75, e_n=.75, e_w=.5):

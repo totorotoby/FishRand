@@ -8,17 +8,15 @@
     <bookmark url="file://$PROJECT_DIR$/FishRand.py" description="&#10;mypath = Path().absolute()" line="11" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="32e81eb3-a9b7-4cb8-a9cd-bcc8c2ebfb39" name="Default" comment="determinstic and bio monte loop both seem to be stable, after redoing dimensions">
+    <list default="true" id="32e81eb3-a9b7-4cb8-a9cd-bcc8c2ebfb39" name="Default" comment="Fixed rounding problem, and output excel for temporal stat">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Bioaccum.py" beforeDir="false" afterPath="$PROJECT_DIR$/Bioaccum.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Classes.py" beforeDir="false" afterPath="$PROJECT_DIR$/Classes.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/FR_Input_Output.py" beforeDir="false" afterPath="$PROJECT_DIR$/FR_Input_Output.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FishRand.py" beforeDir="false" afterPath="$PROJECT_DIR$/FishRand.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/documentation/Python FishRand User Manual.md" beforeDir="false" afterPath="$PROJECT_DIR$/documentation/Python FishRand User Manual.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/prob.py" beforeDir="false" afterPath="$PROJECT_DIR$/prob.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sheets/input/Blank_Input.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/sheets/input/Blank_Input.xlsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sheets/input/example.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/sheets/input/example.xlsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sheets/input/Pegan_Cove_South_Pond.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/sheets/input/Pegan_Cove_South_Pond.xlsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sheets/input/~$Blank_Input.xlsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/sheets/input/~$example.xlsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/sheets/~$Pegan_Cove_South_Pond_Output.xlsx" beforeDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -30,9 +28,10 @@
     <session id="-1953109061">
       <usages-collector id="statistics.lifecycle.project">
         <counts>
-          <entry key="project.closed" value="1" />
+          <entry key="project.closed" value="2" />
           <entry key="project.open.time.0" value="2" />
-          <entry key="project.opened" value="2" />
+          <entry key="project.open.time.6" value="1" />
+          <entry key="project.opened" value="3" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.open">
@@ -47,12 +46,14 @@
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
-          <entry key="py" value="1488" />
+          <entry key="py" value="1765" />
+          <entry key="txt" value="72" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="Python" value="1488" />
+          <entry key="PLAIN_TEXT" value="72" />
+          <entry key="Python" value="1765" />
         </counts>
       </usages-collector>
     </session>
@@ -66,7 +67,7 @@
         <entry file="file://$PROJECT_DIR$/main.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="345">
-              <caret line="23" lean-forward="true" selection-start-line="23" selection-end-line="23" />
+              <caret line="23" selection-start-line="23" selection-end-line="23" />
               <folding>
                 <element signature="e#0#15#0" expanded="true" />
               </folding>
@@ -74,10 +75,10 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/FishRand.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="284">
+            <state relative-caret-position="1710">
               <caret line="114" column="17" selection-start-line="114" selection-start-column="17" selection-end-line="114" selection-end-column="17" />
               <folding>
                 <element signature="e#0#20#0" expanded="true" />
@@ -90,10 +91,10 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/prob.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="284">
-              <caret line="343" column="1" selection-start-line="343" selection-start-column="1" selection-end-line="343" selection-end-column="1" />
+            <state relative-caret-position="353">
+              <caret line="205" column="26" lean-forward="true" selection-start-line="205" selection-start-column="26" selection-end-line="205" selection-end-column="26" />
               <folding>
-                <marker date="1539879313001" expanded="true" signature="11449:11453" ph="..." />
+                <marker date="1540916184724" expanded="true" signature="11449:11453" ph="..." />
               </folding>
             </state>
           </provider>
@@ -102,7 +103,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/spatial.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state>
+            <state relative-caret-position="-4797">
               <folding>
                 <element signature="e#0#50#0" expanded="true" />
               </folding>
@@ -119,11 +120,11 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/FR_Input_Output.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="181">
-              <caret line="342" column="2" selection-start-line="342" selection-start-column="2" selection-end-line="342" selection-end-column="2" />
+            <state relative-caret-position="401">
+              <caret line="436" lean-forward="true" selection-start-line="436" selection-end-line="436" />
               <folding>
                 <element signature="e#0#23#0" expanded="true" />
               </folding>
@@ -134,7 +135,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Bioaccum.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1380">
+            <state relative-caret-position="-9647">
               <caret line="92" column="18" selection-start-line="92" selection-start-column="18" selection-end-line="92" selection-end-column="18" />
               <folding>
                 <element signature="e#0#17#0" expanded="true" />
@@ -146,8 +147,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Classes.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="285">
-              <caret line="19" column="8" selection-start-line="19" selection-start-column="8" selection-end-line="19" selection-end-column="8" />
+            <state relative-caret-position="302">
+              <caret line="51" column="25" lean-forward="true" selection-start-line="51" selection-start-column="25" selection-end-line="51" selection-end-column="25" />
               <folding>
                 <element signature="e#0#11#0" expanded="true" />
               </folding>
@@ -166,7 +167,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>self.Vnd</find>
       <find>calc_gf</find>
       <find>cwdo</find>
       <find>self.vnd</find>
@@ -196,6 +196,7 @@
       <find>chemical</find>
       <find>init_chems</find>
       <find>print</find>
+      <find>round</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -224,18 +225,18 @@
         <option value="$PROJECT_DIR$/Time_parser.py" />
         <option value="$PROJECT_DIR$/main.py" />
         <option value="$PROJECT_DIR$/Bioaccum.py" />
-        <option value="$PROJECT_DIR$/Classes.py" />
-        <option value="$PROJECT_DIR$/FR_Input_Output.py" />
-        <option value="$PROJECT_DIR$/prob.py" />
         <option value="$PROJECT_DIR$/FishRand.py" />
+        <option value="$PROJECT_DIR$/Classes.py" />
+        <option value="$PROJECT_DIR$/prob.py" />
+        <option value="$PROJECT_DIR$/FR_Input_Output.py" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="188" />
+    <option name="x" value="623" />
     <option name="y" value="23" />
-    <option name="width" value="1224" />
-    <option name="height" value="877" />
+    <option name="width" value="1493" />
+    <option name="height" value="1128" />
   </component>
   <component name="ProjectLevelVcsManager">
     <ConfirmationsSetting value="2" id="Add" />
@@ -260,12 +261,12 @@
     </panes>
   </component>
   <component name="PropertiesComponent">
-    <property name="ChangesBrowser.SHOW_FLATTEN" value="true" />
-    <property name="settings.editor.selected.configurable" value="preferences.lookFeel" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="ChangesTree.GroupingKeys" value="" />
     <property name="SearchEverywhereHistoryKey" value="&#9;FILE&#9;file:///Users/toby/Desktop/FishRand/FR_Input_Output.py" />
     <property name="com.intellij.ide.scratch.LRUPopupBuilder$2/Languages" value="Python" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="run.code.analysis.last.selected.profile" value="pProject Default" />
+    <property name="settings.editor.selected.configurable" value="preferences.lookFeel" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
@@ -474,7 +475,7 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="189" y="23" width="1224" height="877" extended-state="0" />
+    <frame x="623" y="23" width="1493" height="1128" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info content_ui="combo" id="Project" order="0" sideWeight="0.49376947" weight="0.2295673" />
@@ -486,8 +487,8 @@
       <window_info anchor="bottom" id="Debug" order="3" sideWeight="0.76872426" weight="0.01614143" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
-      <window_info active="true" anchor="bottom" id="TODO" order="6" visible="true" weight="0.21019109" />
-      <window_info anchor="bottom" id="Event Log" order="7" sideWeight="0.115656964" side_tool="true" weight="0.29808918" />
+      <window_info anchor="bottom" id="TODO" order="6" sideWeight="0.46550292" weight="0.21019109" />
+      <window_info anchor="bottom" id="Event Log" order="7" sideWeight="0.5344971" side_tool="true" weight="0.21019109" />
       <window_info anchor="bottom" id="Python Console" order="8" weight="0.18726115" />
       <window_info anchor="bottom" id="Terminal" order="9" sideWeight="0.884343" weight="0.18089172" />
       <window_info anchor="bottom" id="Version Control" order="10" weight="0.32866243" />
@@ -621,32 +622,21 @@
     <entry file="file://$PROJECT_DIR$/Classes1.py" />
     <entry file="file://$PROJECT_DIR$/fish.py" />
     <entry file="file://$PROJECT_DIR$/gui.py" />
-    <entry file="file://$PROJECT_DIR$/main.py">
+    <entry file="file://$PROJECT_DIR$/spatial.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="345">
-          <caret line="23" lean-forward="true" selection-start-line="23" selection-end-line="23" />
+        <state relative-caret-position="-4797">
           <folding>
-            <element signature="e#0#15#0" expanded="true" />
+            <element signature="e#0#50#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/Bioaccum.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1380">
+        <state relative-caret-position="-9647">
           <caret line="92" column="18" selection-start-line="92" selection-start-column="18" selection-end-line="92" selection-end-column="18" />
           <folding>
             <element signature="e#0#17#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Classes.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="285">
-          <caret line="19" column="8" selection-start-line="19" selection-start-column="8" selection-end-line="19" selection-end-column="8" />
-          <folding>
-            <element signature="e#0#11#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -658,42 +648,53 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/FR_Input_Output.py">
+    <entry file="file://$PROJECT_DIR$/FishRand.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="181">
-          <caret line="342" column="2" selection-start-line="342" selection-start-column="2" selection-end-line="342" selection-end-column="2" />
+        <state relative-caret-position="1710">
+          <caret line="114" column="17" selection-start-line="114" selection-start-column="17" selection-end-line="114" selection-end-column="17" />
           <folding>
-            <element signature="e#0#23#0" expanded="true" />
+            <element signature="e#0#20#0" expanded="true" />
+            <marker date="1539893788948" expanded="true" signature="14818:14819" ph="..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/main.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="345">
+          <caret line="23" selection-start-line="23" selection-end-line="23" />
+          <folding>
+            <element signature="e#0#15#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/prob.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="284">
-          <caret line="343" column="1" selection-start-line="343" selection-start-column="1" selection-end-line="343" selection-end-column="1" />
+        <state relative-caret-position="353">
+          <caret line="205" column="26" lean-forward="true" selection-start-line="205" selection-start-column="26" selection-end-line="205" selection-end-column="26" />
           <folding>
-            <marker date="1539879313001" expanded="true" signature="11449:11453" ph="..." />
+            <marker date="1540916184724" expanded="true" signature="11449:11453" ph="..." />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/spatial.py">
+    <entry file="file://$PROJECT_DIR$/Classes.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state>
+        <state relative-caret-position="302">
+          <caret line="51" column="25" lean-forward="true" selection-start-line="51" selection-start-column="25" selection-end-line="51" selection-end-column="25" />
           <folding>
-            <element signature="e#0#50#0" expanded="true" />
+            <element signature="e#0#11#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/FishRand.py">
+    <entry file="file://$PROJECT_DIR$/FR_Input_Output.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="284">
-          <caret line="114" column="17" selection-start-line="114" selection-start-column="17" selection-end-line="114" selection-end-column="17" />
+        <state relative-caret-position="401">
+          <caret line="436" lean-forward="true" selection-start-line="436" selection-end-line="436" />
           <folding>
-            <element signature="e#0#20#0" expanded="true" />
-            <marker date="1539893788948" expanded="true" signature="14818:14819" ph="..." />
+            <element signature="e#0#23#0" expanded="true" />
           </folding>
         </state>
       </provider>
