@@ -486,8 +486,11 @@ class Chemical:
         self.Cwdo = -1
         self.Ddoc = -1
         self.Dpoc = 0
-        self.betal = 1
-        self.betan = .035
+        self.beta1 = 1
+        self.beta2 = .035
+        self.beta3 = 1
+        self.beta4 = .35
+        self.beta5 = .035
         self.Ew = self.calc_ew()
         self.Ed = self.calc_ed()
 
@@ -508,10 +511,25 @@ class Chemical:
         self.Ddoc = ddoc
         self.Dpoc = dpoc
 
-    def set_betas(self, betal, betan):
+    def set_beta1(self, beta1):
 
-        self.betal = betal
-        self.betan = betan
+        self.beta1 = beta1
+
+    def set_beta2(self, beta2):
+
+        self.beta2 = beta2
+
+    def set_beta3(self, beta3):
+
+        self.beta3 = beta3
+
+    def set_beta4(self, beta4):
+
+        self.beta4 = beta4
+
+    def set_beta5(self, beta5):
+
+        self.beta5 = beta5
 
     def calc_ew(self):
         Ew = 1/(1.85 + (155/self.Kow))

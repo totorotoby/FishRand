@@ -40,7 +40,7 @@ def convert_to_lists(filename):
     num_timestep = num_timestep + 1
     get_temp_data(temp_data, temp_sheet, len(region_data))
 
-    chem_len = 7 + (len(region_data)*4)
+    chem_len = 10 + (len(region_data)*4)
     chem_sheet = all_sheets.sheet_by_index(3)
 
     entry_col = chem_sheet.col(1)
@@ -49,6 +49,7 @@ def convert_to_lists(filename):
     chem_data = []
 
     get_chem_data(entry_col, dist_col, chem_len, chem_data, len(region_data))
+    print(chem_data)
 
     org_sheet = all_sheets.sheet_by_index(4)
 
@@ -185,22 +186,26 @@ def get_diet_data(diet_sheet, diet_data, entrysize):
 def get_chem_data(entry_col, dist_col, chem_len, chem_data, num_regions):
 
     for i in range(len(entry_col)):
+
         if entry_col[i].value == "END":
-            break
-        if i % chem_len == 0:
+            return
+        elif i % chem_len == 0:
             new_chem = []
             sed_con = []
             total_con = []
             dis_con = []
             por_con = []
-        if i % chem_len == 1:
+        elif i % chem_len == 1:
             new_chem.append(entry_col[i].value)
             data_get_helper(entry_col[i+1], dist_col[i+1], new_chem)
             data_get_helper(entry_col[i + 2], dist_col[i + 2], new_chem)
             data_get_helper(entry_col[i + 3], dist_col[i + 3], new_chem)
             data_get_helper(entry_col[i + 4], dist_col[i + 4], new_chem)
             data_get_helper(entry_col[i + 5], dist_col[i + 5], new_chem)
-        if i % chem_len == 7:
+            data_get_helper(entry_col[i + 6], dist_col[i + 6], new_chem)
+            data_get_helper(entry_col[i + 7], dist_col[i + 7], new_chem)
+            data_get_helper(entry_col[i + 8], dist_col[i + 8], new_chem)
+        elif i % chem_len == 10:
             for j in range(i, i+num_regions*4):
                 if (j-i) % 4 == 0:
                     data_get_helper(entry_col[j], dist_col[j], sed_con)
@@ -214,7 +219,9 @@ def get_chem_data(entry_col, dist_col, chem_len, chem_data, num_regions):
             new_chem.append(total_con)
             new_chem.append(dis_con)
             new_chem.append(por_con)
-        chem_data.append(new_chem)
+            chem_data.append(new_chem)
+
+
 
 
 

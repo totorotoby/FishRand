@@ -96,21 +96,29 @@ def init_chems(chem_data, region, region_index, u_count, v_count):
         chemical = chem_data[i]
 
         chemical = check_inst_non_st(chemical, u_count, v_count)
-        toadd = obj.Chemical(chemical[0], chemical[1], chemical[6][region_index])
+        toadd = obj.Chemical(chemical[0], chemical[1], chemical[9][region_index])
 
         # dealing with ddoc and dpoc
         if chemical[2] and chemical[3] != '':
             toadd.set_ddoc_dpoc(chemical[2], chemical[3])
-        if chemical[4] and chemical[5] != '':
-            toadd.set_betas(chemical[4], chemical[5])
+        if chemical[4] != '':
+            toadd.set_beta1(chemical[4])
+        if chemical[5] != '':
+            toadd.set_beta2(chemical[5])
+        if chemical[6] != '':
+            toadd.set_beta3(chemical[6])
+        if chemical[7] != '':
+            toadd.set_beta4(chemical[7])
+        if chemical[8] != '':
+            toadd.set_beta5(chemical[8])
 
         # dealing with cwto and cwdo
-        if chemical[7][region_index] != '':
-            toadd.set_cwto(chemical[7][region_index])
-        if chemical[8][region_index] != '':
-            toadd.set_cwdo(chemical[8][region_index])
-        if chemical[9][region_index] != '':
-            toadd.set_cwp(chemical[9][region_index])
+        if chemical[10][region_index] != '':
+            toadd.set_cwto(chemical[10][region_index])
+        if chemical[11][region_index] != '':
+            toadd.set_cwdo(chemical[11][region_index])
+        if chemical[12][region_index] != '':
+            toadd.set_cwp(chemical[12][region_index])
 
         if toadd.Cwp != -1 and toadd.Cwdo != -1 and toadd.Cs == '' and region.Ocs != '':
             toadd.calc_cs(region)
