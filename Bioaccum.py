@@ -72,7 +72,7 @@ def init_region(reg_data, temp, u_count, v_count):
 
         # dealing with cox
         if region[6] != '':
-            toadd.set_cox(region[7])
+            toadd.set_cox(region[6])
         else:
             toadd.calc_cox()
 
@@ -156,10 +156,11 @@ def init_phyto(phyto_data, chemicals, u_count, v_count, per_step=0):
     for i in range(len(chemicals)):
 
         kow = chemicals[i].Kow
-        betal = chemicals[i].betal
-        betan = chemicals[i].betan
+        beta1 = chemicals[i].beta1
+        beta2 = chemicals[i].beta2
+        beta4 = chemicals[i].beta4
         toadd.calc_k1(kow, i)
-        toadd.calc_k2(kow, i, betal, betan)
+        toadd.calc_k2(kow, i, beta1, beta4)
 
     if toadd.init_check():
         phytos.append(toadd)
@@ -212,12 +213,15 @@ def init_zoop(zoo_data, region, chemicals, phyto, u_count, v_count, per_step=0):
             kow = chemicals[j].Kow
             ed = chemicals[j].Ed
             ew = chemicals[j].Ew
-            betal = chemicals[j].betal
-            betan = chemicals[j].betan
+            beta1 = chemicals[j].beta1
+            beta2 = chemicals[j].beta2
+            beta3 = chemicals[j].beta3
+            beta4 = chemicals[j].beta4
+            beta5 = chemicals[j].beta5
 
             toadd.calc_k1(ew, j)
-            toadd.calc_k2(kow, j, betal, betan)
-            toadd.calc_kgb(kow, j, betal, betan)
+            toadd.calc_k2(kow, j, beta1, beta5)
+            toadd.calc_kgb(kow, j, beta3, beta4 ,beta5)
             toadd.calc_ke(ed, j)
             toadd.calc_kd(ed, j)
 
@@ -318,6 +322,8 @@ def init_fish_pre_region(fish_data, region, chemicals, phyto, zoops, diet_data, 
 
 def init_fish_post_region(fishs, tempfishs, region, chemicals):
 
+    print(tempfishs)
+
     for i in range(len(fishs)):
 
         fishs[i].calc_diet_per(tempfishs, region)
@@ -328,11 +334,15 @@ def init_fish_post_region(fishs, tempfishs, region, chemicals):
             kow = chemicals[j].Kow
             ed = chemicals[j].Ed
             ew = chemicals[j].Ew
-            betal = chemicals[j].betal
-            betan = chemicals[j].betan
+            beta1 = chemicals[j].beta1
+            beta2 = chemicals[j].beta2
+            beta3 = chemicals[j].beta3
+            beta4 = chemicals[j].beta4
+            beta5 = chemicals[j].beta5
+
             fishs[i].calc_k1(ew, j)
-            fishs[i].calc_k2(kow, j, betal, betan)
-            fishs[i].calc_kgb(kow, j, betal, betan)
+            fishs[i].calc_k2(kow, j, beta1, beta5)
+            fishs[i].calc_kgb(kow, j, beta3, beta4, beta5)
             fishs[i].calc_ke(ed, j)
             fishs[i].calc_kd(ed, j)
 
@@ -349,11 +359,14 @@ def init_single_fish_post_region(fish, tempfishs, region, chemicals):
         kow = chemicals[j].Kow
         ed = chemicals[j].Ed
         ew = chemicals[j].Ew
-        betal = chemicals[j].betal
-        betan = chemicals[j].betan
+        beta1 = chemicals[j].beta1
+        beta2 = chemicals[j].beta2
+        beta3 = chemicals[j].beta3
+        beta4 = chemicals[j].beta4
+        beta5 = chemicals[j].beta5
         fish.calc_k1(ew, j)
-        fish.calc_k2(kow, j, betal, betan)
-        fish.calc_kgb(kow, j, betal, betan)
+        fish.calc_k2(kow, j, beta1, beta5)
+        fish.calc_kgb(kow, j, beta3, beta4, beta5)
         fish.calc_ke(ed, j)
         fish.calc_kd(ed, j)
 
@@ -798,7 +811,7 @@ def bio_monte_carlo_loop(model_para, all_data, t, time_per_step, fish_by_region,
                 inverts = init_fish_post_region(inverts, tempinverts, regions[0], chemicals)
                 fishs, tempfishs = init_fish_pre_region(fish_data, regions[0], chemicals, phytos[0], zoops,
                                                         diet_data, u_count, v_count)
-
+                tempfishs = tempinverts + tempfishs[2:]
                 fishs = init_fish_post_region(fishs, tempfishs, regions[0], chemicals)
                 conc_log = solve_steady(regions[0], chemicals, phytos, zoops, inverts, fishs)
                 steady_state.append(conc_log)
