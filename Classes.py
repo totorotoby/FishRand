@@ -16,12 +16,13 @@ class Zooplank:
         self.Mo = 0  # Percent Over Water Ventilated
         self.Vwb = 0  # Percent Water Content
         self.Vld = 0  # lipid fraction of diet
-        self.Vnd = 0  # nonlip fraction of diet
         self.Vwd = 0  # Water fraction of diet
         self.Vlg = 0  # lipid fraction of gut
-        self.Vng = 0  # Non-lipid fraction of gut
         self.Vwg = 0  # water fraction of gut
-        self.Vng = 0  # Non-lipid fraction of gut
+        self.Vndc = 0  # nonlip fraction of diet from dirt
+        self.Vndm = 0  # nonlip fracion of diet from animal
+        self.Vngc = 0  # Non-lipid fraction of gut
+        self.Vngm = 0
 
         self.gd_set = 0
         self.kg_set = 0
@@ -88,9 +89,15 @@ class Zooplank:
         self.k_1[chem_index] = chem_ew * (self.Gv / self.Wb)
 
     # returns k_2 of chemical for this zooplank
-    def calc_k2(self, chem_kow, chem_index, betal, betan, density_lip=.9, density_w=1):
+    def calc_k2(self, chem_kow, chem_index, beta1, beta5, density_lip=.9, density_w=1):
 
-        k_bw = (self.Vlb * betal * chem_kow)/density_lip + (self.Vnb * betan * chem_kow) + (self.Vwb/density_w)
+
+
+
+        k_bw = (self.Vlb * beta1 * chem_kow)/density_lip + (self.Vnb * beta5 * chem_kow) + (self.Vwb/density_w)
+
+
+
         self.k_2[chem_index] = self.k_1[chem_index] / k_bw
 
     # returns k_d of chemical for this zooplank
@@ -121,27 +128,26 @@ class Zooplank:
 
     # returns K_gb for certian chemical
 
-    def calc_kgb(self, chem_kow, chem_index, betal, betan, density_lip=.9, density_w=1, z_water=.05):
+    def calc_kgb(self, chem_kow, chem_index, beta3, beta4 ,beta5, density_lip=.9, density_w=1, z_water=.05):
 
-        print(self.Vlg, self.Vng, betal, betan, self.Vwg)
 
-        top = ((self.Vlg * (z_water*betal*chem_kow))/density_lip) + (self.Vng * .35 * (z_water*chem_kow)) +\
+        top = ((self.Vlg * (z_water*beta3*chem_kow))/density_lip) + (self.Vng * beta4 * (z_water*chem_kow)) +\
               (z_water*self.Vwg/density_w)
 
-        bottom = ((self.Vlb * (z_water*betal*chem_kow))/density_lip) + (self.Vnb * .35 * z_water * chem_kow) +\
+        bottom = ((self.Vlb * (z_water*beta3*chem_kow))/density_lip) + (self.Vnb * beta5 * z_water * chem_kow) +\
                  (z_water*self.Vwb/density_w)
 
         k_gb = top/bottom
 
+
         self.k_gb[chem_index] = k_gb
 
-        print(self.k_gb)
 
     # returns k_e for certain chemical
     def calc_ke(self, chem_ed, chem_index):
         k_e = (self.k_gb[chem_index]/self.Wb) * chem_ed * self.Gf
         self.k_e[chem_index] = k_e
-        #print('kgb:' + str(self.k_gb),'ed: ' +  str(chem_ed), 'Gf: ' + str(self.Gf))
+
 
     def init_check(self):
 
@@ -172,14 +178,9 @@ class Zooplank:
         denom = self.k_2[chem_index] + self.k_e[chem_index] + self.Kg
 
         f_num = (self.k_1[chem_index] * self.Mo * Cwdo) + (self.k_1[chem_index] * self.Mp * Cwp)
-        f_num = f_num/1000
+
 
         l_num = phyto_con * self.k_d[chem_index]
-
-        print("top " + str(f_num + l_num))
-        print('bottom ' + str(denom))
-        print("k2: " + str(self.k_2[0]))
-        print('ke: ' + str(self.k_e[0]))
 
         return (f_num + l_num) / denom
 
@@ -187,7 +188,6 @@ class Zooplank:
     def solve_next_time_step(self, phi, chem_index, Cwp, Cwdo, phyto_con, pre_step):
 
         f_num = (self.k_1[chem_index] * self.Mo * Cwdo) + (self.k_1[chem_index] * self.Mp * Cwp)
-        f_num = f_num / 1000
 
         l_num = phyto_con * self.k_d[chem_index]
 
@@ -200,31 +200,11 @@ class Zooplank:
         return top/bottom
 
 
-
 class Fish(Zooplank):
 
     def __init__(self, name, weight, vlb, diet_data, flag, num_chemicals, per_step, vnb=.2, e_l=.75, e_n=.75, e_w=.5):
         Zooplank.__init__(self, name, weight, vlb, flag, num_chemicals, per_step, vnb, e_l, e_n, e_w)
         self.diet_frac = diet_data
-        self.Vndc = 0  # nonlip fraction of diet from dirt
-        self.Vndm = 0  # nonlip fracion of diet from animal
-        self.Vngc = 0  # Non-lipid fraction of gut
-        self.Vngm = 0
-
-    # returns k_1 of chemical for this zooplank
-    def calc_k1(self, chem_ew, chem_index):
-        self.k_1[chem_index] = chem_ew * (self.Gv / self.Wb)
-
-    # returns k_2 of chemical for this zooplank
-    def calc_k2(self, chem_kow, chem_index, betal, betan, density_lip=.9, density_w=1):
-
-        k_bw = (self.Vlb * betal *chem_kow)/density_lip + (self.Vnb * betan * chem_kow) + (self.Vwb/density_w)
-        self.k_2[chem_index] = self.k_1[chem_index] / k_bw
-
-    # returns k_d of chemical for this zooplank
-    def calc_kd(self, chem_ed, chem_index):
-
-        self.k_d[chem_index] = chem_ed * (self.Gd / self.Wb)
 
     # sets the percentages of zooplank diet that are lipid, non-lipid and water
     def calc_diet_per(self, fishlog, region=None):
@@ -285,13 +265,14 @@ class Fish(Zooplank):
                    ((1-self.e_w) * self.Vwd)) * self.Gd
 
     # returns K_gb for certian chemical
-    def calc_kgb(self, chem_kow, chem_index, betal, betan, density_lip=.9, density_w=1, z_water=.05):
+    def calc_kgb(self, chem_kow, chem_index, beta3, beta4, beta5, density_lip=.9, density_w=1, z_water=.05):
 
-        top = ((self.Vlg * (z_water*betal*chem_kow))/density_lip) + (self.Vngc * betan * (z_water*chem_kow)) +\
-              (self.Vngm * betan * (z_water*chem_kow)) + (z_water*self.Vwg/density_w)
-        bottom = ((self.Vlb * (z_water*betal*chem_kow))/density_lip) + (self.Vnb * betan * z_water * chem_kow) +\
+        top = ((self.Vlg * (z_water*beta3*chem_kow))/density_lip) + (self.Vngc * beta4 * (z_water*chem_kow)) +\
+              (self.Vngm * beta5 * (z_water*chem_kow)) + (z_water*self.Vwg/density_w)
+        bottom = ((self.Vlb * (z_water*beta3*chem_kow))/density_lip) + (self.Vnb * beta5 * z_water * chem_kow) +\
                  (z_water*self.Vwb/density_w)
         k_gb = top/bottom
+
         self.k_gb[chem_index] = k_gb
 
 
@@ -301,6 +282,10 @@ class Fish(Zooplank):
 
         denom = self.k_2[chem_index] + self.k_e[chem_index] + self.Kg
         f_num = (self.k_1[chem_index] * self.Mo * Cwdo) + (self.k_1[chem_index] * self.Mp * Cwp)
+
+        #print(self.name, 'bottom: ', denom, 'top left: ', f_num)
+        #print('k2: ', self.k_2[chem_index], 'ke: ', self.k_e[chem_index], "k1: ", self.k_1, 'kd: ', self.k_d, 'cwdo: ', Cwdo, 'Cwp: ', Cwp, 'Gf: ', self.Gf, 'k_gb: ', self.k_gb,'\n')
+
 
         l_num = 0
 
@@ -324,7 +309,7 @@ class Fish(Zooplank):
 
         if out_check == 0:
 
-            #print(self.name, self.k_2, self.k_e)
+
             k = self.k_2[chem_index] + self.k_e[chem_index]
 
             q1 = (self.k_1[chem_index] * self.Mo * Cwdo) + (self.k_1[chem_index] * self.Mp * Cwp)
@@ -419,7 +404,7 @@ class Pplank:
         self.Vnb = vnp
 
     def calc_vwb(self):
-        self.Vwb = 1 - (self.Vlb - self.Vnb)
+        self.Vwb = 1 - (self.Vlb + self.Vnb)
 
     def set_kg(self, kg):
         self.Kg = kg
@@ -429,8 +414,11 @@ class Pplank:
         self.k_1[chem_index] = 1/(self.A + (self.B/chem_kow))
 
     # returns k_2 of chemical for this pplank
-    def calc_k2(self, chem_kow, chem_index, betal, betan, density_lip=.9, density_w=1):
-        k_pw = (self.Vlb * betal * chem_kow) / density_lip + (self.Vnb * betan * chem_kow) + (self.Vwb / density_w)
+    def calc_k2(self, chem_kow, chem_index, beta1, beta4, density_lip=.9, density_w=1):
+
+
+        k_pw = (self.Vlb * beta1 * chem_kow) / density_lip + (self.Vnb * beta4 * chem_kow) + (self.Vwb / density_w)
+        print((self.Vlb * beta1 * chem_kow) / density_lip, (self.Vnb * beta4 * chem_kow), (self.Vwb / density_w))
         self.k_2[chem_index] = self.k_1[chem_index] / k_pw
 
     def init_check(self):
@@ -458,10 +446,11 @@ class Pplank:
 
     def solve_steady_state(self, Cwd, i):
 
+        print(self.k_1, self.k_2, self.Kg)
+
         return (self.k_1[i] * Cwd) / (self.k_2[i] + self.Kg)
 
     def solve_next_time_step(self, Cwd, chem_index, pre_step, t):
-        print(self.Kg, self.k_1)
         q = self.k_1[chem_index] * Cwd
         k = (self.k_2[chem_index]) + self.Kg
 
@@ -486,8 +475,11 @@ class Chemical:
         self.Cwdo = -1
         self.Ddoc = -1
         self.Dpoc = 0
-        self.betal = 1
-        self.betan = .035
+        self.beta1 = 1
+        self.beta2 = .035
+        self.beta3 = 1
+        self.beta4 = .35
+        self.beta5 = .035
         self.Ew = self.calc_ew()
         self.Ed = self.calc_ed()
 
@@ -508,10 +500,25 @@ class Chemical:
         self.Ddoc = ddoc
         self.Dpoc = dpoc
 
-    def set_betas(self, betal, betan):
+    def set_beta1(self, beta1):
 
-        self.betal = betal
-        self.betan = betan
+        self.beta1 = beta1
+
+    def set_beta2(self, beta2):
+
+        self.beta2 = beta2
+
+    def set_beta3(self, beta3):
+
+        self.beta3 = beta3
+
+    def set_beta4(self, beta4):
+
+        self.beta4 = beta4
+
+    def set_beta5(self, beta5):
+
+        self.beta5 = beta5
 
     def calc_ew(self):
         Ew = 1/(1.85 + (155/self.Kow))

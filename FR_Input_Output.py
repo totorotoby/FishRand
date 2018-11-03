@@ -40,7 +40,7 @@ def convert_to_lists(filename):
     num_timestep = num_timestep + 1
     get_temp_data(temp_data, temp_sheet, len(region_data))
 
-    chem_len = 7 + (len(region_data)*4)
+    chem_len = 10 + (len(region_data)*4)
     chem_sheet = all_sheets.sheet_by_index(3)
 
     entry_col = chem_sheet.col(1)
@@ -49,6 +49,7 @@ def convert_to_lists(filename):
     chem_data = []
 
     get_chem_data(entry_col, dist_col, chem_len, chem_data, len(region_data))
+    print(chem_data)
 
     org_sheet = all_sheets.sheet_by_index(4)
 
@@ -185,22 +186,26 @@ def get_diet_data(diet_sheet, diet_data, entrysize):
 def get_chem_data(entry_col, dist_col, chem_len, chem_data, num_regions):
 
     for i in range(len(entry_col)):
+
         if entry_col[i].value == "END":
-            break
-        if i % chem_len == 0:
+            return
+        elif i % chem_len == 0:
             new_chem = []
             sed_con = []
             total_con = []
             dis_con = []
             por_con = []
-        if i % chem_len == 1:
+        elif i % chem_len == 1:
             new_chem.append(entry_col[i].value)
             data_get_helper(entry_col[i+1], dist_col[i+1], new_chem)
             data_get_helper(entry_col[i + 2], dist_col[i + 2], new_chem)
             data_get_helper(entry_col[i + 3], dist_col[i + 3], new_chem)
             data_get_helper(entry_col[i + 4], dist_col[i + 4], new_chem)
             data_get_helper(entry_col[i + 5], dist_col[i + 5], new_chem)
-        if i % chem_len == 7:
+            data_get_helper(entry_col[i + 6], dist_col[i + 6], new_chem)
+            data_get_helper(entry_col[i + 7], dist_col[i + 7], new_chem)
+            data_get_helper(entry_col[i + 8], dist_col[i + 8], new_chem)
+        elif i % chem_len == 10:
             for j in range(i, i+num_regions*4):
                 if (j-i) % 4 == 0:
                     data_get_helper(entry_col[j], dist_col[j], sed_con)
@@ -214,7 +219,9 @@ def get_chem_data(entry_col, dist_col, chem_len, chem_data, num_regions):
             new_chem.append(total_con)
             new_chem.append(dis_con)
             new_chem.append(por_con)
-        chem_data.append(new_chem)
+            chem_data.append(new_chem)
+
+
 
 
 
@@ -340,7 +347,7 @@ def write_output_steady(total_cons, output_name, stop, dist_type):
     else:
         for i in range(org_len):
             for j in range(chem_len):
-                sheet.write(i+1,j+1, round(total_cons[region][org_list[i]][chem_list[j][0]],3))
+                sheet.write(i+1,j+1, round(total_cons[region][org_list[i]][chem_list[j][0]],6))
 
 
 
@@ -391,7 +398,7 @@ def write_temporal_excel(array, output_name, stops, stat_flag, regional_areas, d
                 for j in range(len(lower_org_list)):
                     for k in range(len(chem_list)):
                         # row first term everything before, then over organisms
-                        sheet.write((1 + i * (1 + len(lower_org_list))) + (1+j) , k+1, round(lower_non_avg[reg_list[i]][lower_org_list[j]][chem_list[k]],3))
+                        sheet.write((1 + i * (1 + len(lower_org_list))) + (1+j) , k+1, round(lower_non_avg[reg_list[i]][lower_org_list[j]][chem_list[k]],6))
 
 
 
@@ -400,13 +407,13 @@ def write_temporal_excel(array, output_name, stops, stat_flag, regional_areas, d
                 sheet.write(0, len(chem_list) + 1 + (j + 1), chem_list[j])
             for i in range(len(lower_org_list)):
                 for j in range(len(chem_list)):
-                    sheet.write(2 + i, 2 + len(chem_list) + j, round(lower_avg[lower_org_list[i]][chem_list[j]],3))
+                    sheet.write(2 + i, 2 + len(chem_list) + j, round(lower_avg[lower_org_list[i]][chem_list[j]],6))
 
             sheet.write(count + 1, 0, 'Upper Food Web Concentrations Averaged over Populations (ng/g)', big)
             for i in range(len(upper_org_list)):
                 sheet.write(count + 2 + i, 0, upper_org_list[i])
                 for j in range (len(chem_list)):
-                    sheet.write(count + 2 + i, j+1, round(upper_avg[upper_org_list[i]][chem_list[j]],3))
+                    sheet.write(count + 2 + i, j+1, round(upper_avg[upper_org_list[i]][chem_list[j]],6))
 
 
     if stat_flag == 1:
