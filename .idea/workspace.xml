@@ -8,13 +8,7 @@
     <bookmark url="file://$PROJECT_DIR$/FishRand.py" description="&#10;mypath = Path().absolute()" line="11" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="32e81eb3-a9b7-4cb8-a9cd-bcc8c2ebfb39" name="Default" comment="Started to deal with betas">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Bioaccum.py" beforeDir="false" afterPath="$PROJECT_DIR$/Bioaccum.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Classes.py" beforeDir="false" afterPath="$PROJECT_DIR$/Classes.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FR_Input_Output.py" beforeDir="false" afterPath="$PROJECT_DIR$/FR_Input_Output.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sheets/input/Arnot_match.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/sheets/input/Arnot_match.xlsx" afterDir="false" />
-    </list>
+    <list default="true" id="32e81eb3-a9b7-4cb8-a9cd-bcc8c2ebfb39" name="Default" comment="Started to deal with betas" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -143,8 +137,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Classes.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="388">
-              <caret line="187" column="84" lean-forward="true" selection-start-line="187" selection-start-column="84" selection-end-line="187" selection-end-column="84" />
+            <state relative-caret-position="85">
+              <caret line="376" column="12" selection-start-line="376" selection-start-column="6" selection-end-line="376" selection-end-column="12" />
               <folding>
                 <element signature="e#0#11#0" expanded="true" />
               </folding>
@@ -699,8 +693,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Classes.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="388">
-          <caret line="187" column="84" lean-forward="true" selection-start-line="187" selection-start-column="84" selection-end-line="187" selection-end-column="84" />
+        <state relative-caret-position="85">
+          <caret line="376" column="12" selection-start-line="376" selection-start-column="6" selection-end-line="376" selection-end-column="12" />
           <folding>
             <element signature="e#0#11#0" expanded="true" />
           </folding>
