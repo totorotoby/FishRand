@@ -66,7 +66,6 @@ def init_region(reg_data, temp, u_count, v_count):
     regions = []
     for i in range(len(reg_data)):
         region = reg_data[i]
-        print(region)
         region = check_inst_non_st(region, u_count, v_count)
         toadd = obj.Region(region[0], temp[i], region[1], region[2], region[3], region[4], region[5])
 
@@ -227,6 +226,7 @@ def init_zoop(zoo_data, region, chemicals, phyto, u_count, v_count, per_step=0):
 
         zoops.append(toadd)
 
+
     return zoops
 
 
@@ -322,7 +322,6 @@ def init_fish_pre_region(fish_data, region, chemicals, phyto, zoops, diet_data, 
 
 def init_fish_post_region(fishs, tempfishs, region, chemicals):
 
-    print(tempfishs)
 
     for i in range(len(fishs)):
 
@@ -345,6 +344,9 @@ def init_fish_post_region(fishs, tempfishs, region, chemicals):
             fishs[i].calc_kgb(kow, j, beta3, beta4, beta5)
             fishs[i].calc_ke(ed, j)
             fishs[i].calc_kd(ed, j)
+
+    for fish in fishs:
+        print(fish)
 
     return fishs
 

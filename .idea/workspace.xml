@@ -8,7 +8,13 @@
     <bookmark url="file://$PROJECT_DIR$/FishRand.py" description="&#10;mypath = Path().absolute()" line="11" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="32e81eb3-a9b7-4cb8-a9cd-bcc8c2ebfb39" name="Default" comment="Started to deal with betas" />
+    <list default="true" id="32e81eb3-a9b7-4cb8-a9cd-bcc8c2ebfb39" name="Default" comment="Started to deal with betas">
+      <change beforePath="$PROJECT_DIR$/Bioaccum.py" beforeDir="false" afterPath="$PROJECT_DIR$/Bioaccum.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Classes.py" beforeDir="false" afterPath="$PROJECT_DIR$/Classes.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FR_Input_Output.py" beforeDir="false" afterPath="$PROJECT_DIR$/FR_Input_Output.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sheets/input/~$Arnot_match.xlsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/sheets/input/~$Blank_Input.xlsx" beforeDir="false" />
+    </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -38,14 +44,14 @@
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
-          <entry key="py" value="4113" />
+          <entry key="py" value="4713" />
           <entry key="txt" value="110" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
           <entry key="PLAIN_TEXT" value="110" />
-          <entry key="Python" value="4113" />
+          <entry key="Python" value="4713" />
         </counts>
       </usages-collector>
     </session>
@@ -113,8 +119,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/FR_Input_Output.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="15">
-              <caret line="290" column="99" selection-start-line="290" selection-start-column="99" selection-end-line="290" selection-end-column="99" />
+            <state relative-caret-position="99">
+              <caret line="41" lean-forward="true" selection-start-line="41" selection-end-line="41" />
               <folding>
                 <element signature="e#0#23#0" expanded="true" />
               </folding>
@@ -125,8 +131,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Bioaccum.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="757">
-              <caret line="163" lean-forward="true" selection-start-line="163" selection-end-line="163" />
+            <state relative-caret-position="566">
+              <caret line="348" column="18" selection-start-line="348" selection-start-column="18" selection-end-line="348" selection-end-column="18" />
               <folding>
                 <element signature="e#0#17#0" expanded="true" />
               </folding>
@@ -137,10 +143,11 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Classes.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="146">
-              <caret line="380" column="22" lean-forward="true" selection-start-line="380" selection-start-column="22" selection-end-line="380" selection-end-column="22" />
+            <state relative-caret-position="300">
+              <caret line="311" column="37" selection-start-line="311" selection-start-column="37" selection-end-line="311" selection-end-column="37" />
               <folding>
                 <element signature="e#0#11#0" expanded="true" />
+                <marker date="1541539662020" expanded="true" signature="1889:2658" ph="..." />
               </folding>
             </state>
           </provider>
@@ -157,9 +164,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>solve_single_fish_single_region</find>
-      <find>stat_check</find>
-      <find>bio_monte</find>
       <find>Ed</find>
       <find>k_d</find>
       <find>diet</find>
@@ -181,12 +185,15 @@
       <find>invert</find>
       <find>solve_steady</find>
       <find>vng</find>
-      <find>init_zoop</find>
       <find>self.kg</find>
       <find>calc_ke</find>
       <find>calc_</find>
-      <find>print</find>
       <find>init_phyto</find>
+      <find>init_zoop</find>
+      <find>pplank</find>
+      <find>set_kg</find>
+      <find>calc_kg</find>
+      <find>print</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -222,7 +229,7 @@
       </list>
     </option>
   </component>
-  <component name="ProjectFrameBounds" extendedState="6" fullScreen="true">
+  <component name="ProjectFrameBounds" fullScreen="true">
     <option name="width" value="2560" />
     <option name="height" value="1440" />
   </component>
@@ -477,7 +484,7 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="0" width="1440" height="900" extended-state="6" />
+    <frame x="0" y="0" width="1440" height="900" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info content_ui="combo" id="Project" order="0" sideWeight="0.49376947" weight="0.22853535" />
@@ -673,8 +680,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/FR_Input_Output.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="15">
-          <caret line="290" column="99" selection-start-line="290" selection-start-column="99" selection-end-line="290" selection-end-column="99" />
+        <state relative-caret-position="99">
+          <caret line="41" lean-forward="true" selection-start-line="41" selection-end-line="41" />
           <folding>
             <element signature="e#0#23#0" expanded="true" />
           </folding>
@@ -683,8 +690,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Bioaccum.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="757">
-          <caret line="163" lean-forward="true" selection-start-line="163" selection-end-line="163" />
+        <state relative-caret-position="566">
+          <caret line="348" column="18" selection-start-line="348" selection-start-column="18" selection-end-line="348" selection-end-column="18" />
           <folding>
             <element signature="e#0#17#0" expanded="true" />
           </folding>
@@ -693,10 +700,11 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Classes.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="146">
-          <caret line="380" column="22" lean-forward="true" selection-start-line="380" selection-start-column="22" selection-end-line="380" selection-end-column="22" />
+        <state relative-caret-position="300">
+          <caret line="311" column="37" selection-start-line="311" selection-start-column="37" selection-end-line="311" selection-end-column="37" />
           <folding>
             <element signature="e#0#11#0" expanded="true" />
+            <marker date="1541539662020" expanded="true" signature="1889:2658" ph="..." />
           </folding>
         </state>
       </provider>

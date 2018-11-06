@@ -39,8 +39,26 @@ class Zooplank:
 
         self.days_per_step = per_step
 
+    # a display but only for the first chemical
     def __str__(self):
-        return self.__dict__.__str__()
+
+        string = '\n'
+        string += str(self.name)
+        string += '\n'
+        string += '|         K_1         |         K_D         |         K_2         |         K_E       |         K_GB       |         K_g       |'
+        string += '\n'
+        string += '|  ' + str(round(self.k_1[0],16)) + '  |'
+        string += '  ' + str(round(self.k_d[0],16)) + '  |'
+        string += '  ' + str(round(self.k_2[0],16)) + '  |'
+        string += '  ' + str(round(self.k_e[0],16)) + '  |'
+        string += '  ' + str(round(self.k_gb[0], 16)) + '  |'
+        string += '  ' + str(round(self.Kg, 16)) + '  |'
+        string += '\n\n'
+        string += 'm_o :  ' + str(self.Mo) + '\n'
+        string += 'm_p :  ' + str(self.Mp) + '\n\n\n'
+
+
+        return string
 
     def set_el_en_ew(self, el, en, ew):
         self.e_l = el
@@ -79,9 +97,9 @@ class Zooplank:
 
     def calc_kg(self, T):
 
-        if T <= 15:
-            self.Kg = .0005 * math.pow(self.Wb, -.2)
-        if T > 15:
+        if T <= 18:
+            self.Kg = .000502 * math.pow(self.Wb, -.2)
+        if T > 18:
             self.Kg = .00251 * math.pow(self.Wb, -.2)
 
     # returns k_1 of chemical for this zooplank
@@ -283,10 +301,6 @@ class Fish(Zooplank):
         denom = self.k_2[chem_index] + self.k_e[chem_index] + self.Kg
         f_num = (self.k_1[chem_index] * self.Mo * Cwdo) + (self.k_1[chem_index] * self.Mp * Cwp)
 
-        #print(self.name, 'bottom: ', denom, 'top left: ', f_num)
-        #print('k2: ', self.k_2[chem_index], 'ke: ', self.k_e[chem_index], "k1: ", self.k_1, 'kd: ', self.k_d, 'cwdo: ', Cwdo, 'Cwp: ', Cwp, 'Gf: ', self.Gf, 'k_gb: ', self.k_gb,'\n')
-
-
         l_num = 0
 
         for j in range(len(self.diet_frac)):
@@ -295,11 +309,14 @@ class Fish(Zooplank):
                 if self.diet_frac[j][0] == 'Sediment/Detritus':
 
                     concentration = chemical.Cs
+                    print(chemical.Cs)
                     l_num += (self.diet_frac[j][1]*concentration)
 
                 else:
                     concentration = log[self.diet_frac[j][0]][chemical.name]
                     l_num += (self.diet_frac[j][1]*concentration)
+
+        print('\nTotal concentration consumed in prey : ', l_num, '\n')
 
         l_num = l_num * self.k_d[chem_index]
 
@@ -446,7 +463,6 @@ class Pplank:
 
     def solve_steady_state(self, Cwd, i):
 
-        print(self.k_1, self.k_2, self.Kg)
 
         return (self.k_1[i] * Cwd) / (self.k_2[i] + self.Kg)
 
