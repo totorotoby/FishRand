@@ -301,6 +301,10 @@ class Fish(Zooplank):
         denom = self.k_2[chem_index] + self.k_e[chem_index] + self.Kg
         f_num = (self.k_1[chem_index] * self.Mo * Cwdo) + (self.k_1[chem_index] * self.Mp * Cwp)
 
+        #print(self.name, 'bottom: ', denom, 'top left: ', f_num)
+        #print('k2: ', self.k_2[chem_index], 'ke: ', self.k_e[chem_index], "k1: ", self.k_1, 'kd: ', self.k_d, 'cwdo: ', Cwdo, 'Cwp: ', Cwp, 'Gf: ', self.Gf, 'k_gb: ', self.k_gb,'\n')
+
+
         l_num = 0
 
         for j in range(len(self.diet_frac)):
@@ -462,7 +466,6 @@ class Pplank:
         return False
 
     def solve_steady_state(self, Cwd, i):
-
 
         return (self.k_1[i] * Cwd) / (self.k_2[i] + self.Kg)
 

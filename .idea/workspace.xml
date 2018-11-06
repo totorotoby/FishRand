@@ -9,11 +9,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="32e81eb3-a9b7-4cb8-a9cd-bcc8c2ebfb39" name="Default" comment="Started to deal with betas">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Bioaccum.py" beforeDir="false" afterPath="$PROJECT_DIR$/Bioaccum.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Classes.py" beforeDir="false" afterPath="$PROJECT_DIR$/Classes.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/FR_Input_Output.py" beforeDir="false" afterPath="$PROJECT_DIR$/FR_Input_Output.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sheets/input/~$Arnot_match.xlsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/sheets/input/~$Blank_Input.xlsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/testing/mathmatica plots.nb" beforeDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -131,10 +131,11 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Bioaccum.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="566">
-              <caret line="348" column="18" selection-start-line="348" selection-start-column="18" selection-end-line="348" selection-end-column="18" />
+            <state relative-caret-position="2009">
+              <caret line="346" lean-forward="true" selection-start-line="346" selection-end-line="346" />
               <folding>
                 <element signature="e#0#17#0" expanded="true" />
+                <marker date="1541541182675" expanded="true" signature="10347:10349" ph="..." />
               </folding>
             </state>
           </provider>
@@ -143,11 +144,11 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Classes.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="300">
-              <caret line="311" column="37" selection-start-line="311" selection-start-column="37" selection-end-line="311" selection-end-column="37" />
+            <state relative-caret-position="4855">
+              <caret line="392" column="34" selection-start-line="392" selection-start-column="34" selection-end-line="392" selection-end-column="34" />
               <folding>
                 <element signature="e#0#11#0" expanded="true" />
-                <marker date="1541539662020" expanded="true" signature="1889:2658" ph="..." />
+                <marker date="1541541248150" expanded="true" signature="1889:2658" ph="..." />
               </folding>
             </state>
           </provider>
@@ -690,21 +691,22 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Bioaccum.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="566">
-          <caret line="348" column="18" selection-start-line="348" selection-start-column="18" selection-end-line="348" selection-end-column="18" />
+        <state relative-caret-position="2009">
+          <caret line="346" lean-forward="true" selection-start-line="346" selection-end-line="346" />
           <folding>
             <element signature="e#0#17#0" expanded="true" />
+            <marker date="1541541182675" expanded="true" signature="10347:10349" ph="..." />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/Classes.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="300">
-          <caret line="311" column="37" selection-start-line="311" selection-start-column="37" selection-end-line="311" selection-end-column="37" />
+        <state relative-caret-position="4855">
+          <caret line="392" column="34" selection-start-line="392" selection-start-column="34" selection-end-line="392" selection-end-column="34" />
           <folding>
             <element signature="e#0#11#0" expanded="true" />
-            <marker date="1541539662020" expanded="true" signature="1889:2658" ph="..." />
+            <marker date="1541541248150" expanded="true" signature="1889:2658" ph="..." />
           </folding>
         </state>
       </provider>

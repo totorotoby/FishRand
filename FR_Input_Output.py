@@ -49,6 +49,7 @@ def convert_to_lists(filename):
     chem_data = []
 
     get_chem_data(entry_col, dist_col, chem_len, chem_data, len(region_data))
+    print(chem_data)
 
     org_sheet = all_sheets.sheet_by_index(4)
 

@@ -345,8 +345,6 @@ def init_fish_post_region(fishs, tempfishs, region, chemicals):
             fishs[i].calc_ke(ed, j)
             fishs[i].calc_kd(ed, j)
 
-    for fish in fishs:
-        print(fish)
 
     return fishs
 
