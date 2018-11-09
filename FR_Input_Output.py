@@ -49,7 +49,6 @@ def convert_to_lists(filename):
     chem_data = []
 
     get_chem_data(entry_col, dist_col, chem_len, chem_data, len(region_data))
-    print(chem_data)
 
     org_sheet = all_sheets.sheet_by_index(4)
 
@@ -196,6 +195,7 @@ def get_chem_data(entry_col, dist_col, chem_len, chem_data, num_regions):
             dis_con = []
             por_con = []
         elif i % chem_len == 1:
+            print(i)
             new_chem.append(entry_col[i].value)
             data_get_helper(entry_col[i+1], dist_col[i+1], new_chem)
             data_get_helper(entry_col[i + 2], dist_col[i + 2], new_chem)

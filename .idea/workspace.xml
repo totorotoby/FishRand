@@ -10,10 +10,11 @@
   <component name="ChangeListManager">
     <list default="true" id="32e81eb3-a9b7-4cb8-a9cd-bcc8c2ebfb39" name="Default" comment="Started to deal with betas">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Bioaccum.py" beforeDir="false" afterPath="$PROJECT_DIR$/Bioaccum.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Classes.py" beforeDir="false" afterPath="$PROJECT_DIR$/Classes.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/FR_Input_Output.py" beforeDir="false" afterPath="$PROJECT_DIR$/FR_Input_Output.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/testing/mathmatica plots.nb" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/sheets/input/Pegan_Cove_South_Pond edits 181101a.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/sheets/input/Pegan_Cove_South_Pond edits 181101a.xlsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sheets/input/Pegan_Cove_South_Pond.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/sheets/input/Pegan_Cove_South_Pond.xlsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sheets/input/~$Pegan_Cove_South_Pond.xlsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/sheets/output/arnot_match_current.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/sheets/output/arnot_match_current.xlsx" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -44,14 +45,14 @@
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
-          <entry key="py" value="4713" />
+          <entry key="py" value="4785" />
           <entry key="txt" value="110" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
           <entry key="PLAIN_TEXT" value="110" />
-          <entry key="Python" value="4713" />
+          <entry key="Python" value="4785" />
         </counts>
       </usages-collector>
     </session>
@@ -116,11 +117,11 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/FR_Input_Output.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="99">
-              <caret line="41" lean-forward="true" selection-start-line="41" selection-end-line="41" />
+            <state relative-caret-position="302">
+              <caret line="197" column="19" selection-start-line="197" selection-start-column="19" selection-end-line="197" selection-end-column="19" />
               <folding>
                 <element signature="e#0#23#0" expanded="true" />
               </folding>
@@ -141,10 +142,10 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Classes.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="4855">
+            <state relative-caret-position="4825">
               <caret line="392" column="34" selection-start-line="392" selection-start-column="34" selection-end-line="392" selection-end-column="34" />
               <folding>
                 <element signature="e#0#11#0" expanded="true" />
@@ -193,8 +194,8 @@
       <find>init_zoop</find>
       <find>pplank</find>
       <find>set_kg</find>
-      <find>calc_kg</find>
       <find>print</find>
+      <find>calc_kg</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -224,15 +225,16 @@
         <option value="$PROJECT_DIR$/main.py" />
         <option value="$PROJECT_DIR$/FishRand.py" />
         <option value="$PROJECT_DIR$/prob.py" />
-        <option value="$PROJECT_DIR$/FR_Input_Output.py" />
         <option value="$PROJECT_DIR$/Bioaccum.py" />
         <option value="$PROJECT_DIR$/Classes.py" />
+        <option value="$PROJECT_DIR$/FR_Input_Output.py" />
       </list>
     </option>
   </component>
-  <component name="ProjectFrameBounds" fullScreen="true">
-    <option name="width" value="2560" />
-    <option name="height" value="1440" />
+  <component name="ProjectFrameBounds" extendedState="1">
+    <option name="y" value="23" />
+    <option name="width" value="745" />
+    <option name="height" value="877" />
   </component>
   <component name="ProjectLevelVcsManager">
     <ConfirmationsSetting value="2" id="Add" />
@@ -485,7 +487,7 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="0" width="1440" height="900" extended-state="0" />
+    <frame x="0" y="23" width="745" height="877" extended-state="1" />
     <editor active="true" />
     <layout>
       <window_info content_ui="combo" id="Project" order="0" sideWeight="0.49376947" weight="0.22853535" />
@@ -498,7 +500,7 @@
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" sideWeight="0.46550292" weight="0.21019109" />
-      <window_info anchor="bottom" id="Event Log" order="7" sideWeight="0.23185341" side_tool="true" visible="true" weight="0.015662652" />
+      <window_info anchor="bottom" id="Event Log" order="7" sideWeight="0.23185341" side_tool="true" visible="true" weight="0.01656051" />
       <window_info anchor="bottom" id="Python Console" order="8" weight="0.18726115" />
       <window_info anchor="bottom" id="Terminal" order="9" sideWeight="0.884343" weight="0.18089172" />
       <window_info anchor="bottom" id="Version Control" order="10" weight="0.32866243" />
@@ -679,16 +681,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/FR_Input_Output.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="99">
-          <caret line="41" lean-forward="true" selection-start-line="41" selection-end-line="41" />
-          <folding>
-            <element signature="e#0#23#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Bioaccum.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="2009">
@@ -702,11 +694,21 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Classes.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="4855">
+        <state relative-caret-position="4825">
           <caret line="392" column="34" selection-start-line="392" selection-start-column="34" selection-end-line="392" selection-end-column="34" />
           <folding>
             <element signature="e#0#11#0" expanded="true" />
             <marker date="1541541248150" expanded="true" signature="1889:2658" ph="..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/FR_Input_Output.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="302">
+          <caret line="197" column="19" selection-start-line="197" selection-start-column="19" selection-end-line="197" selection-end-column="19" />
+          <folding>
+            <element signature="e#0#23#0" expanded="true" />
           </folding>
         </state>
       </provider>
