@@ -120,8 +120,11 @@ class ResultDist:
 
         uni_b = 2*Sig_y
         uni_a = M_y - Sig_y
-
-        gamma_k = (math.pow(M_y, 2))/(math.pow(Sig_y, 2))
+        try:
+            gamma_k = (math.pow(M_y, 2))/(math.pow(Sig_y, 2))
+        except ZeroDivisionError:
+            print("\n\nNot enough stastical parameters defined. There are situations where some concentrations are determinstic and others are distrubtions. Hopefully FishRand will support this in future versions.\n\n")
+            exit(0)
         gamma_theta = (math.pow(Sig_y, 2))/M_y
         
         # returns guess array...order: [normal, lognormal, uniform, gamma]
@@ -353,15 +356,18 @@ def set_hyper_samp_cube(model_para, Var):
     bin_num = int(model_para[2])
 
     if Var.type == 'V':
-        hype_sample = v_iter*u_iter//bin_num + 2
+        hype_sample = v_iter*u_iter//bin_num
     else:
-        hype_sample = u_iter//bin_num + 2
+        #the +1 makes sure that we have enough samples everytime, but not all of the are used
+        hype_sample = u_iter//bin_num + 1
 
+    print(hype_sample)
     lhs = pyDOE.lhs(bin_num, samples=hype_sample)
     lhs = lhs.ravel()
     Var.lhs = lhs
     Var.take_samples()
-
+    if Var.type == 'U':
+        print(len(Var.values))
 
 def make_result_dist(dicts):
 

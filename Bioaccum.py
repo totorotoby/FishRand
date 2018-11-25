@@ -37,6 +37,7 @@ def check_inst_non_st(inst, u_count, v_count):
     for i in range(len(inst)):
         if type(inst[i]) is pr.Var:
             if inst[i].type == 'U':
+                print(inst[i].values, len(inst[i].values))
                 new_entry.append(inst[i].values[u_count])
             if inst[i].type == 'V':
                 new_entry.append(inst[i].values[v_count])
@@ -87,15 +88,18 @@ def init_region(reg_data, temp, u_count, v_count):
     return regions
 
 # initiates chemicals for a specific single region in a single monte carlo sample in a time period
-def init_chems(chem_data, region, region_index, u_count, v_count):
-
+def init_chems(chem_data, r_con_data, region, region_index, u_count, v_count):
+    #print(region_index)
+    concentrations = r_con_data[region_index]
+    
     chemicals = []
     for i in range(len(chem_data)):
 
         chemical = chem_data[i]
 
         chemical = check_inst_non_st(chemical, u_count, v_count)
-        toadd = obj.Chemical(chemical[0], chemical[1], chemical[9][region_index])
+        concentrations = check_inst_non_st(concentrations, u_count, v_count)
+        toadd = obj.Chemical(chemical[0], chemical[1], concentrations[0])
 
         # dealing with ddoc and dpoc
         if chemical[2] and chemical[3] != '':
@@ -110,14 +114,14 @@ def init_chems(chem_data, region, region_index, u_count, v_count):
             toadd.set_beta4(chemical[7])
         if chemical[8] != '':
             toadd.set_beta5(chemical[8])
-
+        
         # dealing with cwto and cwdo
-        if chemical[10][region_index] != '':
-            toadd.set_cwto(chemical[10][region_index])
-        if chemical[11][region_index] != '':
-            toadd.set_cwdo(chemical[11][region_index])
-        if chemical[12][region_index] != '':
-            toadd.set_cwp(chemical[12][region_index])
+        if concentrations[1] != '':
+            toadd.set_cwto(concentrations[1])
+        if concentrations[2] != '':
+            toadd.set_cwdo(concentrations[2])
+        if concentrations[3] != '':
+            toadd.set_cwp(concentrations[3])
 
         if toadd.Cwp != -1 and toadd.Cwdo != -1 and toadd.Cs == '' and region.Ocs != '':
             toadd.calc_cs(region)
@@ -127,11 +131,13 @@ def init_chems(chem_data, region, region_index, u_count, v_count):
             toadd.calc_phi_and_cwdo(region)
         if toadd.Cwdo == -1 and (toadd.Cwto == -1 or region.adoc or region.apoc or region.Xdoc or region.Xpoc == ''):
             print('Not enough parameters to solve for Cwdo in ' + chemical[0])
+            exit(0)
         if toadd.Cwp == -1 and region.Ocs != '':
             toadd.calc_pore_water(region.Ocs)
         if toadd.Cwp == -1 and (region.Ocs == '' or toadd.Cs == ''):
             print('Not enough parameters to solve for Cwp in' + chemical[0])
-
+            exit(0)
+            
         chemicals.append(toadd)
 
     return chemicals
@@ -674,12 +680,13 @@ def bio_monte_carlo_loop(model_para, all_data, t, time_per_step, fish_by_region,
     invert_data = all_data[5]
     fish_data = all_data[6]
     diet_data = all_data[7]
+    r_con_data = all_data[9][t]
 
+    
     f_names = [fish[0] for fish in fish_data]
-    # dictionaries will be appended to with the out come of very simulation in monte carlo
+    # dictionaries will be appended to with the 8
     uv_results = [[],[]]
     steady_state = []
-
     # enter the monte carlo loops
     inner_count = 0
     u_count = 0
@@ -703,9 +710,9 @@ def bio_monte_carlo_loop(model_para, all_data, t, time_per_step, fish_by_region,
                 # - 2d list of zoop objects by all regions
                 # - 2d list of invert objects by all regions
 
-                regions, r_chems, r_phytos, r_zoops, r_inverts = single_setup_bottom_web(region_data, temperatures, chem_data,
-                                                                                       phyto_data, zoop_data, invert_data,
-                                                                                       diet_data, u_count, v_count, time_per_step)
+                regions, r_chems, r_phytos, r_zoops, r_inverts = single_setup_bottom_web(region_data, temperatures, chem_data, r_con_data,
+                                                                                         phyto_data, zoop_data, invert_data,
+                                                                                         diet_data, u_count, v_count, time_per_step)
 
                 ############################################################################################################
 
@@ -798,11 +805,8 @@ def bio_monte_carlo_loop(model_para, all_data, t, time_per_step, fish_by_region,
             if model_para[8] == 'YES':
 
                 temp = all_data[1][0]
-                reg_data = all_data[0]
-                chem_data = all_data[2]
-
-                regions = init_region(reg_data, temp, u_count, v_count)
-                chemicals = init_chems(chem_data, regions[0], 0, u_count, v_count)
+                regions = init_region(region_data, temp, u_count, v_count)
+                chemicals = init_chems(chem_data, r_con_data, regions[0], 0, u_count, v_count)
                 phytos = init_phyto(all_data[3], chemicals, u_count, v_count)
                 zoops = init_zoop(all_data[4], regions[0], chemicals, phytos[0], u_count, v_count,)
                 inverts, tempinverts = init_fish_pre_region(invert_data, regions[0], chemicals, phytos[0], zoops,
@@ -856,8 +860,7 @@ def filter_stat_case(dictionaries):
         return results_dic
 
 
-def single_setup_bottom_web(region_data, temperatures, chem_data, phyto_data, zoop_data, invert_data, diet_data, u_count, v_count, days_per_step):
-
+def single_setup_bottom_web(region_data, temperatures, chem_data, r_con_data, phyto_data, zoop_data, invert_data, diet_data, u_count, v_count, days_per_step):
     # return regions
     regions = init_region(region_data, temperatures, u_count, v_count)
 
@@ -871,7 +874,7 @@ def single_setup_bottom_web(region_data, temperatures, chem_data, phyto_data, zo
 
     # sets up all chemicals in all regions
     for i in range(len(regions)):
-        chemicals = init_chems(chem_data, regions[i], i, u_count, v_count)
+        chemicals = init_chems(chem_data, r_con_data ,regions[i], i, u_count, v_count)
         r_chems.append(chemicals)
 
 

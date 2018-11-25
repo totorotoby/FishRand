@@ -24,6 +24,7 @@ class app(tk.Frame):
         self.dictvars = []
         self.viewopt = None
         self.filename = ''
+        self.mypath = os.path.dirname(os.path.abspath(__file__))
         master.title("FishRand")
         super().__init__(master)
         self.grid()
@@ -31,7 +32,7 @@ class app(tk.Frame):
 
     def add_widg(self):
         ###Top Labels###
-        tk.Label(self, text="Input:", font=("Times New Roman", 18), height= 2).grid(row=4,column=0, columnspan=1)
+        tk.Label(self, text="Input", font=("Times New Roman", 18), height= 2).grid(row=4,column=0, columnspan=1)
         tk.Label(self, text="View Distributions", font=("Times New Roman", 18), height= 2).grid(row=4,column=2, columnspan=1, sticky=tk.W)
         tk.Label(self, text= "Other Info", font=("Times New Roman", 18), height=2).grid(row=0, column=2, columnspan=1, sticky=tk.SW)
         tk.Label(self, text="Save Results", font=("Times New Roman", 18), height= 2).grid(row=4,column=5, columnspan=1, sticky=tk.W)
@@ -112,20 +113,19 @@ class app(tk.Frame):
 
 
          ###Fish Image###
-        mypath = os.path.dirname(os.path.abspath(__file__))
-        fish_image = tk.PhotoImage(file= mypath + "/fishrand.gif")
+        fish_image = tk.PhotoImage(file= self.mypath + "/fishrand.gif")
         label_image0 = tk.Label(self, image=fish_image)
         label_image0.image = fish_image
         label_image0.grid(row=0,column=0, sticky=tk.W)
 
     def askfile(self):
         self.filebox.delete(0, tk.END)
-        filename = filedialog.askopenfilename()
+        filename = filedialog.askopenfilename(initialdir=self.mypath + '/sheets/input')
         self.filebox.insert(tk.END, filename)
 
     def askdirectory(self):
 
-        self.savepath = filedialog.asksaveasfilename(defaultextension=".xlsx")
+        self.savepath = filedialog.asksaveasfilename(initialdir=self.mypath + '/sheets/output', defaultextension=".xlsx")
         dist_type = self.save_dist_type.get()
 
         if self.output[0] == 'YES':

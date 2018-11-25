@@ -206,7 +206,7 @@ def filter_cases(filename, stops):
             # • finding the probabilities assosiated with regions and hotspot polygons
             # • getting number of draws per fish per timestep from the input
             # • Making the prior concentrations dictionary for all the animals
-
+            
         boundary, regions, hotspots= spatial.setup(site_data)
         region_areas = [region[1].area for region in regions]
         loc_setups, f_names = loc_setup(all_data[6], boundary, regions, hotspots, site_data[3])
@@ -275,8 +275,9 @@ def filter_cases(filename, stops):
 
 
 def steady_state_output(total_cons, stat_check, output_name, dist_type):
-
-        FR_Input_Output.write_output_steady(total_cons[0], output_name, 'Steady State Simulation', dist_type)
+    if stat_check == False:
+        total_cons = total_cons[0]
+    FR_Input_Output.write_output_steady(total_cons, output_name, 'Steady State Simulation', dist_type)
 
 def temporal_output(stat_check, to_write, output_name, stops, region_areas, dist_type):
 

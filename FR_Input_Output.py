@@ -13,78 +13,102 @@ def convert_to_lists(filename):
 
     all_sheets = xlrd.open_workbook(filename)
 
-    f_len = 11  # number of inputs per fish
-    zo_len = 11  # number of inputs per zoo
-    ph_len = 4  # number of inputs per phyto
     reg_len = 9  # number of inputs per region
 
+    
+    ## getting model param from first excel sheet ##
+    
     model_para = []
     model_sheet = all_sheets.sheet_by_index(0)
     para_col = model_sheet.col(1)
 
     get_model_para(para_col, model_para)
 
+    ## getting regional parameters from excel ##
+
     reg_sheet = all_sheets.sheet_by_index(1)
 
     entry_col = reg_sheet.col(1)
-    dist_col = reg_sheet.col(2)
 
     region_data = []
 
-    get_data(entry_col, dist_col, reg_len, region_data)
+    get_data(entry_col, reg_len, region_data)
 
+
+    ## temp data from excel ##
+    
     temp_data = []
     temp_sheet = all_sheets.sheet_by_index(2)
 
     num_timestep, time_per_step = Time_parser.num_steps(model_para[4], model_para[5], model_para[6])
-    num_timestep = num_timestep + 1
-    get_temp_data(temp_data, temp_sheet, len(region_data))
+    
+    get_temp_data(temp_data, temp_sheet, len(region_data), num_timestep)
 
-    chem_len = 10 + (len(region_data)*4)
+    ## chemical properties from excel ##
+    
+
+    chem_len = 9
     chem_sheet = all_sheets.sheet_by_index(3)
-
-    entry_col = chem_sheet.col(1)
-    dist_col = chem_sheet.col(2)
-
+    chem_entry_col = chem_sheet.col(1)
     chem_data = []
+    
+    get_data(chem_entry_col, chem_len, chem_data)
 
-    get_chem_data(entry_col, dist_col, chem_len, chem_data, len(region_data))
+    ## chemical concentrations from excel ##
+    
+    con_sheet = all_sheets.sheet_by_index(4)
+    con_data = []
+    
+    get_con_data(con_sheet, con_data, len(region_data), num_timestep)
 
-    org_sheet = all_sheets.sheet_by_index(4)
+    ## organism properties from excel ##
+    
+    org_sheet = all_sheets.sheet_by_index(5)
+
+    f_len = 11  # number of inputs per fish
+    zo_len = 11  # number of inputs per zoo
+    ph_len = 4  # number of inputs per phyto
 
     fish_entry_col = org_sheet.col(1)
-    fish_dist_col = org_sheet.col(2)
-    invert_entry_col = org_sheet.col(4)
-    invert_dist_col = org_sheet.col(5)
-    zoop_entry_col = org_sheet.col(7)
-    zoop_dist_col = org_sheet.col(8)
-    phyto_entry_col = org_sheet.col(10)
-    phyto_dist_col = org_sheet.col(11)
+    invert_entry_col = org_sheet.col(3)
+    zoop_entry_col = org_sheet.col(5)
+    phyto_entry_col = org_sheet.col(7)
 
     fish_data = []
     invert_data = []
     zoop_data = []
     phyto_data = []
 
-    get_data(fish_entry_col, fish_dist_col, f_len, fish_data)
-    get_data(invert_entry_col, invert_dist_col, f_len, invert_data)
-    get_data(zoop_entry_col, zoop_dist_col, zo_len, zoop_data)
-    get_data(phyto_entry_col, phyto_dist_col, ph_len, phyto_data)
+    get_data(fish_entry_col, f_len, fish_data)
+    get_data(invert_entry_col, f_len, invert_data)
+    get_data(zoop_entry_col, zo_len, zoop_data)
+    get_data(phyto_entry_col, ph_len, phyto_data)
+
+    ## organisms diets from excel ##
+    
     diet_data = {}
     entrysize = len(fish_data) + len(invert_data) + 5
-    diet_sheet = all_sheets.sheet_by_index(5)
+    diet_sheet = all_sheets.sheet_by_index(6)
     get_diet_data(diet_sheet, diet_data, entrysize)
+
     #Used to visualize foodweb
     foodweb_graph = foodweb_to_network_struc(diet_data)
 
+    ## Fish migration data from excel ##
+    
     mig_data = {}
-    mig_sheet = all_sheets.sheet_by_index(6)
+    mig_sheet = all_sheets.sheet_by_index(7)
     get_mig_data(mig_data, mig_sheet)
 
-    sites_sheet = all_sheets.sheet_by_index(7)
+    
+    ## geometric site, and hotspot data from excel ##
+    
+    sites_sheet = all_sheets.sheet_by_index(8)
     sites_data = get_sites_data(sites_sheet)
 
-    total = [region_data, temp_data, chem_data, phyto_data, zoop_data, invert_data, fish_data, diet_data, mig_data]
+    ## pass to program ##
+
+    total = [region_data, temp_data, chem_data, phyto_data, zoop_data, invert_data, fish_data, diet_data, mig_data, con_data]
 
     return model_para, total, num_timestep, time_per_step, sites_data, foodweb_graph
 
@@ -95,29 +119,21 @@ def get_model_para(para_col, model_para):
         model_para.append(para_col[i].value)
 
 
-def get_temp_data(temp_data, temp_sheet, reg_len):
-    for i in range(2, (reg_len * 2) + 1, 2):
-        try:
-            row = temp_sheet.row(i)
+def get_temp_data(temp_data, temp_sheet, reg_len, timesteps):
 
-        except:
-            break
-        regional_temps = []
-        for j in range(1, len(row), 2):
-            entry = row[j].value
-            if type(entry) == float:
-                regional_temps.append(entry)
-            if type(entry) == str:
-                entry = entry.split(', ')
-                param = row[j+1].value.split(', ')
-                param = [float(i) for i in param]
-                toadd = pr.Var(entry[0], entry[1], param)
-                regional_temps.append(toadd)
+    #loop over regions by row
+    for i in range (1, reg_len + 1):
+        r_temps = []
+        row = temp_sheet.row(i)
+        #loop over timesteps by column
+        for j in range (1, timesteps + 1):
+            data_get_helper(row[j], r_temps)
+            
+        temp_data.append(r_temps)
 
-        temp_data.append(regional_temps)
-
-
-def get_data(entry_col, dist_col, instance_len, new_list):
+    return temp_data
+    
+def get_data(entry_col, instance_len, new_list):
 
     new_entry = []
     for i in range(len(entry_col)):
@@ -135,39 +151,58 @@ def get_data(entry_col, dist_col, instance_len, new_list):
                 else:
                     new_entry.append(entry_col[i].value)
             else:
-                data_get_helper(entry_col[i], dist_col[i], new_entry)
+                data_get_helper(entry_col[i], new_entry)
     if len(new_entry) != 0:
         new_list.append(new_entry)
 
 
-def data_get_helper(preentry, dist, new_entry):
+def data_get_helper(preentry, new_entry):
 
     entry = preentry.value
-    dist_par = dist.value
-    if entry == '' and type(dist_par) == str and dist_par != '':
-        print('You must specify a distribution where you provide ' + dist_par)
-    elif type(entry) == float and dist_par == '':
+    
+    if type(entry) == float:
         new_entry.append(entry)
-    elif type(dist_par) == str and entry != '':
-        entry = entry.split(',')
-        ty = entry[0].strip()
-        dist_name = entry[1].strip()
-
-        dist_par = dist_par.split(',')
-        dist_par = map(str.strip, dist_par)
+    elif type(entry) == str and entry != '':
+        split = entry.split(" ", 2)
+        ty = split[0].replace(',', '')
+        print(split)
+        name = split[1]
+        params = split[2].replace('(', '')
+        params = params.replace(')', '')
+        params = params.split(', ')
         try:
-            dist_par = [float(i) for i in dist_par]
+            params = [float(i) for i in params]
         except ValueError:
-            print('In ' + str(new_entry[0]) + ', ' + str(list(dist_par)) + ' something is wrong with format.')
+            print(entry)
+            print('In ' + str(new_entry[0]) +  ' something is wrong with the format of' + entry)
+            exit(0)
 
-        to_add = pr.Var(ty, dist_name, dist_par)
+        to_add = pr.Var(ty, name, params)
         new_entry.append(to_add)
     else:
-        new_entry.append(dist_par)
+        new_entry.append(entry)
 
+
+def get_con_data(con_sheet, con_data, reg_len, timesteps):
+
+    for i in range (1, timesteps + 1):
+        r_cons = []
+        column = con_sheet.col(i)
+        for j in range (0, reg_len):
+            t_cons = []
+            begin_row =1 +  j * 5
+            for k in range (0, 5):
+                if k == 0:
+                    continue
+                else:
+                    entry = column[begin_row + k]
+                    data_get_helper(entry, t_cons)
+            r_cons.append(t_cons)
+        con_data.append(r_cons)
+            
 
 def get_diet_data(diet_sheet, diet_data, entrysize):
-    # getting Diet data #
+
     new_name = 0
     rows = diet_sheet.nrows
 
@@ -180,49 +215,6 @@ def get_diet_data(diet_sheet, diet_data, entrysize):
         else:
             new_prey_data = [diet_sheet.row(i)[0].value, float(diet_sheet.row(i)[1].value)]
             diet_data[new_name].append(new_prey_data)
-
-
-def get_chem_data(entry_col, dist_col, chem_len, chem_data, num_regions):
-
-    for i in range(len(entry_col)):
-
-        if entry_col[i].value == "END":
-            return
-        elif i % chem_len == 0:
-            new_chem = []
-            sed_con = []
-            total_con = []
-            dis_con = []
-            por_con = []
-        elif i % chem_len == 1:
-            print(i)
-            new_chem.append(entry_col[i].value)
-            data_get_helper(entry_col[i+1], dist_col[i+1], new_chem)
-            data_get_helper(entry_col[i + 2], dist_col[i + 2], new_chem)
-            data_get_helper(entry_col[i + 3], dist_col[i + 3], new_chem)
-            data_get_helper(entry_col[i + 4], dist_col[i + 4], new_chem)
-            data_get_helper(entry_col[i + 5], dist_col[i + 5], new_chem)
-            data_get_helper(entry_col[i + 6], dist_col[i + 6], new_chem)
-            data_get_helper(entry_col[i + 7], dist_col[i + 7], new_chem)
-            data_get_helper(entry_col[i + 8], dist_col[i + 8], new_chem)
-        elif i % chem_len == 10:
-            for j in range(i, i+num_regions*4):
-                if (j-i) % 4 == 0:
-                    data_get_helper(entry_col[j], dist_col[j], sed_con)
-                if (j - i) % 4 == 1:
-                    data_get_helper(entry_col[j], dist_col[j], total_con)
-                if (j - i) % 4 == 2:
-                    data_get_helper(entry_col[j], dist_col[j], dis_con)
-                if (j - i) % 4 == 3:
-                    data_get_helper(entry_col[j], dist_col[j], por_con)
-            new_chem.append(sed_con)
-            new_chem.append(total_con)
-            new_chem.append(dis_con)
-            new_chem.append(por_con)
-            chem_data.append(new_chem)
-
-
-
 
 
 def get_mig_data(mig_data, mig_sheet):
@@ -316,7 +308,7 @@ def write_output_steady(total_cons, output_name, stop, dist_type):
     chem_list = list(list(list(total_cons.values())[0].values())[0].items())
     chem_len = len(chem_list)
     #write down region which is dictionaries first key
-    sheet.write(0,0, 'Region: ' + str(list(total_cons.keys())[0]), bold)
+    sheet.write(0,0, 'Region: ' + str(list(total_cons.keys())[0]) + ' Concentrations (ng/g ww)', bold)
 
     #write chemicals at the top
     for j in range(chem_len):
@@ -348,6 +340,8 @@ def write_output_steady(total_cons, output_name, stop, dist_type):
         for i in range(org_len):
             for j in range(chem_len):
                 sheet.write(i+1,j+1, round(total_cons[region][org_list[i]][chem_list[j][0]],6))
+
+    workbook.close()
 
 
 
@@ -381,7 +375,7 @@ def write_temporal_excel(array, output_name, stops, stat_flag, regional_areas, d
             lower_non_avg = data_at_time[0][0]
             lower_avg = data_at_time[1]
             upper_avg = data_at_time[2]
-            sheet.write(0,0, 'Lower Food Web Concentrations by Region (ng/g)', big)
+            sheet.write(0,0, 'Lower Food Web Concentrations by Region (ng/g ww)', big)
             # write chemicals at the top
             for j in range(len(chem_list)):
                 sheet.write(0, j + 1, chem_list[j])
@@ -402,14 +396,14 @@ def write_temporal_excel(array, output_name, stops, stat_flag, regional_areas, d
 
 
 
-            sheet.write(0, len(chem_list) + 1, 'Lower Food Web Concentrations Average Concentrations Weighted by Regional Area (ng/g)', big)
+            sheet.write(0, len(chem_list) + 1, 'Lower Food Web Concentrations Average Concentrations Weighted by Regional Area (ng/g ww)', big)
             for j in range(len(chem_list)):
                 sheet.write(0, len(chem_list) + 1 + (j + 1), chem_list[j])
             for i in range(len(lower_org_list)):
                 for j in range(len(chem_list)):
                     sheet.write(2 + i, 2 + len(chem_list) + j, round(lower_avg[lower_org_list[i]][chem_list[j]],6))
 
-            sheet.write(count + 1, 0, 'Upper Food Web Concentrations Averaged over Populations (ng/g)', big)
+            sheet.write(count + 1, 0, 'Upper Food Web Concentrations Averaged over Populations (ng/g ww)', big)
             for i in range(len(upper_org_list)):
                 sheet.write(count + 2 + i, 0, upper_org_list[i])
                 for j in range (len(chem_list)):
@@ -432,9 +426,10 @@ def write_temporal_excel(array, output_name, stops, stat_flag, regional_areas, d
             upper_org_list = list(upper_dists.keys())
             chem_list = list(list(upper_dists.values())[0].keys())
 
-            sheet.write(0, 0, 'Lower Food Web Concentrations by Region (ng/g)', big)
+            sheet.write(0, 0, 'Lower Food Web Concentrations by Region (ng/g ww)', big)
 
             for j in range(len(chem_list)):
+
                 sheet.write(0, j + 1, chem_list[j])
 
             count = 1
@@ -456,7 +451,7 @@ def write_temporal_excel(array, output_name, stops, stat_flag, regional_areas, d
                             sheet.write((1 + i * (1 + len(lower_org_list))) + (1+j), k + 1,
                                         lower_dists[reg_list[i]][lower_org_list[j]][chem_list[k]].best_para[0])
 
-            sheet.write(0, len(chem_list) + 1, 'Lower Food Web Mean Concentrations Weighted by Regional Area (ng/g)', big)
+            sheet.write(0, len(chem_list) + 1, 'Lower Food Web Mean Concentrations Weighted by Regional Area (ng/g ww)', big)
             sheet.write(1, len(chem_list) + 1, 'All Regions', bold)
 
             for j in range(len(chem_list)):
@@ -471,7 +466,7 @@ def write_temporal_excel(array, output_name, stops, stat_flag, regional_areas, d
 
                     sheet.write(2 + j, 2 + len(chem_list) + i, weight_avg)
 
-            sheet.write(count + 1, 0, 'Upper Food Web Concentrations (ng/g)', big)
+            sheet.write(count + 1, 0, 'Upper Food Web Concentrations (ng/g ww)', big)
             count += 1
 
             for i in range(len(upper_org_list)):
@@ -484,7 +479,7 @@ def write_temporal_excel(array, output_name, stops, stat_flag, regional_areas, d
                     else:
                         sheet.write(count + 1 + i, j + 1, upper_dists[upper_org_list[i]][chem_list[j]].best_para[0])
 
-            sheet.write(count, 1 + len(chem_list), 'Upper Food Web Concentrations (ng/g) (Mean and standard Deviation of Samples)', big)
+            sheet.write(count, 1 + len(chem_list), 'Upper Food Web Concentrations (ng/g ww) (Mean and standard Deviation of Samples)', big)
 
             for i in range(len(upper_org_list)):
                 for j in range(len(chem_list)):
@@ -492,3 +487,7 @@ def write_temporal_excel(array, output_name, stops, stat_flag, regional_areas, d
 
 
     workbook.close()
+
+
+
+

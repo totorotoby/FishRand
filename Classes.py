@@ -301,9 +301,6 @@ class Fish(Zooplank):
         denom = self.k_2[chem_index] + self.k_e[chem_index] + self.Kg
         f_num = (self.k_1[chem_index] * self.Mo * Cwdo) + (self.k_1[chem_index] * self.Mp * Cwp)
 
-        #print(self.name, 'bottom: ', denom, 'top left: ', f_num)
-        #print('k2: ', self.k_2[chem_index], 'ke: ', self.k_e[chem_index], "k1: ", self.k_1, 'kd: ', self.k_d, 'cwdo: ', Cwdo, 'Cwp: ', Cwp, 'Gf: ', self.Gf, 'k_gb: ', self.k_gb,'\n')
-
 
         l_num = 0
 
@@ -313,14 +310,13 @@ class Fish(Zooplank):
                 if self.diet_frac[j][0] == 'Sediment/Detritus':
 
                     concentration = chemical.Cs
-                    print(chemical.Cs)
                     l_num += (self.diet_frac[j][1]*concentration)
 
                 else:
                     concentration = log[self.diet_frac[j][0]][chemical.name]
                     l_num += (self.diet_frac[j][1]*concentration)
 
-        print('\nTotal concentration consumed in prey : ', l_num, '\n')
+       
 
         l_num = l_num * self.k_d[chem_index]
 
@@ -439,7 +435,7 @@ class Pplank:
 
 
         k_pw = (self.Vlb * beta1 * chem_kow) / density_lip + (self.Vnb * beta4 * chem_kow) + (self.Vwb / density_w)
-        print((self.Vlb * beta1 * chem_kow) / density_lip, (self.Vnb * beta4 * chem_kow), (self.Vwb / density_w))
+
         self.k_2[chem_index] = self.k_1[chem_index] / k_pw
 
     def init_check(self):
@@ -548,25 +544,25 @@ class Chemical:
         return Ed
 
     def calc_cs(self, region):
-
+        
         self.Cs = region.Ocs * .35 * self.Kow * self.Cwp
 
     def calc_pore_water(self, Ocs):
+        
         self.Cwp = self.Cs/(Ocs * .35 * self.Kow)
 
 
     def calc_phi_and_cwdo(self, region):
 
-        if self.Cwdo == -1 and self.Cwto != -1:
 
-            adoc = region.adoc
-            apoc = region.apoc
-            xdoc = region.Xdoc
-            xpoc = region.Xpoc
+        adoc = region.adoc
+        apoc = region.apoc
+        xdoc = region.Xdoc
+        xpoc = region.Xpoc
 
-            self.phi = 1/((1+xpoc*self.Dpoc*apoc*self.Kow)+(xdoc*self.Ddoc*adoc*self.Kow))
+        self.phi = 1/((1+xpoc*self.Dpoc*apoc*self.Kow)+(xdoc*self.Ddoc*adoc*self.Kow))
 
-            self.Cwdo = (self.Cwto/1000) * self.phi
+        self.Cwdo = (self.Cwto/1000) * self.phi
 
     def init_check(self):
         atts = self.__dict__
