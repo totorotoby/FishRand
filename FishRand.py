@@ -10,7 +10,7 @@ from main import *
 import subprocess
 import sys
 import os
-
+from threading import Thread
 
 exitflag = False
 root = tk.Tk()
@@ -109,7 +109,7 @@ class app(tk.Frame):
         inputbutton = tk.Button(self, text="Choose File", command=self.askfile, width=18)
         inputbutton.grid(column=0, row=7)
         tk.Label(self, text='File: ').grid(column=0, row=6)
-        tk.Button(self, text="Run", command=self.run_model).grid(column=0, row=11)
+        tk.Button(self, text="Run", command=self.loading).grid(column=0, row=11)
 
 
          ###Fish Image###
@@ -117,6 +117,14 @@ class app(tk.Frame):
         label_image0 = tk.Label(self, image=fish_image)
         label_image0.image = fish_image
         label_image0.grid(row=0,column=0, sticky=tk.W)
+
+        ###Loading window###
+        
+        self.Loading = tk.Toplevel(self)
+        tk.Label(self.Loading, text="Running Simulations...").pack()
+        self.bar = tk.ttk.Progressbar(self.Loading, orient='horizontal')
+        self.bar.pack()
+        self.Loading.withdraw()
 
     def askfile(self):
         self.filebox.delete(0, tk.END)
@@ -136,7 +144,24 @@ class app(tk.Frame):
 
             temporal_output(self.stat_check, self.to_write, self.savepath, self.time_entry, self.region_areas, dist_type)
 
+    def loading(self):
+
+        self.run_thread(self.run_model)
+
+    def run_thread(self, func):
+        Thread(target=self.run_func, args=[func]).start()
+
+    def run_func(self, func):
+
+        self.Loading.update()
+        self.Loading.deiconify()
+        self.bar.start()
+        self.run_model()
+        self.bar.stop()
+        self.Loading.withdraw()
+        
     def run_model(self):
+
         self.filename = self.filebox.get()
 
         if self.filename == '':
@@ -171,6 +196,7 @@ class app(tk.Frame):
                 self.region_info = self.output[6]
                 self.foodweb_graph = self.output[7]
 
+       
 
             ########### TO SET UP INDIVDUAL GRAPHS ###########################
             # update time steps
@@ -208,8 +234,7 @@ class app(tk.Frame):
                         menu['menu'].add_command(label=entry, command=tk._setit(var, entry))
 
             ##################################################################
-
-
+        
     def parse_filename(self):
 
         pieces = self.filename.split('/')
