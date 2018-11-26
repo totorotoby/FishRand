@@ -89,6 +89,7 @@ class Zooplank:
 
     # sets G_d for this zooplank
     def calc_gd_filter(self, css, sigma=1):
+        print(self.Gv, css)
         self.Gd = self.Gv * css * sigma
 
     def calc_gd_no_filter(self, T):
@@ -551,6 +552,10 @@ class Chemical:
         
         self.Cwp = self.Cs/(Ocs * .35 * self.Kow)
 
+        print("########")
+        print("Cwp: ", self.Cwp)
+        print("########")
+        
 
     def calc_phi_and_cwdo(self, region):
 
@@ -564,6 +569,10 @@ class Chemical:
 
         self.Cwdo = (self.Cwto/1000) * self.phi
 
+        print("########")
+        print("Cwdo: ", self.Cwdo)
+        print("########")
+        
     def init_check(self):
         atts = self.__dict__
         count = 0

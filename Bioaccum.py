@@ -125,10 +125,13 @@ def init_chems(chem_data, r_con_data, region, region_index, u_count, v_count):
 
         if toadd.Cwp != -1 and toadd.Cwdo != -1 and toadd.Cs == '' and region.Ocs != '':
             toadd.calc_cs(region)
+            
         if toadd.Cwp != -1 and toadd.Cwdo == -1 and toadd.Cs == '' and toadd.Cwto != -1:
             toadd.calc_cs(region)
+            
         if toadd.Cwdo == -1 and toadd.Cwto != -1 and region.adoc and region.apoc and region.Xdoc and region.Xpoc != '':
             toadd.calc_phi_and_cwdo(region)
+            
         if toadd.Cwdo == -1 and (toadd.Cwto == -1 or region.adoc or region.apoc or region.Xdoc or region.Xpoc == ''):
             print('Not enough parameters to solve for Cwdo in ' + chemical[0])
             exit(0)
