@@ -31,7 +31,6 @@ def convert_to_lists(filename):
     entry_col = reg_sheet.col(1)
 
     region_data = []
-
     get_data(entry_col, reg_len, region_data)
 
 
@@ -59,7 +58,7 @@ def convert_to_lists(filename):
     con_sheet = all_sheets.sheet_by_index(4)
     con_data = []
     
-    get_con_data(con_sheet, con_data, len(region_data), num_timestep)
+    get_con_data(con_sheet, con_data, len(region_data), len(chem_data), num_timestep)
 
     ## organism properties from excel ##
     
@@ -183,22 +182,20 @@ def data_get_helper(preentry, new_entry):
         new_entry.append(entry)
 
 
-def get_con_data(con_sheet, con_data, reg_len, timesteps):
+def get_con_data(con_sheet, con_data, num_reg, num_chem, timesteps):
 
     for i in range (1, timesteps + 1):
-        r_cons = []
+        t_cons = []
         column = con_sheet.col(i)
-        for j in range (0, reg_len):
-            t_cons = []
-            begin_row =1 +  j * 5
-            for k in range (0, 5):
-                if k == 0:
-                    continue
-                else:
-                    entry = column[begin_row + k]
-                    data_get_helper(entry, t_cons)
-            r_cons.append(t_cons)
-        con_data.append(r_cons)
+        for j in range (1, num_reg + 1):
+            r_cons = []
+            for k in range (1, num_chem + 1):
+                c_cons = []
+                for p in range(5):
+                    print(j,k,p)
+        
+        
+    #print(len(con_data), len(con_data[0]), len(con_data[0][0]))
             
 
 def get_diet_data(diet_sheet, diet_data, entrysize):
@@ -491,3 +488,4 @@ def write_temporal_excel(array, output_name, stops, stat_flag, regional_areas, d
 
 
 
+convert_to_lists("sheets/input/Pegan_Cove_South_Pond.xlsx")

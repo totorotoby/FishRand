@@ -551,7 +551,7 @@ class Chemical:
     def calc_pore_water(self, Ocs):
         
         self.Cwp = self.Cs/(Ocs * .35 * self.Kow)
-
+        print('Cwp: ', self.Cwp)
 
     def calc_phi_and_cwdo(self, region):
 
@@ -564,7 +564,7 @@ class Chemical:
         self.phi = 1/((1+xpoc*self.Dpoc*apoc*self.Kow)+(xdoc*self.Ddoc*adoc*self.Kow))
 
         self.Cwdo = (self.Cwto/1000) * self.phi
-
+        print('Cwdo: ', self.Cwdo)
         
     def init_check(self):
         atts = self.__dict__
