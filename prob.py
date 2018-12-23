@@ -361,13 +361,10 @@ def set_hyper_samp_cube(model_para, Var):
         #the +1 makes sure that we have enough samples everytime, but not all of the are used
         hype_sample = u_iter//bin_num + 1
 
-    print(hype_sample)
     lhs = pyDOE.lhs(bin_num, samples=hype_sample)
     lhs = lhs.ravel()
     Var.lhs = lhs
     Var.take_samples()
-    if Var.type == 'U':
-        print(len(Var.values))
 
 def make_result_dist(dicts):
 

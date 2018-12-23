@@ -60,6 +60,7 @@ def convert_to_lists(filename):
     
     get_con_data(con_sheet, con_data, len(region_data), len(chem_data), num_timestep)
 
+    
     ## organism properties from excel ##
     
     org_sheet = all_sheets.sheet_by_index(5)
@@ -184,18 +185,27 @@ def data_get_helper(preentry, new_entry):
 
 def get_con_data(con_sheet, con_data, num_reg, num_chem, timesteps):
 
-    for i in range (1, timesteps + 1):
+    for i in range (1, timesteps+1):
         t_cons = []
-        column = con_sheet.col(i)
-        for j in range (1, num_reg + 1):
+        column = con_sheet.col(1)
+        for j in range (0, num_reg):
             r_cons = []
-            for k in range (1, num_chem + 1):
+            for k in range (0, num_chem):
                 c_cons = []
-                for p in range(5):
-                    print(j,k,p)
-        
-        
-    #print(len(con_data), len(con_data[0]), len(con_data[0][0]))
+                for p in range (1,5):
+                    
+                    # This is a mess so...
+                    # num_chem * 4 * j counts all red spaces in all of the  prior regional sections
+                    # 1 + j counts the number of yellow regional labels
+                    # k*4 counts the number of red spaces from this region to the partiular chemical
+                    # 2*j + 1 + k counts the number of green labels for chemicals
+                    # p counts the remaining red spaces down to the type of concentration to append
+                    
+                    data_get_helper(column[(((num_chem * 4 * j) + (1 + j) ) + ( (k * 4) + ( (2 * j) + (1 + k) ) ) + p)], c_cons)
+                r_cons.append(c_cons)
+            t_cons.append(r_cons)
+        con_data.append(t_cons)
+    
             
 
 def get_diet_data(diet_sheet, diet_data, entrysize):
@@ -228,10 +238,7 @@ def foodweb_to_network_struc(foodweb):
 
     for node in nodes:
             network_struc[node[0]] = []
-    # for key in network_struc.keys():
-    #     for node in nodes:
-    #         network_struc[key][node[0]] = 0
-
+    
     no_eat = ['Sediment/Detritus', 'Zooplankton', 'Phytoplankton']
     network_struc['Zooplankton'].append('Phytoplankton')
     for predator, prey in network_struc.items():
@@ -484,8 +491,3 @@ def write_temporal_excel(array, output_name, stops, stat_flag, regional_areas, d
 
 
     workbook.close()
-
-
-
-
-convert_to_lists("sheets/input/Pegan_Cove_South_Pond.xlsx")

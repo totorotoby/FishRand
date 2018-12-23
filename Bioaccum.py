@@ -24,6 +24,15 @@ def set_all_h_and_s(model_para, all_data):
                         if type(list_item[j]) == pr.Var:
                             count += 1
                             pr.set_hyper_samp_cube(model_para, list_item[j])
+                        if type(list_item[j]) == list:
+                            nested_list_item = list_item[j]
+                            for k in range(len(nested_list_item)):
+                                print(type(nested_list_item[k]))
+                                if type(nested_list_item[k]) == pr.Var:
+                                    count += 1
+                                    pr.set_hyper_samp_cube(model_para, nested_list_item[k])
+                                    print(nested_list_item[k].lhs)
+                                          
 
     if count >= 1:
         return True
@@ -89,12 +98,13 @@ def init_region(reg_data, temp, u_count, v_count):
 
 # initiates chemicals for a specific single region in a single monte carlo sample in a time period
 def init_chems(chem_data, r_con_data, region, region_index, u_count, v_count):
-    #print(region_index)
-    concentrations = r_con_data[region_index]
+    
+    r_concentrations = r_con_data[region_index]
     
     chemicals = []
     for i in range(len(chem_data)):
-
+        
+        concentrations = r_concentrations[i]
         chemical = chem_data[i]
 
         chemical = check_inst_non_st(chemical, u_count, v_count)
@@ -143,6 +153,8 @@ def init_chems(chem_data, r_con_data, region, region_index, u_count, v_count):
             
         chemicals.append(toadd)
 
+
+    
     return chemicals
 
 
@@ -744,16 +756,9 @@ def bio_monte_carlo_loop(model_para, all_data, t, time_per_step, fish_by_region,
                     #loops over number of regions...do simulation for each region that fish is in
                     for j in range(len(regions)):
 
-                        # #This if statement is don't bother doing simulation if fish isnt in region
-                        # if all_data[6][i][0] not in fish_by_region[j]:
-                        #     #if fish not in region at the time then concentration for that region is 0 for that timestep
-                        #     new_concentrations_higher[regions[j].name][all_data[6][i][0]] = 0
-
-                        #else:
-
-                         # The diet of the fish must be adjusted at this point to make sure that the fish doesn't
-                         # try to eat anything that isn't in the region
-                         # adj_fish_diet is the diet that is used for these iterations
+                        # The diet of the fish must be adjusted at this point to make sure that the fish doesn't
+                        # try to eat anything that isn't in the region
+                        # adj_fish_diet is the diet that is used for these iterations
 
                          adj_fish_diet = spatial.adjust_diet_to_region(fish_data[i][0], j, diet_data,
                                                                        fish_by_region, len(r_inverts[0]) + 2)
@@ -810,6 +815,7 @@ def bio_monte_carlo_loop(model_para, all_data, t, time_per_step, fish_by_region,
                 temp = all_data[1][0]
                 regions = init_region(region_data, temp, u_count, v_count)
                 chemicals = init_chems(chem_data, r_con_data, regions[0], 0, u_count, v_count)
+                
                 phytos = init_phyto(all_data[3], chemicals, u_count, v_count)
                 zoops = init_zoop(all_data[4], regions[0], chemicals, phytos[0], u_count, v_count,)
                 inverts, tempinverts = init_fish_pre_region(invert_data, regions[0], chemicals, phytos[0], zoops,
@@ -826,7 +832,8 @@ def bio_monte_carlo_loop(model_para, all_data, t, time_per_step, fish_by_region,
                 inner_count += 1
 
     if model_para[8] == 'YES':
-
+        
+        print(steady_state)
         return steady_state
 
     return uv_results
@@ -877,9 +884,10 @@ def single_setup_bottom_web(region_data, temperatures, chem_data, r_con_data, ph
 
     # sets up all chemicals in all regions
     for i in range(len(regions)):
+        print('hello')
         chemicals = init_chems(chem_data, r_con_data ,regions[i], i, u_count, v_count)
         r_chems.append(chemicals)
-
+        print(r_chems)
 
     for i in range(len(regions)):
         phyto = init_phyto(phyto_data, r_chems[i], u_count, v_count, per_step=days_per_step)

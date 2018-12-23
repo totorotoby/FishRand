@@ -178,7 +178,6 @@ def filter_cases(filename, stops):
     v_iter = int(model_para[1])
     writing_info = []
     sample_data = model_para[0:3]
-    Bioaccum.set_all_h_and_s(sample_data, all_data)
     stops_count = 0
     t = 0
     # if steady state problem wants to be solved
@@ -243,8 +242,7 @@ def filter_cases(filename, stops):
             fish_by_region = get_fish_in_region(locations, f_names, len(all_data[0]))
 
             # do entire simulation for a time step, and return concentration dictionaries
-            uv_single = Bioaccum.bio_monte_carlo_loop(model_para, all_data, t, time_per_step, fish_by_region, prior_locations, locations, u_iter, v_iter,
-                                                         p_dic=total_cons)
+            uv_single = Bioaccum.bio_monte_carlo_loop(model_para, all_data, t, time_per_step, fish_by_region, prior_locations, locations, u_iter, v_iter, p_dic=total_cons)
 
             total_cons = uv_single
 
@@ -263,7 +261,7 @@ def filter_cases(filename, stops):
 
 
     if model_para[8] == 'YES':
-
+        print(total_cons)
         return [model_para[8], total_cons, stat_check, foodweb_graph]
 
     if model_para[8] == 'NO':

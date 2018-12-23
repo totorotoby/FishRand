@@ -463,7 +463,7 @@ class Pplank:
         return False
 
     def solve_steady_state(self, Cwd, i):
-
+        print(Cwd)
         return (self.k_1[i] * Cwd) / (self.k_2[i] + self.Kg)
 
     def solve_next_time_step(self, Cwd, chem_index, pre_step, t):
