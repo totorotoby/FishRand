@@ -672,7 +672,7 @@ def get_prey_con(predator, reg_index, len_chems, chem_names, fish_names, non_fis
 
 
 def solve_single_fish_single_region(region, chemicals, fish, days, prior_prey_cons, new_prey_cons, prior_C, out_check):
-
+    print(prior_prey_cons, new_prey_cons)
     new_cons_by_chemical = []
     for j in range(len(chemicals)):
         prior_c = prior_C[j]

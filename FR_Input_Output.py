@@ -185,10 +185,11 @@ def data_get_helper(preentry, new_entry):
 
 def get_con_data(con_sheet, con_data, num_reg, num_chem, timesteps):
 
+    
     for i in range (1, timesteps+1):
         t_cons = []
         column = con_sheet.col(1)
-        for j in range (0, num_reg):
+        for j in range (num_reg):
             r_cons = []
             for k in range (0, num_chem):
                 c_cons = []
@@ -200,11 +201,14 @@ def get_con_data(con_sheet, con_data, num_reg, num_chem, timesteps):
                     # k*4 counts the number of red spaces from this region to the partiular chemical
                     # 2*j + 1 + k counts the number of green labels for chemicals
                     # p counts the remaining red spaces down to the type of concentration to append
-                    
-                    data_get_helper(column[(((num_chem * 4 * j) + (1 + j) ) + ( (k * 4) + ( (2 * j) + (1 + k) ) ) + p)], c_cons)
+                    #print(column[(((num_chem * 4 * j) + (1 + j) ) + ( (k * 4) + ( (2 * j) + (1 + k) ) ) + p)])
+                    #print((((num_chem * 4 * j) + (1 + j) ) + ( (k * 4) + ( (2 * j) + (1 + k) ) ) + p))
+                    data_get_helper(column[(1+j) + ((j * num_chem) + (1+k)) + ((j * num_chem * 4) + (k * 4) + p)], c_cons)
                 r_cons.append(c_cons)
             t_cons.append(r_cons)
+        print(t_cons)
         con_data.append(t_cons)
+
     
             
 
@@ -212,7 +216,7 @@ def get_diet_data(diet_sheet, diet_data, entrysize):
 
     new_name = 0
     rows = diet_sheet.nrows
-
+    
     for i in range(rows):
         if i % entrysize == 0:
             continue
@@ -220,7 +224,11 @@ def get_diet_data(diet_sheet, diet_data, entrysize):
             new_name = diet_sheet.row(i)[0].value
             diet_data[new_name] = []
         else:
-            new_prey_data = [diet_sheet.row(i)[0].value, float(diet_sheet.row(i)[1].value)]
+            try:
+                new_prey_data = [diet_sheet.row(i)[0].value, float(diet_sheet.row(i)[1].value)]
+            except ValueError:
+                print("you are missing an organism in a diet list or the entirety of a diet for a organism.")
+                exit(0)
             diet_data[new_name].append(new_prey_data)
 
 
@@ -259,7 +267,7 @@ def get_sites_data(sites_sheet):
     bound_row = sites_sheet.row(1)
     col = 1
     while bound_row[col].value != '':
-        coord = [float(i) for i in (bound_row[col].value.replace(' ', '').split(','))]
+        coord = [float(i) for i in (bound_row[col].value.replace('', '').split(','))]
         boundary.append(coord)
         col += 1
 
@@ -268,7 +276,7 @@ def get_sites_data(sites_sheet):
     site_col_coord = sites_sheet.col(2)
     row = 3
     while site_col_coord[row].value != '' and site_col_name[row].value != '':
-        site = (site_col_name[row].value, [float(i) for i in (site_col_coord[row].value.replace(' ', '').split(','))])
+        site = (site_col_name[row].value, [float(i) for i in (site_col_coord[row].value.replace('', '').split(', '))])
         sites.append(site)
         row += 1
 

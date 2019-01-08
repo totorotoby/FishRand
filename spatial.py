@@ -197,6 +197,7 @@ def plot_vor(vor, boundary, hotspots):
 def setup(site_data):
 
     # get boundary polygon
+    print(site_data[0])
     boundary = Polygon(site_data[0])
 
     reg_polygons = []
@@ -226,7 +227,7 @@ def setup(site_data):
 
 
     # Use to see regions
-    #plot_vor(vor, boundary, attract_poly)
+    plot_vor(vor, boundary, attract_poly)
 
     return boundary, reg_polygons, attract_poly
 

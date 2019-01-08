@@ -204,8 +204,12 @@ class app(tk.Frame):
             count = 0
             # get fish names
             if self.stat_check == True and self.output[0] == 'NO':
-                fishs = list(self.to_write[0][1].keys())
-                chemicals = list(list(self.to_write[0][1].values())[0].keys())
+                try:
+                    fishs = list(self.to_write[0][1].keys())
+                    chemicals = list(list(self.to_write[0][1].values())[0].keys())
+                except:
+                    print('You asked to display a timestep that is outside the range between 0, and ((End Time - Start Time) / step) - 1)')
+                    exit(0)
                 count = 1
             elif self.stat_check == False and self.output[0] == 'NO':
                 fishs = list(self.to_write[0][2].keys())
@@ -256,7 +260,7 @@ class app(tk.Frame):
                 where.append(opt.get())
 
             if self.output[0] == 'NO':
-                dist_to_show = self.graph_data[int(where[0])][where[1]][where[2]]
+                dist_to_show = self.graph_data[int(where[0])-1][where[1]][where[2]]
             else:
                 dist_to_show = list(self.to_write.values())[0][where[1]][where[2]]
             dist_to_show.display = dist_type
