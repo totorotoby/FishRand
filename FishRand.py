@@ -109,7 +109,7 @@ class app(tk.Frame):
         inputbutton = tk.Button(self, text="Choose File", command=self.askfile, width=18)
         inputbutton.grid(column=0, row=7)
         tk.Label(self, text='File: ').grid(column=0, row=6)
-        tk.Button(self, text="Run", command=self.loading).grid(column=0, row=11)
+        tk.Button(self, text="Run", command=self.loading).grid(column=0, row=12)
 
 
          ###Fish Image###
@@ -418,6 +418,7 @@ def closing():
     if messagebox.askokcancel("Quit", "Do you want to quit?"):
         exitflag = True
         root.destroy()
+
 
 
 def install(package):

@@ -37,7 +37,12 @@ class HotSpot:
     def calcweights(self, reg_polys):
         if self.deftype == 'Polygon':
             for poly in reg_polys:
-                area_of_intersect = poly[1].intersection(self.polygon).area
+                #plot_shape([poly[1], self.polygon])
+                try:
+                    area_of_intersect = poly[1].intersection(self.polygon).area
+                except:
+                    print('attraction areas and regions incompatible. Make sure attraction areas are inside of the boundary, and that you your attraction area is a valid shape.')
+                    exit(0)
                 self.weights.append([poly[0], area_of_intersect])
         else:
             for i in range(len(reg_polys)):
@@ -197,7 +202,6 @@ def plot_vor(vor, boundary, hotspots):
 def setup(site_data):
 
     # get boundary polygon
-    print(site_data[0])
     boundary = Polygon(site_data[0])
 
     reg_polygons = []
@@ -205,11 +209,15 @@ def setup(site_data):
         # get regional polygons...takes some messing around with Voronoi function...
         points = np.array([row[1] for row in site_data[1]])
         vor = Voronoi(points)
-        regions, vertices = voronoi_finite_polygons_2d(vor, radius=boundary.length * 2)
+        regions, vertices = voronoi_finite_polygons_2d(vor, radius=boundary.length * 1.2)
         for i in range(len(regions)):
             if len(regions[i]) != 0:
                 poly_u = Polygon(vertices[regions[i]])
-                poly = poly_u.intersection(boundary)
+                try:
+                    poly = poly_u.intersection(boundary)
+                except:
+                    print('Boundary and Regions incompatible. Make sure regions are inside of the boundary, and that you your boundary is a valid shape.')
+                    exit(0)
 
                 reg_polygons.append([site_data[1][i][0],poly])
     else:
@@ -227,7 +235,7 @@ def setup(site_data):
 
 
     # Use to see regions
-    plot_vor(vor, boundary, attract_poly)
+    #plot_vor(vor, boundary, attract_poly)
 
     return boundary, reg_polygons, attract_poly
 
@@ -280,7 +288,14 @@ def trim_regpoly(reg_poly, attraction_polys):
         trimmed_area = [trim.area for trim in trimmed]
 
         summed = sum(trimmed_area)
-        trimmed_prob = [area / summed for area in trimmed_area]
+        try:
+            trimmed_prob = [area / summed for area in trimmed_area]
+        except ZeroDivisionError:
+            areas = [reg[1].area for reg in reg_poly]
+            summed = sum(areas)
+            trimmed_prob = [area / summed for area in areas]
+                
+                
 
     else:
 

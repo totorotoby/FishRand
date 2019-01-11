@@ -165,7 +165,6 @@ def data_get_helper(preentry, new_entry):
     elif type(entry) == str and entry != '':
         split = entry.split(" ", 2)
         ty = split[0].replace(',', '')
-        print(split)
         name = split[1]
         params = split[2].replace('(', '')
         params = params.replace(')', '')
@@ -206,7 +205,6 @@ def get_con_data(con_sheet, con_data, num_reg, num_chem, timesteps):
                     data_get_helper(column[(1+j) + ((j * num_chem) + (1+k)) + ((j * num_chem * 4) + (k * 4) + p)], c_cons)
                 r_cons.append(c_cons)
             t_cons.append(r_cons)
-        print(t_cons)
         con_data.append(t_cons)
 
     

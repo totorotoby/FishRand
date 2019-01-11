@@ -233,7 +233,7 @@ def filter_cases(filename, stops):
         locations = get_locs_matrix(loc_setups, draws, mig_data, t)
         fish_by_region = get_fish_in_region(locations, f_names, len(all_data[0]))
         while t < time_steps:
-
+            
             # get all locations for each fish... locations matrix is fish number by list of region numbers draws long
             prior_locations = locations
             locations = get_locs_matrix(loc_setups, draws, mig_data, t)
@@ -244,6 +244,7 @@ def filter_cases(filename, stops):
             # do entire simulation for a time step, and return concentration dictionaries
             uv_single = Bioaccum.bio_monte_carlo_loop(model_para, all_data, t, time_per_step, fish_by_region, prior_locations, locations, u_iter, v_iter, p_dic=total_cons)
 
+            print(uv_single, '\n\n')
             total_cons = uv_single
 
             lower_cons, fish_dic = get_fish_dic(total_cons[1], total_cons[0], [chem[0] for chem in all_data[2]], [fish[0] for fish in all_data[6]], region_areas)

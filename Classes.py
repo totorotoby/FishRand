@@ -56,6 +56,9 @@ class Zooplank:
         string += '\n\n'
         string += 'm_o :  ' + str(self.Mo) + '\n'
         string += 'm_p :  ' + str(self.Mp) + '\n\n\n'
+        
+        
+        
 
 
         return string
@@ -166,7 +169,7 @@ class Zooplank:
     def calc_ke(self, chem_ed, chem_index):
         k_e = (self.k_gb[chem_index]/self.Wb) * chem_ed * self.Gf
         self.k_e[chem_index] = k_e
-
+        
 
     def init_check(self):
 
@@ -285,13 +288,20 @@ class Fish(Zooplank):
 
     # returns K_gb for certian chemical
     def calc_kgb(self, chem_kow, chem_index, beta3, beta4, beta5, density_lip=.9, density_w=1, z_water=.05):
-
+        print(beta4, beta5)
         top = ((self.Vlg * (z_water*beta3*chem_kow))/density_lip) + (self.Vngc * beta4 * (z_water*chem_kow)) +\
               (self.Vngm * beta5 * (z_water*chem_kow)) + (z_water*self.Vwg/density_w)
+
+        print('Vlg: ', self.Vlg, 'Vngc: ', self.Vngc, 'Vngm: ', self.Vngm, 'Vwg: ', self.Vwg)
+        
         bottom = ((self.Vlb * (z_water*beta3*chem_kow))/density_lip) + (self.Vnb * beta5 * z_water * chem_kow) +\
                  (z_water*self.Vwb/density_w)
+        print(top, bottom)
         k_gb = top/bottom
 
+
+        print(top, bottom)
+        
         self.k_gb[chem_index] = k_gb
 
 
@@ -299,7 +309,7 @@ class Fish(Zooplank):
     def solve_steady_state(self, phi, chem_index, Cwp, Cwdo, log, chemical):
 
 
-        denom = self.k_2[chem_index] + self.k_e[chem_index] + self.Kg
+        denom = self.k_2[chem_index] + self.k_e[chem_index]
         f_num = (self.k_1[chem_index] * self.Mo * Cwdo) + (self.k_1[chem_index] * self.Mp * Cwp)
 
 
@@ -365,9 +375,10 @@ class Fish(Zooplank):
                             else:
                                 old_conc = fishlog_old[self.diet_frac[j][0]][chemical.name]
                                 new_conc = fishlog_new[self.diet_frac[j][0]][chemical.name]
-
-                            if old_conc == 0:
+                            ### debug 1/9/19 added or old_conc == None ###
+                            if old_conc == 0 or old_conc == None:
                                 concentration = new_conc
+                            ### debug 1/9/19  ###  
                             else:
                                 concentration = (old_conc + new_conc)/2
                             q2 += (self.diet_frac[j][1]*concentration)
@@ -463,7 +474,7 @@ class Pplank:
         return False
 
     def solve_steady_state(self, Cwd, i):
-        print(Cwd)
+        
         return (self.k_1[i] * Cwd) / (self.k_2[i] + self.Kg)
 
     def solve_next_time_step(self, Cwd, chem_index, pre_step, t):
@@ -551,7 +562,7 @@ class Chemical:
     def calc_pore_water(self, Ocs):
         
         self.Cwp = self.Cs/(Ocs * .35 * self.Kow)
-        print('Cwp: ', self.Cwp)
+        
 
     def calc_phi_and_cwdo(self, region):
 
@@ -564,7 +575,7 @@ class Chemical:
         self.phi = 1/((1+xpoc*self.Dpoc*apoc*self.Kow)+(xdoc*self.Ddoc*adoc*self.Kow))
 
         self.Cwdo = (self.Cwto/1000) * self.phi
-        print('Cwdo: ', self.Cwdo)
+        
         
     def init_check(self):
         atts = self.__dict__

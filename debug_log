@@ -1,20 +1,18 @@
 
 check multiple zooplankton:
 
-easly done
-
-Fix shapely error:
-
-This may have something to do with the points phil input.
-In actually shapely module. Look at map before assuming anything.
+easly done.
 
 Fix hotspots inside outside error:
 
 idea is that it is only crashing when hotspot is completely inside of region or hotspot is entire region. Need replicate code written on phils computer plus more
 
-Fix prior chemical con error:
+Fix prior chemical con error (potentially solved 1/8/2018):
 
 ##unknown probably has to do with chemical not seen yet in area or definitely a prior concentration bug.
+
+problem was when there has been to taking in of chemical in regions for lower down fish prey of an apex predator, chemical cons aren't initiziled to 0 when they should be. Attempted fix at Bioaccum: 663. 
+
 
 
 
