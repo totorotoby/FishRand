@@ -7,6 +7,7 @@ from tkinter import filedialog
 from tkinter import messagebox
 import networkx as nx
 from main import *
+from FR_Input_Output import convert_to_lists
 import subprocess
 import sys
 import os
@@ -34,7 +35,6 @@ class app(tk.Frame):
         ###Top Labels###
         tk.Label(self, text="Input", font=("Times New Roman", 18), height= 2).grid(row=4,column=0, columnspan=1)
         tk.Label(self, text="View Distributions", font=("Times New Roman", 18), height= 2).grid(row=4,column=2, columnspan=1, sticky=tk.W)
-        tk.Label(self, text= "Other Info", font=("Times New Roman", 18), height=2).grid(row=0, column=2, columnspan=1, sticky=tk.SW)
         tk.Label(self, text="Save Results", font=("Times New Roman", 18), height= 2).grid(row=4,column=5, columnspan=1, sticky=tk.W)
         ttk.Separator(self, orient="horizontal").grid(row=3, column=0, columnspan=8, sticky= 'ew')
         ttk.Separator(self, orient="horizontal").grid(row=5, column=0, columnspan=8, sticky= 'ew')
@@ -83,12 +83,7 @@ class app(tk.Frame):
         ttk.Separator(self, orient=tk.VERTICAL).grid(row=3, column=4 , rowspan=10, sticky='ns')
 
 
-        ###Other info####
-
-        tk.Button(self, text='Show Regions', command=self.show_regions).grid(row=1, column=2, columnspan=1, sticky=tk.NW)
-        tk.Button(self, text='Show Foodweb', command=self.show_foodweb).grid(row=2, column=2, columnspan=1, sticky=tk.NW)
-
-
+        
         ###saving data###
         self.filebox = tk.Entry(self)
         self.filebox.grid(column=0, row=8)
@@ -109,7 +104,9 @@ class app(tk.Frame):
         inputbutton = tk.Button(self, text="Choose File", command=self.askfile, width=18)
         inputbutton.grid(column=0, row=7)
         tk.Label(self, text='File: ').grid(column=0, row=6)
-        tk.Button(self, text="Run", command=self.loading).grid(column=0, row=12)
+        tk.Button(self, text='View Foodweb', command=self.show_foodweb).grid(column=0, row=11)
+        tk.Button(self, text='View Map', command=self.show_map).grid(column=0, row=12)
+        tk.Button(self, text="Run", command=self.loading).grid(column=0, row=13)
 
 
          ###Fish Image###
@@ -177,7 +174,8 @@ class app(tk.Frame):
                 self.time_entry = [0]
 
             # run the code
-            self.output = filter_cases(self.filename, self.time_entry)
+            data = convert_to_lists(self.filename)
+            self.output = filter_cases(data, self.time_entry)
 
             if self.output[0] == 'YES':
 
@@ -187,7 +185,7 @@ class app(tk.Frame):
 
 
             if self.output[0] == 'NO':
-                #print(self.output)
+                
                 self.to_write = self.output[1]
                 self.stat_check = self.output[2]
                 self.region_areas = self.output[3]
@@ -349,65 +347,86 @@ class app(tk.Frame):
             print('There is no time graph for steady state.')
 
 
-    def show_regions(self):
+    def show_map(self):
 
-        if self.output[0] == 'NO':
+        self.filename = self.filebox.get()
 
-            b_xy = self.region_info[0].exterior.xy
-
-            reg_xys = []
-            rep_point = []
-            for reg in self.region_info[1]:
-                rep_point.append(reg[1].centroid.coords)
-                reg_xys.append(reg[1].exterior.xy)
-
-            hotspot_xys=[]
-            hotspot_point = []
-            for hotspot in self.region_info[2]:
-                hotspot_point.append(hotspot.polygon.centroid.coords)
-                hotspot_xys.append(hotspot.polygon.exterior.xy)
-
-            fig = plt.figure(1)
-            ax = fig.add_subplot(111)
-            ax.plot(b_xy[0], b_xy[1],color='#6699cc', alpha=0.7, linewidth=3, solid_capstyle='round', zorder=2)
-            count = 0
-            for pair in reg_xys:
-                ax.plot(pair[0], pair[1],color='#6699cc', alpha=0.7, linewidth=3, solid_capstyle='round', zorder=2)
-                ax.annotate(self.region_info[1][count][0],  xy=(rep_point[count][0][0],rep_point[count][0][1]), xytext=(rep_point[count][0][0],rep_point[count][0][1]), ha='center')
-                count += 1
-
-            count = 0
-            for pair in hotspot_xys:
-                ax.plot(pair[0], pair[1], color='green', alpha=0.7, linewidth=3, solid_capstyle='round', zorder=2)
-                ax.annotate(self.region_info[2][count].name, xy=(hotspot_point[count][0][0], hotspot_point[count][0][1]), xytext=(hotspot_point[count][0][0], hotspot_point[count][0][1]), ha='center')
-                count += 1
-
-            fig.tight_layout()
-            plt.show()
-
+        if self.filename == '':
+            print('Please choose an input file')
+            
         else:
-            print('Steady state can not be run with regions.')
+
+            everything = convert_to_lists(self.filename)
+            
+            if everything[0][8] == 'NO':
+                
+                spatial_data = everything[4]
+                region_info = pre_run_loc_data(spatial_data)
+                b_xy = region_info[0].exterior.xy
+
+                reg_xys = []
+                rep_point = []
+                for reg in region_info[1]:
+                    rep_point.append(reg[1].centroid.coords)
+                    reg_xys.append(reg[1].exterior.xy)
+
+                hotspot_xys=[]
+                hotspot_point = []
+                for hotspot in region_info[2]:
+                    hotspot_point.append(hotspot.polygon.centroid.coords)
+                    hotspot_xys.append(hotspot.polygon.exterior.xy)
+
+                fig = plt.figure(1)
+                ax = fig.add_subplot(111)
+                ax.plot(b_xy[0], b_xy[1],color='#6699cc', alpha=0.7, linewidth=3, solid_capstyle='round', zorder=2)
+                count = 0
+                for pair in reg_xys:
+                    ax.plot(pair[0], pair[1],color='#6699cc', alpha=0.7, linewidth=3, solid_capstyle='round', zorder=2)
+                    ax.annotate(region_info[1][count][0],  xy=(rep_point[count][0][0],rep_point[count][0][1]), xytext=(rep_point[count][0][0],rep_point[count][0][1]), ha='center')
+                    count += 1
+
+                count = 0
+                for pair in hotspot_xys:
+                    ax.plot(pair[0], pair[1], color='green', alpha=0.7, linewidth=3, solid_capstyle='round', zorder=2)
+                    ax.annotate(region_info[2][count].name, xy=(hotspot_point[count][0][0], hotspot_point[count][0][1]), xytext=(hotspot_point[count][0][0], hotspot_point[count][0][1]), ha='center')
+                    count += 1
+
+                fig.tight_layout()
+                plt.show()
+
+            else:
+                print('Steady state can not be run with regions.')
 
     def show_foodweb(self):
 
-        pos = nx.spectral_layout(self.foodweb_graph)
+        filename = self.filebox.get()
 
-        pos_higher = {}
-        for k, v in pos.items():
-            pos_higher[k] = (v[0] + .15, v[1])
+        if filename == '':
+            print('Please choose an input file')
+            
+        else:
 
-        labels = {}
-        for label in self.foodweb_graph.nodes:
-            labels[label] = label
+            foodweb_graph = convert_to_lists(filename)[5]
+            
+            
+            pos = nx.spring_layout(foodweb_graph)
 
-        nx.draw_networkx_labels(self.foodweb_graph, pos=pos_higher, labels=labels, font_size=10)
-        nx.draw(self.foodweb_graph, pos, arrows=True)
+            pos_higher = {}
+            for k, v in pos.items():
+                pos_higher[k] = (v[0] + .15, v[1])
 
-        lowerx, upperx = plt.xlim()
-        lowery, uppery = plt.ylim()
-        plt.xlim(lowerx - .05, upperx + .08)
-        plt.ylim(lowery - .05, uppery + .08)
-        plt.show()
+            labels = {}
+            for label in foodweb_graph.nodes:
+                labels[label] = label
+
+            nx.draw_networkx_labels(foodweb_graph, pos=pos_higher, labels=labels, font_size=10)
+            nx.draw(foodweb_graph, pos, arrows=True)
+
+            lowerx, upperx = plt.xlim()
+            lowery, uppery = plt.ylim()
+            plt.xlim(lowerx - .05, upperx + .08)
+            plt.ylim(lowery - .05, uppery + .08)
+            plt.show()
 
 
 

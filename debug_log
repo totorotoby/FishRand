@@ -3,9 +3,6 @@ check multiple zooplankton:
 
 easly done.
 
-Fix hotspots inside outside error:
-
-idea is that it is only crashing when hotspot is completely inside of region or hotspot is entire region. Need replicate code written on phils computer plus more
 
 Fix prior chemical con error (potentially solved 1/8/2018):
 
@@ -16,7 +13,7 @@ problem was when there has been to taking in of chemical in regions for lower do
 
 
 
-SHEETS:
+
 
 
 

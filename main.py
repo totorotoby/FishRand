@@ -9,6 +9,7 @@ from matplotlib import pyplot as plt
 
 def loc_setup(fishs, boundary, regions, hotspots, draw_num):
 
+
     fl = []
     for fish in fishs:
         fl.append(fish[0])
@@ -169,10 +170,20 @@ def niceprint(prior_total_cons, locations):
                     count3 += 1
 
 
-# are we solving steady state on single region, solving with time on single region, or time on multiple regions
-def filter_cases(filename, stops):
+def pre_run_loc_data(site_data):
 
-    model_para, all_data, time_steps, time_per_step, site_data, foodweb_graph = FR_Input_Output.convert_to_lists(filename)
+    return spatial.setup(site_data)
+                
+
+# are we solving steady state on single region, solving with time on single region, or time on multiple regions
+def filter_cases(data, stops):
+
+    model_para = data[0]
+    all_data = data[1]
+    time_steps = data[2]
+    time_per_step = data[3]
+    site_data = data[4]
+    foodweb_graph = data[5]
     # set up for
     u_iter = int(model_para[0])
     v_iter = int(model_para[1])
@@ -200,6 +211,7 @@ def filter_cases(filename, stops):
 
         #assigning mig_data for later adding to locations
         mig_data = all_data[8]
+        
         # The setup before time iterations start includes:
             # • Setting put the regions as Polygon, objects
             # • finding the probabilities assosiated with regions and hotspot polygons
@@ -211,6 +223,7 @@ def filter_cases(filename, stops):
         loc_setups, f_names = loc_setup(all_data[6], boundary, regions, hotspots, site_data[3])
         draws = site_data[3]
         graph_data = []
+        
         # turns all_data that is distributions into array of samples which can be iterated through with u_count or v_count
         # Will return true if there is at least one distrubtion input
         stat_check = Bioaccum.set_all_h_and_s(model_para, all_data)
@@ -267,7 +280,7 @@ def filter_cases(filename, stops):
 
     if model_para[8] == 'NO':
 
-        return [model_para[8], writing_info, stat_check, region_areas, graph_data, model_para[6], [boundary,regions,hotspots], foodweb_graph]
+        return [model_para[8], writing_info, stat_check, region_areas, graph_data, model_para[6], [boundary, regions, hotspots], foodweb_graph]
 
 
     #################### STEADY STATE EXCEL WRITING ########################
