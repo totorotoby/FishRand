@@ -667,6 +667,7 @@ def get_prey_con(predator, reg_index, len_chems, chem_names, fish_names, non_fis
                 
                 
                 if reg_count-1 == k:
+                    print('1/11/19: problem happens')
                     for j in range(len_chems):
                         # make entry in dictionary
                         prior_conc_prey[predator.diet_frac[i][0]][chem_names[j]] = None
