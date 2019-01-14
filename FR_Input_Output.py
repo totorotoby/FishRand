@@ -274,7 +274,11 @@ def get_sites_data(sites_sheet):
     site_col_coord = sites_sheet.col(2)
     row = 3
     while site_col_coord[row].value != '' and site_col_name[row].value != '':
-        site = (site_col_name[row].value, [float(i) for i in (site_col_coord[row].value.replace('', '').split(', '))])
+        try:
+            site = (site_col_name[row].value, [float(i) for i in (site_col_coord[row].value.replace('', '').split(', '))])
+        except ValueError:
+            print('Some coordinate entries are not formatted correctly in Sample Sites')
+            exit(0)
         sites.append(site)
         row += 1
 
