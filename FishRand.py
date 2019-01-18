@@ -169,7 +169,7 @@ class app(tk.Frame):
 
             time_entry = self.timeentry.get().split(",")
             try:
-                self.time_entry = [int(i) for i in time_entry]
+                self.time_entry = [int(i)-1 for i in time_entry]
             except:
                 self.time_entry = [0]
 
@@ -337,6 +337,9 @@ class app(tk.Frame):
                 ax.set_ylabel('Concentration of ' + chemical + ' in ' + fish + ' (ng/g)')
                 ax.set_title('Distrubtions of Best Fit over Time')
                 fig.tight_layout()
+                mng = plt.get_current_fig_manager()
+                #mng.resize(*mng.window.maxsize())
+                mng.window.state('zoomed')
                 plt.show()
 
             else:

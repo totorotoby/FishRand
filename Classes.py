@@ -288,19 +288,17 @@ class Fish(Zooplank):
 
     # returns K_gb for certian chemical
     def calc_kgb(self, chem_kow, chem_index, beta3, beta4, beta5, density_lip=.9, density_w=1, z_water=.05):
-        print(beta4, beta5)
+        
         top = ((self.Vlg * (z_water*beta3*chem_kow))/density_lip) + (self.Vngc * beta4 * (z_water*chem_kow)) +\
               (self.Vngm * beta5 * (z_water*chem_kow)) + (z_water*self.Vwg/density_w)
 
-        print('Vlg: ', self.Vlg, 'Vngc: ', self.Vngc, 'Vngm: ', self.Vngm, 'Vwg: ', self.Vwg)
+        
         
         bottom = ((self.Vlb * (z_water*beta3*chem_kow))/density_lip) + (self.Vnb * beta5 * z_water * chem_kow) +\
                  (z_water*self.Vwb/density_w)
-        print(top, bottom)
+        
         k_gb = top/bottom
 
-
-        print(top, bottom)
         
         self.k_gb[chem_index] = k_gb
 

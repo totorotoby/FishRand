@@ -123,7 +123,7 @@ class ResultDist:
         try:
             gamma_k = (math.pow(M_y, 2))/(math.pow(Sig_y, 2))
         except ZeroDivisionError:
-            print("\n\nNot enough stastical parameters defined. There are situations where some concentrations are determinstic and others are distrubtions. Hopefully FishRand will support this in future versions.\n\n")
+            print("\n\nNot enough stastical parameters input. There are situations where some concentrations are determinstic and others are distrubtions. Hopefully FishRand will support this in future versions.\n\n")
             exit(0)
         gamma_theta = (math.pow(Sig_y, 2))/M_y
         
@@ -142,6 +142,8 @@ class ResultDist:
         for i in range(len(cdf_list)):
 
             param = optimize.curve_fit(cdf_list[i][0], self.values, y, p0=self.init_guess[i])[0]
+            
+            
             cdf_list[i].append(param)
 
         cdf_list[1][1] = [cdf_list[1][1][1], 0, math.exp(cdf_list[1][1][0])]
@@ -286,8 +288,9 @@ class ResultDist:
             self.plot_single(temp_index)
         plt.show()
 
-    def bestparam(self):
 
+    def bestparam(self):
+ 
         params = []
         self.count += 1
         string = ''
@@ -295,8 +298,12 @@ class ResultDist:
 
         for i in range(len(self.cdfs[self.index][1])-1):
             params.append(self.cdfs[self.index][1][i])
-            string += str("{0:.4f}".format(self.cdfs[self.index][1][i]))
-            string += ', '
+            if self.index == 1:
+                print('lognormal? ', self.cdfs[self.index])
+                string
+            else:
+                string += str("{0:.4f}".format(self.cdfs[self.index][1][i]))
+                string += ', '
         params.append(self.cdfs[self.index][1][i+1])
         string += str("{0:.4f}".format(self.cdfs[self.index][1][i+1]))
         string += ')'
@@ -342,11 +349,16 @@ def lognorm_to_scipyinput(M_y,Sig_y):
     return s, scale
 
 
-#TODO add in scipy to output functions
+def scipyinput_to_lognormal(s, loc, scale):
 
-#def scipyinput_to_lognormal(s, loc, scale):
+    mu = math.log(scale)
+
+    M_y = math.exp(mu + (math.pow(s,2)/2))
+    V_y = math.exp((2*mu) + math.pow(s,2)) * (math.exp(math.pow(s,2))-1)
+    Sig_y = math.sqrt(V_y)
 
 
+    return M_y, Sig_y
 
 # overarching loop methods
 def set_hyper_samp_cube(model_para, Var):

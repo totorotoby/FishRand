@@ -842,7 +842,6 @@ def bio_monte_carlo_loop(model_para, all_data, t, time_per_step, fish_by_region,
                                                         diet_data, u_count, v_count)
                 tempfishs = tempinverts + tempfishs[2:]
                 fishs = init_fish_post_region(fishs, tempfishs, regions[0], chemicals)
-                print(fishs[0], fishs[0].Wb, fishs[0].k_gb, fishs[0].Gf, chemicals[0].Ed)
                 conc_log = solve_steady(regions[0], chemicals, phytos, zoops, inverts, fishs)
                 steady_state.append(conc_log)
                 v_count += 1

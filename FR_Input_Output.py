@@ -200,8 +200,8 @@ def get_con_data(con_sheet, con_data, num_reg, num_chem, timesteps):
                     # k*4 counts the number of red spaces from this region to the partiular chemical
                     # 2*j + 1 + k counts the number of green labels for chemicals
                     # p counts the remaining red spaces down to the type of concentration to append
-                    #print(column[(((num_chem * 4 * j) + (1 + j) ) + ( (k * 4) + ( (2 * j) + (1 + k) ) ) + p)])
-                    #print((((num_chem * 4 * j) + (1 + j) ) + ( (k * 4) + ( (2 * j) + (1 + k) ) ) + p))
+                    
+                    
                     data_get_helper(column[(1+j) + ((j * num_chem) + (1+k)) + ((j * num_chem * 4) + (k * 4) + p)], c_cons)
                 r_cons.append(c_cons)
             t_cons.append(r_cons)

@@ -3,7 +3,6 @@ check multiple zooplankton:
 
 easly done.
 
-
 Fix prior chemical con error (potentially solved 1/8/2018):
 
 ##unknown probably has to do with chemical not seen yet in area or definitely a prior concentration bug.
@@ -12,9 +11,6 @@ problem was when there has been to taking in of chemical in regions for lower do
 
 
 
-
-
-
-
-
-
+change 8 timestep
+add apendix
+fix dimensions of graphs
