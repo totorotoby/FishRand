@@ -274,7 +274,6 @@ class app(tk.Frame):
 
         if self.output[0] == 'NO':
 
-
             fish = self.dictvars[1].get()
             chemical = self.dictvars[2].get()
 
@@ -336,6 +335,8 @@ class app(tk.Frame):
                 ax.set_xlabel('Timesteps (' + self.timescale + ')')
                 ax.set_ylabel('Concentration of ' + chemical + ' in ' + fish + ' (ng/g)')
                 ax.set_title('Distrubtions of Best Fit over Time')
+                ax.set_xlim(0)
+                ax.set_ylim(0)
                 fig.tight_layout()
                 mng = plt.get_current_fig_manager()
                 #mng.resize(*mng.window.maxsize())
@@ -343,7 +344,7 @@ class app(tk.Frame):
                 plt.show()
 
             else:
-
+                
                 graph_by_time(self.graph_data, fish, chemical, self.timescale)
 
         else:
@@ -372,7 +373,8 @@ class app(tk.Frame):
                 for reg in region_info[1]:
                     rep_point.append(reg[1].centroid.coords)
                     reg_xys.append(reg[1].exterior.xy)
-
+    
+                
                 hotspot_xys=[]
                 hotspot_point = []
                 for hotspot in region_info[2]:
@@ -394,11 +396,40 @@ class app(tk.Frame):
                     ax.annotate(region_info[2][count].name, xy=(hotspot_point[count][0][0], hotspot_point[count][0][1]), xytext=(hotspot_point[count][0][0], hotspot_point[count][0][1]), ha='center')
                     count += 1
 
+                self.print_calc_regions(reg_xys, [reg[0] for reg in region_info[1]])
+
                 fig.tight_layout()
                 plt.show()
 
+                
+
+
             else:
                 print('Steady state can not be run with regions.')
+
+
+    def print_calc_regions(self, reg_xys, names):
+        print('\n')
+        max_points = max([len(reg[0]) for reg in reg_xys])
+
+        print('Thessian Polygon generated coordinates:')
+        print(f'|{" ":^10}', end='')
+        for i in range (1, max_points):
+            print(f'|{"Coord. " + str(i):^14}', end='')
+        print('|')
+        for i in range (len(names)):
+            print(f'|{names[i]:^10}|', end='')
+            for j in range(max_points-1):
+                try:
+                    x = round(reg_xys[i][0][j], 2)
+                    y = round(reg_xys[i][1][j], 2)
+                    print(f'{str(x) + ", " + str(y):^14}|', end='')
+                except:
+                    print(f'{" ":^14}|', end='')
+
+            print()
+
+
 
     def show_foodweb(self):
 

@@ -215,6 +215,8 @@ def setup(site_data):
                 poly_u = Polygon(vertices[regions[i]])
                 try:
                     poly = poly_u.intersection(boundary)
+                    round_ex = [(round(coord[0], 2), round(coord[1], 2)) for coord in list(poly.exterior.coords)]
+                    poly = Polygon(round_ex)
                 except:
                     print('Boundary and Regions incompatible. Make sure regions are inside of the boundary, and that you your boundary is a valid shape.')
                     exit(0)
@@ -346,6 +348,8 @@ def new_draw(hotspotnames, probs, regnames, outside_reg_prob, draw_num):
         if type(region) == Polygon or region == 'Out':
             locations.append(np.random.choice(regnames, p=outside_reg_prob))
 
+
+    
     return locations
 
 

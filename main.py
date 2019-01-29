@@ -104,16 +104,20 @@ def get_fish_dic(fish_cons, lower_cons, chem_name, fish_name, region_areas):
 
 def graph_by_time(data, fish_name, chem_name, time_interval):
 
+    fig, ax = plt.subplots()
+
     time_steps = len(data)
     values = []
-    times = [i for i in range(time_steps)]
+    times = [i for i in range(1, time_steps+1)]
     for i in range(len(data)):
         con_at_t = data[i][fish_name][chem_name]
         values.append(con_at_t)
 
-    plt.plot(times, values, 'ro', )
-    plt.xlabel('Timesteps (' + time_interval + ')')
-    plt.ylabel('Concentration of ' + chem_name + ' in ' + fish_name + ' (ng/g)')
+    ax.plot(times, values, 'ro', )
+    ax.set_xlabel('Timesteps (' + time_interval + ')')
+    ax.set_ylabel('Concentration of ' + chem_name + ' in ' + fish_name + ' (ng/g)')
+    ax.set_xlim(0)
+    ax.set_ylim(0)
     plt.show()
 
 

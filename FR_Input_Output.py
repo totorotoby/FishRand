@@ -127,7 +127,11 @@ def get_temp_data(temp_data, temp_sheet, reg_len, timesteps):
         row = temp_sheet.row(i)
         #loop over timesteps by column
         for j in range (1, timesteps + 1):
-            data_get_helper(row[j], r_temps)
+            try:
+                data_get_helper(row[j], r_temps)
+            except IndexError:
+                print("Not enough tempature data for the number of timesteps you have input")
+                exit(0)
             
         temp_data.append(r_temps)
 

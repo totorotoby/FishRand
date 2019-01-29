@@ -126,7 +126,7 @@ class Zooplank:
     def calc_kd(self, chem_ed, chem_index):
 
         self.k_d[chem_index] = chem_ed * (self.Gd / self.Wb)
-
+        
     # sets the percentages of zooplank diet that are lipid, non-lipid and water
     def calc_diet_per(self, phyto):
 
