@@ -88,6 +88,7 @@ class Zooplank:
 
     # sets the Gill ventilation rate of zooplank
     def calc_gv(self, region_cox):
+        
         self.Gv = 1400 * (math.pow(self.Wb, .65) / region_cox)
 
     # sets G_d for this zooplank

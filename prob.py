@@ -29,16 +29,16 @@ class Var:
         if self.dist == 'Normal':
             mean = self.param[0]
             std = self.param[1]
-            if len(self.param) > 2:
+            if len(self.param) == 3:
+                min = self.param[2]
+                max = numpy.inf
+            if len(self.param) == 4:
                 min = self.param[2]
                 max = self.param[3]
-                if min == '':
-                    min = -numpy.inf
-                if max == '':
-                    max = -numpy.inf
                 self.values = st.truncnorm(a=min, loc=mean, scale= std, b=max).ppf(self.lhs)
             else:
                 self.values = st.norm(loc=mean, scale=std).ppf(self.lhs)
+                #print(mean,std, self.values, '\n\n\n')
 
         elif self.dist == 'Uniform':
             a = self.param[0]
@@ -49,6 +49,7 @@ class Var:
             b = self.param[1] - self.param[0]
             c = (self.param[2] - a) / b
             self.values = st.triang(c, loc=a, scale=b).ppf(self.lhs)
+            print(a, b, c, self.values, '\n\n')
         elif self.dist == 'Log-Normal':
             m_y = self.param[0]
             sig_y = self.param[1]
