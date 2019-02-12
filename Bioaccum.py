@@ -882,7 +882,7 @@ def filter_stat_case(dictionaries):
 
     # if we ran bio monte carlo
     else:
-        results_dic = pr.make_result_dist(dictionaries)
+        results_dic = make_result_dist(dictionaries)
         return results_dic
 
 

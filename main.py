@@ -249,8 +249,9 @@ def filter_cases(data, stops):
         # The time loop
         locations = get_locs_matrix(loc_setups, draws, mig_data, t)
         fish_by_region = get_fish_in_region(locations, f_names, len(all_data[0]))
+
         while t < time_steps:
-            
+            print((t/time_steps)*100, "% done")
             # get all locations for each fish... locations matrix is fish number by list of region numbers draws long
             prior_locations = locations
             locations = get_locs_matrix(loc_setups, draws, mig_data, t)
@@ -273,6 +274,7 @@ def filter_cases(data, stops):
                     writing_info.append([lower_cons, fish_dic])
 
             t += 1
+        print('100% done')
     else:
 
         print('Need to set steady state in the Sample and Time Input tab to YES or NO.')

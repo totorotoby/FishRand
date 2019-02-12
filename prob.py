@@ -49,7 +49,7 @@ class Var:
             b = self.param[1] - self.param[0]
             c = (self.param[2] - a) / b
             self.values = st.triang(c, loc=a, scale=b).ppf(self.lhs)
-            print(a, b, c, self.values, '\n\n')
+            #print(a, b, c, self.values, '\n\n')
         elif self.dist == 'Log-Normal':
             m_y = self.param[0]
             sig_y = self.param[1]
@@ -71,6 +71,16 @@ class Var:
         else:
             print(self.dist)
             print('There is a unknown distribution called ', '\'' + self.dist + '\'')
+
+    def plot_samples(self):
+
+        num_bins = len(self.values)//20
+        
+        hist, bins = numpy.histogram(self.values, num_bins, normed=True)
+
+        plt.scatter(bins[:-1], hist, s=16)
+        plt.show()
+
 
 
 class Loguniform:
@@ -141,7 +151,6 @@ class ResultDist:
         cdf_list = [[stats.norm.cdf], [my_log_normal_cdf], [stats.uniform.cdf], [my_gamma_cdf]]
 
         for i in range(len(cdf_list)):
-
             param = optimize.curve_fit(cdf_list[i][0], self.values, y, p0=self.init_guess[i])[0]
             
             
@@ -228,17 +237,17 @@ class ResultDist:
         for i in range(len(ax1)):
             ax1[i].set_xlabel('(ng/g) of ' + self.chem + ' in ' + self.animal, size='large')
             ax1[i].set_ylabel('P(x)')
-            ax1[self.index].title.set_text(titles[self.index] + '(Considered Optimal by ks-test)')
+            #ax1[self.index].title.set_text(titles[self.index] + '(Considered Optimal by ks-test)')
             ax1[i].title.set_text(titles[i])
             ax1[i].scatter(self.hist[1][:-1], self.hist[0], s=16)
             ax1[i].set_ylim(min(self.hist[0]))
-
+    
         ax1[0].plot(x1, stats.norm.pdf(x1, scale=normal_param[1], loc=normal_param[0]), linewidth=2.0, color='g')
         ax1[1].plot(x1, stats.lognorm.pdf(x1, s=lognorm_param[0], scale=lognorm_param[2]), linewidth=2.0, color='g')
         ax1[2].plot(x1, stats.uniform.pdf(x1, scale=uniform_param[1], loc=uniform_param[0]), linewidth=2.0, color='g')
         ax1[3].plot(x1, stats.gamma.pdf(x1, a=gamma_param[0], loc=gamma_param[1], scale=gamma_param[2]),
                     linewidth=2.0, color='g')
-
+        
         fig1.tight_layout()
 
     def plot_single(self, temp_index):
@@ -300,7 +309,7 @@ class ResultDist:
         for i in range(len(self.cdfs[self.index][1])-1):
             params.append(self.cdfs[self.index][1][i])
             if self.index == 1:
-                print('lognormal? ', self.cdfs[self.index])
+                print(' ')
                 string
             else:
                 string += str("{0:.4f}".format(self.cdfs[self.index][1][i]))
@@ -378,6 +387,7 @@ def set_hyper_samp_cube(model_para, Var):
     lhs = lhs.ravel()
     Var.lhs = lhs
     Var.take_samples()
+    Var.plot_samples()
 
 def make_result_dist(dicts):
 
