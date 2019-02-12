@@ -308,12 +308,12 @@ class ResultDist:
 
         for i in range(len(self.cdfs[self.index][1])-1):
             params.append(self.cdfs[self.index][1][i])
-            if self.index == 1:
-                print(' ')
-                string
-            else:
-                string += str("{0:.4f}".format(self.cdfs[self.index][1][i]))
-                string += ', '
+            #if self.index == 1:
+                #print(' ')
+            #    string
+            #else:
+            string += str("{0:.4f}".format(self.cdfs[self.index][1][i]))
+            string += ', '
         params.append(self.cdfs[self.index][1][i+1])
         string += str("{0:.4f}".format(self.cdfs[self.index][1][i+1]))
         string += ')'
@@ -387,7 +387,7 @@ def set_hyper_samp_cube(model_para, Var):
     lhs = lhs.ravel()
     Var.lhs = lhs
     Var.take_samples()
-    Var.plot_samples()
+    #Var.plot_samples()
 
 def make_result_dist(dicts):
 
