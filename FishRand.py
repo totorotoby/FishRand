@@ -339,8 +339,6 @@ class app(tk.Frame):
                 ax.set_ylim(0)
                 fig.tight_layout()
                 mng = plt.get_current_fig_manager()
-                #mng.resize(*mng.window.maxsize())
-                mng.window.state('zoomed')
                 plt.show()
 
             else:
