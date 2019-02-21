@@ -151,6 +151,7 @@ class ResultDist:
         cdf_list = [[stats.norm.cdf], [my_log_normal_cdf], [stats.uniform.cdf], [my_gamma_cdf]]
 
         for i in range(len(cdf_list)):
+            print("on index ", i, "of cdf list")
             param = optimize.curve_fit(cdf_list[i][0], self.values, y, p0=self.init_guess[i])[0]
             
             
