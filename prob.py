@@ -112,12 +112,59 @@ class ResultDist:
         self.init_guess = self.inital_guess()
         self.num_bins = len(self.values)//50
         self.hist = self.make_pdf_hist()
-        self.cdfs, self.y = self.make_cdfs()
+        #self.cdfs, self.y = self.make_cdfs()
         self.pdfs = [stats.norm.pdf, stats.lognorm.pdf, stats.uniform.pdf, stats.gamma.pdf]
         self.cdf_list = [stats.norm.cdf, stats.lognorm.cdf, stats.uniform.cdf, stats.gamma.cdf]
         self.x1 = make_x1(self.values)
-        self.index = self.ks_cdf()
-        self.best_para = self.bestparam()
+
+        ################ DEBUG ##########################
+        '''
+        if self.animal == "pumpkinseed" and self.chem == "PCB 52":
+            #titles = ['CDF: With Normal Fit', 'CDF: With Log-Normal Fit', 'CDF: With Uniform Fit', 'CDF: With Gamma Fit']
+            #titles1 = ['PDF: With Normal Fit', 'PDF: With Log-Normal Fit', 'PDF: With Uniform Fit', 'PDF: With Gamma Fit']
+
+            fig, ax = plt.subplots(1, 2, figsize=(24, 12))
+
+            x1 = self.x1
+            
+            #temp_param = self.cdfs[temp_index][1]
+
+            for i in range(len(ax)):
+                ax[i].set_xlabel('(ng/g) of ' + self.chem + ' in ' + self.animal, size='large')
+                
+            #ax[0].title.set_text(titles1[temp_index])
+            ax[0].set_ylabel('P(x)')
+            ax[0].scatter(self.hist[1][:-1], self.hist[0], s=16)
+            ax[0].set_ylim(min(self.hist[0]))
+            #if len(temp_param) == 2:
+            #    ax[0].plot(x1, self.pdfs[temp_index](x1, scale=temp_param[1], loc=temp_param[0]), linewidth=2.0, color='g')
+            #if len(temp_param) == 3:
+            #    ax[0].plot(x1, self.pdfs[temp_index](x1, temp_param[0], loc=temp_param[1], scale=temp_param[2]),
+            #               linewidth=2.0, color='g')
+
+            #ax[1].title.set_text(titles[temp_index])
+            width = 1/len(self.values)
+            y = []
+            for i in range(len(self.values)):
+                y.append(0+(width*i))
+
+            ax[1].set_ylabel('P(X < x)')
+            ax[1].plot(self.values, y, 'ro', color='r')
+            #if len(temp_param) == 2:
+            #    ax[1].plot(x1, self.cdf_list[temp_index](x1, scale=temp_param[1], loc=temp_param[0]), linewidth=2.0, color='g')
+            #if len(temp_param) == 3:
+            #    ax[1].plot(x1, self.cdf_list[temp_index](x1, temp_param[0], loc=temp_param[1], scale=temp_param[2]),
+            #               linewidth=2.0, color='g')
+
+            fig.tight_layout()
+            plt.show()
+        '''
+
+
+        ####################################################################
+
+        #self.index = self.ks_cdf()
+        #self.best_para = self.bestparam()
 
     def inital_guess(self):
         # guess for normal
@@ -260,29 +307,35 @@ class ResultDist:
 
         x1 = self.x1
         
-        temp_param = self.cdfs[temp_index][1]
+        #temp_param = self.cdfs[temp_index][1]
 
         for i in range(len(ax)):
             ax[i].set_xlabel('(ng/g) of ' + self.chem + ' in ' + self.animal, size='large')
             
-        ax[0].title.set_text(titles1[temp_index])
+        #ax[0].title.set_text(titles1[temp_index])
         ax[0].set_ylabel('P(x)')
         ax[0].scatter(self.hist[1][:-1], self.hist[0], s=16)
         ax[0].set_ylim(min(self.hist[0]))
-        if len(temp_param) == 2:
-            ax[0].plot(x1, self.pdfs[temp_index](x1, scale=temp_param[1], loc=temp_param[0]), linewidth=2.0, color='g')
-        if len(temp_param) == 3:
-            ax[0].plot(x1, self.pdfs[temp_index](x1, temp_param[0], loc=temp_param[1], scale=temp_param[2]),
-                       linewidth=2.0, color='g')
+        #if len(temp_param) == 2:
+            #ax[0].plot(x1, self.pdfs[temp_index](x1, scale=temp_param[1], loc=temp_param[0]), linewidth=2.0, color='g')
+        #if len(temp_param) == 3:
+            #ax[0].plot(x1, self.pdfs[temp_index](x1, temp_param[0], loc=temp_param[1], scale=temp_param[2]),
+            #           linewidth=2.0, color='g')
 
-        ax[1].title.set_text(titles[temp_index])
+        #ax[1].title.set_text(titles[temp_index])
+        #ax[1].title.set_text(titles[temp_index])
+        width = 1/len(self.values)
+        y = []
+        for i in range(len(self.values)):
+            y.append(0+(width*i))
+
         ax[1].set_ylabel('P(X < x)')
-        ax[1].plot(self.values, self.y, 'ro', color='r')
-        if len(temp_param) == 2:
-            ax[1].plot(x1, self.cdf_list[temp_index](x1, scale=temp_param[1], loc=temp_param[0]), linewidth=2.0, color='g')
-        if len(temp_param) == 3:
-            ax[1].plot(x1, self.cdf_list[temp_index](x1, temp_param[0], loc=temp_param[1], scale=temp_param[2]),
-                       linewidth=2.0, color='g')
+        ax[1].plot(self.values, y, 'ro', color='r')
+        #if len(temp_param) == 2:
+        #    ax[1].plot(x1, self.cdf_list[temp_index](x1, scale=temp_param[1], loc=temp_param[0]), linewidth=2.0, color='g')
+        #if len(temp_param) == 3:
+        #    ax[1].plot(x1, self.cdf_list[temp_index](x1, temp_param[0], loc=temp_param[1], scale=temp_param[2]),
+        #               linewidth=2.0, color='g')
 
         fig.tight_layout()
 
