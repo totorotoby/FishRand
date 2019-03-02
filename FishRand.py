@@ -61,9 +61,9 @@ class app(tk.Frame):
             
         ###choosing what graphs to view###
         
-        tk.Label(self, text="Graph Options:").grid(column=3,row=6, sticky=tk.W)
-        options = [("CDFs with all fits", 0), ("PDFs with all fits", 1),
-                   ("Both with all fits", 2), ("CDF and PDF of selected fit:", 3)
+        
+        options = [("Cumaltive Distrubtion Function(s)", 0), ("Probability Density Function(s)", 1),
+                   ("Both CDF(s) and PDF(s)", 2), ("CDF and PDF of selected fit:", 3)
                    ]
         count = 6
         self.viewopt = tk.IntVar()
