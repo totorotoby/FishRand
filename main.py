@@ -46,7 +46,7 @@ def get_locs_matrix(loc_setups, draws, mig_data, timestep):
     return locations
 
 
-def get_fish_dic(fish_cons, lower_cons, chem_name, fish_name, region_areas):
+def get_fish_dic(fish_cons, lower_cons, chem_name, fish_name, region_areas, tofit):
 
     fish_dic = {}
     lower_avg_dic = copy.deepcopy(list(lower_cons[0].items())[0][1])
@@ -79,7 +79,7 @@ def get_fish_dic(fish_cons, lower_cons, chem_name, fish_name, region_areas):
     else:
 
         # making lower distrubtion results
-        lower_result = pr.make_result_dist(lower_cons)
+        lower_result = pr.make_result_dist(lower_cons, tofit)
 
 
         # make upper results dictionary
@@ -96,7 +96,7 @@ def get_fish_dic(fish_cons, lower_cons, chem_name, fish_name, region_areas):
         for i in range(len(chem_values)):
             for j in range(len(chem_values[i])):
                 turn_result = np.unique(chem_values[i][j])
-                upper_result[fish_name[i]][chem_name[j]] = pr.ResultDist(turn_result, chem_name[j], fish_name[i])
+                upper_result[fish_name[i]][chem_name[j]] = pr.ResultDist(turn_result, chem_name[j], fish_name[i], tofit)
         return lower_result, upper_result
 
 
@@ -180,7 +180,7 @@ def pre_run_loc_data(site_data):
                 
 
 # are we solving steady state on single region, solving with time on single region, or time on multiple regions
-def filter_cases(data, stops):
+def filter_cases(data, stops, tofit):
 
     model_para = data[0]
     all_data = data[1]
@@ -226,7 +226,7 @@ def filter_cases(data, stops):
         region_areas = [region[1].area for region in regions]
         loc_setups, f_names = loc_setup(all_data[6], boundary, regions, hotspots, site_data[3])
         draws = site_data[3]
-        graph_data = []
+        graph_data = {}
         
         # turns all_data that is distributions into array of samples which can be iterated through with u_count or v_count
         # Will return true if there is at least one distrubtion input
@@ -261,13 +261,13 @@ def filter_cases(data, stops):
 
             # do entire simulation for a time step, and return concentration dictionaries
             uv_single = Bioaccum.bio_monte_carlo_loop(model_para, all_data, t, time_per_step, fish_by_region, prior_locations, locations, u_iter, v_iter, p_dic=total_cons)
-
             
             total_cons = uv_single
 
-            lower_cons, fish_dic = get_fish_dic(total_cons[1], total_cons[0], [chem[0] for chem in all_data[2]], [fish[0] for fish in all_data[6]], region_areas)
-            graph_data.append(fish_dic)
             if t in stops:
+                lower_cons, fish_dic = get_fish_dic(total_cons[1], total_cons[0], [chem[0] for chem in all_data[2]], [fish[0] for fish in all_data[6]], region_areas, tofit)
+                graph_data[t] = fish_dic
+            
                 if stat_check == False:
                     writing_info.append([total_cons[0], lower_cons, fish_dic])
                 else:

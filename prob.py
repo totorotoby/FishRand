@@ -100,71 +100,38 @@ class ResultDist:
 
     dist_types = ['norm', 'lognorm', 'uniform', 'gamma']
 
-    def __init__(self, values, chemical, animal):
+    def __init__(self, values, chemical, animal, tofit):
 
         self.count = 0
         self.chem = chemical
         self.animal = animal
         self.values = values
+        self.tofit = tofit
         self.v_mean_std = [round(numpy.mean(values), 4), round(numpy.std(values), 4)]
         self.display = 4
         self.values.sort()
-        self.init_guess = self.inital_guess()
         self.num_bins = len(self.values)//50
         self.hist = self.make_pdf_hist()
-        #self.cdfs, self.y = self.make_cdfs()
-        self.pdfs = [stats.norm.pdf, stats.lognorm.pdf, stats.uniform.pdf, stats.gamma.pdf]
-        self.cdf_list = [stats.norm.cdf, stats.lognorm.cdf, stats.uniform.cdf, stats.gamma.cdf]
-        self.x1 = make_x1(self.values)
+        self.y = self.getCDFX()
 
-        ################ DEBUG ##########################
-        '''
-        if self.animal == "pumpkinseed" and self.chem == "PCB 52":
-            #titles = ['CDF: With Normal Fit', 'CDF: With Log-Normal Fit', 'CDF: With Uniform Fit', 'CDF: With Gamma Fit']
-            #titles1 = ['PDF: With Normal Fit', 'PDF: With Log-Normal Fit', 'PDF: With Uniform Fit', 'PDF: With Gamma Fit']
-
-            fig, ax = plt.subplots(1, 2, figsize=(24, 12))
-
-            x1 = self.x1
-            
-            #temp_param = self.cdfs[temp_index][1]
-
-            for i in range(len(ax)):
-                ax[i].set_xlabel('(ng/g) of ' + self.chem + ' in ' + self.animal, size='large')
-                
-            #ax[0].title.set_text(titles1[temp_index])
-            ax[0].set_ylabel('P(x)')
-            ax[0].scatter(self.hist[1][:-1], self.hist[0], s=16)
-            ax[0].set_ylim(min(self.hist[0]))
-            #if len(temp_param) == 2:
-            #    ax[0].plot(x1, self.pdfs[temp_index](x1, scale=temp_param[1], loc=temp_param[0]), linewidth=2.0, color='g')
-            #if len(temp_param) == 3:
-            #    ax[0].plot(x1, self.pdfs[temp_index](x1, temp_param[0], loc=temp_param[1], scale=temp_param[2]),
-            #               linewidth=2.0, color='g')
-
-            #ax[1].title.set_text(titles[temp_index])
-            width = 1/len(self.values)
-            y = []
-            for i in range(len(self.values)):
-                y.append(0+(width*i))
-
-            ax[1].set_ylabel('P(X < x)')
-            ax[1].plot(self.values, y, 'ro', color='r')
-            #if len(temp_param) == 2:
-            #    ax[1].plot(x1, self.cdf_list[temp_index](x1, scale=temp_param[1], loc=temp_param[0]), linewidth=2.0, color='g')
-            #if len(temp_param) == 3:
-            #    ax[1].plot(x1, self.cdf_list[temp_index](x1, temp_param[0], loc=temp_param[1], scale=temp_param[2]),
-            #               linewidth=2.0, color='g')
-
-            fig.tight_layout()
-            plt.show()
-        '''
+        if tofit == 1:
+            self.init_guess = self.inital_guess()
+            self.cdfs= self.make_cdfs()
+            self.pdfs = [stats.norm.pdf, stats.lognorm.pdf, stats.uniform.pdf, stats.gamma.pdf]
+            self.cdf_list = [stats.norm.cdf, stats.lognorm.cdf, stats.uniform.cdf, stats.gamma.cdf]
+            self.x1 = make_x1(self.values)
+            self.index = self.ks_cdf()
+            self.best_para = self.bestparam()
 
 
-        ####################################################################
+    def getCDFX(self):
 
-        #self.index = self.ks_cdf()
-        #self.best_para = self.bestparam()
+        width = 1/len(self.values)
+        y = []
+        for i in range(len(self.values)):
+            y.append(0+(width*i))
+
+        return y
 
     def inital_guess(self):
         # guess for normal
@@ -190,16 +157,11 @@ class ResultDist:
 
     def make_cdfs(self):
 
-        width = 1/len(self.values)
-        y = []
-        for i in range(len(self.values)):
-            y.append(0+(width*i))
-
         cdf_list = [[stats.norm.cdf], [my_log_normal_cdf], [stats.uniform.cdf], [my_gamma_cdf]]
 
         for i in range(len(cdf_list)):
             #print("on index ", i, "of cdf list")
-            param = optimize.curve_fit(cdf_list[i][0], self.values, y, p0=self.init_guess[i], maxfev=10000)[0]
+            param = optimize.curve_fit(cdf_list[i][0], self.values, self.y, p0=self.init_guess[i], maxfev=10000)[0]
             
             
             cdf_list[i].append(param)
@@ -207,7 +169,7 @@ class ResultDist:
         cdf_list[1][1] = [cdf_list[1][1][1], 0, math.exp(cdf_list[1][1][0])]
         cdf_list[3][1] = [cdf_list[3][1][0], 0, cdf_list[3][1][1]]
 
-        return cdf_list, y
+        return cdf_list
 
     def ks_cdf(self):
 
@@ -233,114 +195,138 @@ class ResultDist:
      
     def plot_cdf(self):
 
-        fig, ax = plt.subplots(1, 4, figsize=(24, 12))
 
-        titles = ['CDF: With Normal Fit', 'CDF: With Log-Normal Fit', 'CDF: With Uniform Fit',
-                  'CDF: With Gamma Fit']
+        if self.tofit == 1:
+            fig, ax = plt.subplots(1, 4, figsize=(24, 12))
 
-        # CDF x-axis
-        x1 = self.x1
-       
-        # CDF parameters
-        lognorm_param = self.cdfs[1][1]
-        normal_param = self.cdfs[0][1]
-        uniform_param = self.cdfs[2][1]
-        gamma_param = self.cdfs[3][1]
+            titles = ['CDF: With Normal Fit', 'CDF: With Log-Normal Fit', 'CDF: With Uniform Fit',
+                      'CDF: With Gamma Fit']
 
-        for i in range(len(ax)):
-            
-            # CDF axis labels
-            ax[i].set_xlabel('(ng/g) of ' + self.chem + ' in ' + self.animal, size='large')
-            ax[i].set_ylabel('P(X < x)')
+            # CDF x-axis
+            x1 = self.x1
+           
+            # CDF parameters
+            lognorm_param = self.cdfs[1][1]
+            normal_param = self.cdfs[0][1]
+            uniform_param = self.cdfs[2][1]
+            gamma_param = self.cdfs[3][1]
 
-            # titles
-            ax[i].title.set_text(titles[i])
-            ax[self.index].title.set_text(titles[self.index] + '(Considered Optimal by ks-test)')
+            for i in range(len(ax)):
+                
+                # CDF axis labels
+                ax[i].set_xlabel('(ng/g) of ' + self.chem + ' in ' + self.animal, size='large')
+                ax[i].set_ylabel('P(X < x)')
 
-            # plot points
-            ax[i].plot(self.values, self.y, 'ro', color='r')
+                # titles
+                ax[i].title.set_text(titles[i])
+                ax[self.index].title.set_text(titles[self.index] + '(Considered Optimal by ks-test)')
 
-        ax[0].plot(x1, stats.norm.cdf(x1, scale=normal_param[1], loc=normal_param[0]), linewidth=2.0, color='g')
-        ax[1].plot(x1, stats.lognorm.cdf(x1, s=lognorm_param[0], scale=lognorm_param[2]), linewidth=2.0, color='g')
-        ax[2].plot(x1, stats.uniform.cdf(x1, scale=uniform_param[1], loc=uniform_param[0]), linewidth=2.0, color='g')
-        ax[3].plot(x1, stats.gamma.cdf(x1, a=gamma_param[0], loc=gamma_param[1], scale=gamma_param[2]),
-                   linewidth=2.0, color='g')
+                # plot points
+                ax[i].plot(self.values, self.y, 'ro', color='r')
 
-        fig.tight_layout()
+            ax[0].plot(x1, stats.norm.cdf(x1, scale=normal_param[1], loc=normal_param[0]), linewidth=2.0, color='g')
+            ax[1].plot(x1, stats.lognorm.cdf(x1, s=lognorm_param[0], scale=lognorm_param[2]), linewidth=2.0, color='g')
+            ax[2].plot(x1, stats.uniform.cdf(x1, scale=uniform_param[1], loc=uniform_param[0]), linewidth=2.0, color='g')
+            ax[3].plot(x1, stats.gamma.cdf(x1, a=gamma_param[0], loc=gamma_param[1], scale=gamma_param[2]),
+                       linewidth=2.0, color='g')
+
+            fig.tight_layout()
+
+        else:
+            fig, ax = plt.subplots(1, 1, figsize=(12, 12))
+            ax.set_xlabel('(ng/g) of ' + self.chem + ' in ' + self.animal, size='large')
+            ax.set_ylabel('P(X < x)')
+            ax.plot(self.values, self.y, 'ro', color='r')
+            fig.tight_layout()
+
         
     def plot_pdf(self):
 
-        titles = ['PDF: With Normal Fit', 'PDF: With Log-Normal Fit', 'PDF: With Uniform Fit',
-                  'PDF: With Gamma Fit']
+        if self.tofit == 1:
 
-        fig1, ax1 = plt.subplots(1, 4, figsize=(24, 12))
+            titles = ['PDF: With Normal Fit', 'PDF: With Log-Normal Fit', 'PDF: With Uniform Fit',
+                      'PDF: With Gamma Fit']
 
-        x1 = self.x1
+            fig1, ax1 = plt.subplots(1, 4, figsize=(24, 12))
 
-        lognorm_param = self.cdfs[1][1]
-        normal_param = self.cdfs[0][1]
-        uniform_param = self.cdfs[2][1]
-        gamma_param = self.cdfs[3][1]
+            x1 = self.x1
 
-        for i in range(len(ax1)):
-            ax1[i].set_xlabel('(ng/g) of ' + self.chem + ' in ' + self.animal, size='large')
-            ax1[i].set_ylabel('P(x)')
-            #ax1[self.index].title.set_text(titles[self.index] + '(Considered Optimal by ks-test)')
-            ax1[i].title.set_text(titles[i])
-            ax1[i].scatter(self.hist[1][:-1], self.hist[0], s=16)
-            ax1[i].set_ylim(min(self.hist[0]))
-    
-        ax1[0].plot(x1, stats.norm.pdf(x1, scale=normal_param[1], loc=normal_param[0]), linewidth=2.0, color='g')
-        ax1[1].plot(x1, stats.lognorm.pdf(x1, s=lognorm_param[0], scale=lognorm_param[2]), linewidth=2.0, color='g')
-        ax1[2].plot(x1, stats.uniform.pdf(x1, scale=uniform_param[1], loc=uniform_param[0]), linewidth=2.0, color='g')
-        ax1[3].plot(x1, stats.gamma.pdf(x1, a=gamma_param[0], loc=gamma_param[1], scale=gamma_param[2]),
-                    linewidth=2.0, color='g')
+            lognorm_param = self.cdfs[1][1]
+            normal_param = self.cdfs[0][1]
+            uniform_param = self.cdfs[2][1]
+            gamma_param = self.cdfs[3][1]
+
+            for i in range(len(ax1)):
+                ax1[i].set_xlabel('(ng/g) of ' + self.chem + ' in ' + self.animal, size='large')
+                ax1[i].set_ylabel('P(x)')
+                ax1[self.index].title.set_text(titles[self.index] + '(Considered Optimal by ks-test)')
+                ax1[i].title.set_text(titles[i])
+                ax1[i].scatter(self.hist[1][:-1], self.hist[0], s=16)
+                ax1[i].set_ylim(min(self.hist[0]))
         
-        fig1.tight_layout()
+            ax1[0].plot(x1, stats.norm.pdf(x1, scale=normal_param[1], loc=normal_param[0]), linewidth=2.0, color='g')
+            ax1[1].plot(x1, stats.lognorm.pdf(x1, s=lognorm_param[0], scale=lognorm_param[2]), linewidth=2.0, color='g')
+            ax1[2].plot(x1, stats.uniform.pdf(x1, scale=uniform_param[1], loc=uniform_param[0]), linewidth=2.0, color='g')
+            ax1[3].plot(x1, stats.gamma.pdf(x1, a=gamma_param[0], loc=gamma_param[1], scale=gamma_param[2]),
+                        linewidth=2.0, color='g')
+            
+            fig1.tight_layout()
+
+        else:
+
+            fig1, ax1 = plt.subplots(1, 1, figsize=(12, 12))
+            ax1.set_xlabel('(ng/g) of ' + self.chem + ' in ' + self.animal, size='large')
+            ax1.set_ylabel('P(x)') 
+            ax1.scatter(self.hist[1][:-1], self.hist[0], s=16)
+            ax1.set_ylim(min(self.hist[0]))        
 
     def plot_single(self, temp_index):
+        if self.tofit == 1:
+            titles = ['CDF: With Normal Fit', 'CDF: With Log-Normal Fit', 'CDF: With Uniform Fit', 'CDF: With Gamma Fit']
+            titles1 = ['PDF: With Normal Fit', 'PDF: With Log-Normal Fit', 'PDF: With Uniform Fit', 'PDF: With Gamma Fit']
 
-        titles = ['CDF: With Normal Fit', 'CDF: With Log-Normal Fit', 'CDF: With Uniform Fit', 'CDF: With Gamma Fit']
-        titles1 = ['PDF: With Normal Fit', 'PDF: With Log-Normal Fit', 'PDF: With Uniform Fit', 'PDF: With Gamma Fit']
+            fig, ax = plt.subplots(1, 2, figsize=(24, 12))
 
-        fig, ax = plt.subplots(1, 2, figsize=(24, 12))
-
-        x1 = self.x1
-        
-        #temp_param = self.cdfs[temp_index][1]
-
-        for i in range(len(ax)):
-            ax[i].set_xlabel('(ng/g) of ' + self.chem + ' in ' + self.animal, size='large')
+            x1 = self.x1
             
-        #ax[0].title.set_text(titles1[temp_index])
-        ax[0].set_ylabel('P(x)')
-        ax[0].scatter(self.hist[1][:-1], self.hist[0], s=16)
-        ax[0].set_ylim(min(self.hist[0]))
-        #if len(temp_param) == 2:
-            #ax[0].plot(x1, self.pdfs[temp_index](x1, scale=temp_param[1], loc=temp_param[0]), linewidth=2.0, color='g')
-        #if len(temp_param) == 3:
-            #ax[0].plot(x1, self.pdfs[temp_index](x1, temp_param[0], loc=temp_param[1], scale=temp_param[2]),
-            #           linewidth=2.0, color='g')
+            temp_param = self.cdfs[temp_index][1]
 
-        #ax[1].title.set_text(titles[temp_index])
-        #ax[1].title.set_text(titles[temp_index])
-        width = 1/len(self.values)
-        y = []
-        for i in range(len(self.values)):
-            y.append(0+(width*i))
+            for i in range(len(ax)):
+                ax[i].set_xlabel('(ng/g) of ' + self.chem + ' in ' + self.animal, size='large')
+                
+            ax[0].title.set_text(titles1[temp_index])
+            ax[0].set_ylabel('P(x)')
+            ax[0].scatter(self.hist[1][:-1], self.hist[0], s=16)
+            ax[0].set_ylim(min(self.hist[0]))
+            if len(temp_param) == 2:
+                ax[0].plot(x1, self.pdfs[temp_index](x1, scale=temp_param[1], loc=temp_param[0]), linewidth=2.0, color='g')
+            if len(temp_param) == 3:
+                ax[0].plot(x1, self.pdfs[temp_index](x1, temp_param[0], loc=temp_param[1], scale=temp_param[2]),
+                           linewidth=2.0, color='g')
 
-        ax[1].set_ylabel('P(X < x)')
-        ax[1].plot(self.values, y, 'ro', color='r')
-        #if len(temp_param) == 2:
-        #    ax[1].plot(x1, self.cdf_list[temp_index](x1, scale=temp_param[1], loc=temp_param[0]), linewidth=2.0, color='g')
-        #if len(temp_param) == 3:
-        #    ax[1].plot(x1, self.cdf_list[temp_index](x1, temp_param[0], loc=temp_param[1], scale=temp_param[2]),
-        #               linewidth=2.0, color='g')
+            ax[1].title.set_text(titles[temp_index])
+            ax[1].title.set_text(titles[temp_index])
+            width = 1/len(self.values)
+            y = []
+            for i in range(len(self.values)):
+                y.append(0+(width*i))
 
-        fig.tight_layout()
+            ax[1].set_ylabel('P(X < x)')
+            ax[1].plot(self.values, y, 'ro', color='r')
+            if len(temp_param) == 2:
+                ax[1].plot(x1, self.cdf_list[temp_index](x1, scale=temp_param[1], loc=temp_param[0]), linewidth=2.0, color='g')
+            if len(temp_param) == 3:
+                ax[1].plot(x1, self.cdf_list[temp_index](x1, temp_param[0], loc=temp_param[1], scale=temp_param[2]),
+                           linewidth=2.0, color='g')
+
+            fig.tight_layout()
+
+        else:
+            print("There is no fit to be graphed if you did not choose \"Curve Fit Output Samples\".")
 
     def show(self, temp_index):
 
+        
         if self.display == 0:
             self.plot_cdf()
         elif self.display == 1:
@@ -351,6 +337,7 @@ class ResultDist:
         else:
             self.plot_single(temp_index)
         plt.show()
+
 
 
     def bestparam(self):
@@ -443,7 +430,7 @@ def set_hyper_samp_cube(model_para, Var):
     Var.take_samples()
     #Var.plot_samples()
 
-def make_result_dist(dicts):
+def make_result_dist(dicts, tofit):
 
     result_dict = {}
     for region, values in dicts[0].items():
@@ -452,7 +439,7 @@ def make_result_dist(dicts):
             result_dict[region][animal] = {}
             for chemical in values1.keys():
                 values = get_values(region, chemical, animal, dicts)
-                new_dist = ResultDist(values, chemical, animal)
+                new_dist = ResultDist(values, chemical, animal, tofit)
                 result_dict[region][animal][chemical] = new_dist
 
     return result_dict

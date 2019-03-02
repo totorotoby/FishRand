@@ -82,16 +82,6 @@ class app(tk.Frame):
         ttk.Separator(self,orient=tk.VERTICAL).grid(row=3, column=1 , rowspan=10, sticky='ns')
         ttk.Separator(self, orient=tk.VERTICAL).grid(row=3, column=4 , rowspan=10, sticky='ns')
 
-
-        
-        ###saving data###
-        self.filebox = tk.Entry(self)
-        self.filebox.grid(column=0, row=8)
-        tk.Label(self, text="Timesteps to Save and Display:").grid(column=0,row=9)
-        self.timeentry = tk.Entry(self)
-        self.timeentry.grid(column=0,row=10)
-
-
         tk.Label(self, text='Type of Distrubtion to save: ').grid(column=5, row=7)
         self.save_dist_type  = tk.StringVar(self)
         self.save_dist_type.set('Normal')
@@ -104,9 +94,16 @@ class app(tk.Frame):
         inputbutton = tk.Button(self, text="Choose File", command=self.askfile, width=18)
         inputbutton.grid(column=0, row=7)
         tk.Label(self, text='File: ').grid(column=0, row=6)
+        self.filebox = tk.Entry(self)
+        self.filebox.grid(column=0, row=8)
+        tk.Label(self, text="Timesteps to Save and Display:").grid(column=0,row=9)
+        self.timeentry = tk.Entry(self)
+        self.timeentry.grid(column=0,row=10)
+        self.curvefit = tk.IntVar()
+        tk.Checkbutton(self, text="Curve Fit Output Samples", variable=self.curvefit).grid(column=0, row=13)
         tk.Button(self, text='View Foodweb', command=self.show_foodweb).grid(column=0, row=11)
         tk.Button(self, text='View Map', command=self.show_map).grid(column=0, row=12)
-        tk.Button(self, text="Run", command=self.loading).grid(column=0, row=13)
+        tk.Button(self, text="Run", command=self.loading).grid(column=0, row=14)
 
 
          ###Fish Image###
@@ -168,6 +165,7 @@ class app(tk.Frame):
             # get timesteps
 
             time_entry = self.timeentry.get().split(",")
+            tofit = self.curvefit.get()
             try:
                 self.time_entry = [int(i)-1 for i in time_entry]
             except:
@@ -175,7 +173,7 @@ class app(tk.Frame):
 
             # run the code
             data = convert_to_lists(self.filename)
-            self.output = filter_cases(data, self.time_entry)
+            self.output = filter_cases(data, self.time_entry, tofit)
 
             if self.output[0] == 'YES':
 
