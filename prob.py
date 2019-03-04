@@ -108,6 +108,7 @@ class ResultDist:
         self.values = values
         self.tofit = tofit
         self.v_mean_std = [round(numpy.mean(values), 4), round(numpy.std(values), 4)]
+        self.v_mean_stdString = ', '.join([str(i) for i in self.v_mean_std])
         self.display = 4
         self.values.sort()
         self.num_bins = len(self.values)//50
@@ -281,6 +282,7 @@ class ResultDist:
             ax1.set_ylim(min(self.hist[0]))        
 
     def plot_single(self, temp_index):
+
         if self.tofit == 1:
             titles = ['CDF: With Normal Fit', 'CDF: With Log-Normal Fit', 'CDF: With Uniform Fit', 'CDF: With Gamma Fit']
             titles1 = ['PDF: With Normal Fit', 'PDF: With Log-Normal Fit', 'PDF: With Uniform Fit', 'PDF: With Gamma Fit']
@@ -306,6 +308,7 @@ class ResultDist:
 
             ax[1].title.set_text(titles[temp_index])
             ax[1].title.set_text(titles[temp_index])
+
             width = 1/len(self.values)
             y = []
             for i in range(len(self.values)):
@@ -349,10 +352,6 @@ class ResultDist:
 
         for i in range(len(self.cdfs[self.index][1])-1):
             params.append(self.cdfs[self.index][1][i])
-            #if self.index == 1:
-                #print(' ')
-            #    string
-            #else:
             string += str("{0:.4f}".format(self.cdfs[self.index][1][i]))
             string += ', '
         params.append(self.cdfs[self.index][1][i+1])

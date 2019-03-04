@@ -132,11 +132,11 @@ class app(tk.Frame):
 
         if self.output[0] == 'YES':
 
-            steady_state_output(self.to_write, self.stat_check, self.savepath, dist_type)
+            steady_state_output(self.to_write, self.stat_check, self.savepath, dist_type, self.tofit)
 
         if self.output[0] == 'NO':
 
-            temporal_output(self.stat_check, self.to_write, self.savepath, self.time_entry, self.region_areas, dist_type)
+            temporal_output(self.stat_check, self.to_write, self.savepath, self.time_entry, self.region_areas, dist_type, self.tofit)
 
     def loading(self):
 
@@ -165,7 +165,7 @@ class app(tk.Frame):
             # get timesteps
 
             time_entry = self.timeentry.get().split(",")
-            tofit = self.curvefit.get()
+            self.tofit = self.curvefit.get()
             try:
                 self.time_entry = [int(i)-1 for i in time_entry]
             except:
@@ -173,7 +173,7 @@ class app(tk.Frame):
 
             # run the code
             data = convert_to_lists(self.filename)
-            self.output = filter_cases(data, self.time_entry, tofit)
+            self.output = filter_cases(data, self.time_entry, self.tofit)
 
             if self.output[0] == 'YES':
 

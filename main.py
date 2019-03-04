@@ -292,16 +292,16 @@ def filter_cases(data, stops, tofit):
     #################### STEADY STATE EXCEL WRITING ########################
 
 
-def steady_state_output(total_cons, stat_check, output_name, dist_type):
+def steady_state_output(total_cons, stat_check, output_name, dist_type, tofit):
     if stat_check == False:
         total_cons = total_cons[0]
-    FR_Input_Output.write_output_steady(total_cons, output_name, 'Steady State Simulation', dist_type)
+    FR_Input_Output.write_output_steady(total_cons, output_name, 'Steady State Simulation', dist_type, tofit)
 
-def temporal_output(stat_check, to_write, output_name, stops, region_areas, dist_type):
+def temporal_output(stat_check, to_write, output_name, stops, region_areas, dist_type, tofit):
 
         #Non-statistical
         if stat_check == False:
-            FR_Input_Output.write_temporal_excel(to_write, output_name, stops, 0, region_areas, dist_type)
+            FR_Input_Output.write_temporal_excel(to_write, output_name, stops, 0, region_areas, dist_type, tofit)
         #statistical
         else:
-            FR_Input_Output.write_temporal_excel(to_write, output_name, stops, 1, region_areas, dist_type)
+            FR_Input_Output.write_temporal_excel(to_write, output_name, stops, 1, region_areas, dist_type, tofit)
