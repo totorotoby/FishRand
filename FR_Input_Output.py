@@ -455,7 +455,7 @@ def write_temporal_excel(array, output_name, stops, stat_flag, regional_areas, d
             if tofit == 1:
                 sheet.write(0, 0, 'Lower Food Web Concentrations by Region (ng/g ww)', big)
             else:
-                sheet.write(count + 1, 0, 'Lower Food Web Concentrations by Region (ng/g ww) (Mean, Standard Deviation)', big)
+                sheet.write(0, 0, 'Lower Food Web Concentrations by Region (ng/g ww) (Mean, Standard Deviation)', big)
 
             for j in range(len(chem_list)):
 

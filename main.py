@@ -226,7 +226,7 @@ def filter_cases(data, stops, tofit):
         region_areas = [region[1].area for region in regions]
         loc_setups, f_names = loc_setup(all_data[6], boundary, regions, hotspots, site_data[3])
         draws = site_data[3]
-        graph_data = {}
+        graph_data = []
         
         # turns all_data that is distributions into array of samples which can be iterated through with u_count or v_count
         # Will return true if there is at least one distrubtion input
@@ -264,10 +264,11 @@ def filter_cases(data, stops, tofit):
             
             total_cons = uv_single
 
-            if t in stops:
-                lower_cons, fish_dic = get_fish_dic(total_cons[1], total_cons[0], [chem[0] for chem in all_data[2]], [fish[0] for fish in all_data[6]], region_areas, tofit)
-                graph_data[t] = fish_dic
             
+            lower_cons, fish_dic = get_fish_dic(total_cons[1], total_cons[0], [chem[0] for chem in all_data[2]], [fish[0] for fish in all_data[6]], region_areas, tofit)
+            graph_data.append(fish_dic)
+            
+            if t in stops:
                 if stat_check == False:
                     writing_info.append([total_cons[0], lower_cons, fish_dic])
                 else:

@@ -277,67 +277,21 @@ class app(tk.Frame):
 
             if self.stat_check == True:
 
-                params = []
-                types = []
-                mean_stds = []
+              
+                mean = []
+                std = []
                 for dic in self.graph_data:
-                    params.append(dic[fish][chemical].best_para[1])
-                    types.append(dic[fish][chemical].index)
-                    mean_stds.append(dic[fish][chemical].v_mean_std)
+                    mean.append(dic[fish][chemical].v_mean_std[0])
+                    std.append(dic[fish][chemical].v_mean_std[1])
 
-
-
-                norm = lambda x, param, offset: offset - stats.norm.pdf(x, loc=param[0], scale=param[1])
-                lognorm = lambda x, param, offset: offset - stats.lognorm.pdf(x, s=param[0], loc=param[1], scale=param[2])
-                uniform = lambda x, param, offset: offset - stats.uniform.pdf(x, loc=param[0], scale=param[1])
-                gamma = lambda x, param, offset: offset - stats.gamma.pdf(x, a=param[0], loc=param[1], scale=param[2])
-
-                type_functions = [norm, lognorm, uniform, gamma]
                 fig, ax = plt.subplots()
-                ax.tick_params(bottom=False, labelbottom=False)
-
-                max_step = 0
-                for param, type, mean_std in zip(params, types, mean_stds):
-
-                    if type == 1 or type == 3:
-                        y_plot = np.linspace(mean_std[0] - (2*mean_std[1]), mean_std[0] + (2*mean_std[1]), num=500)
-                    else:
-                        y_plot = np.linspace(mean_std[0] - (2 * mean_std[1]), mean_std[0] + (2 * mean_std[1]), num=500)
-                    values = type_functions[type](y_plot, param, 0)
-
-                    if -min(values) > max_step:
-                        max_step = -min(values)
-
-                step = max_step + (.1 * max_step)
-
-                timesteps = [i*step for i in range (1, len(params)+1)]
-
-                data = zip(params, types, timesteps, mean_stds)
-                timelabel = list(range(len(params)))
-                count = 1
-                for param, type, time, mean_std in data:
-
-                    y_plot = np.linspace(mean_std[0] - (3*mean_std[1]), mean_std[0] + (3*mean_std[1]), num=500)
-                    ax.plot(type_functions[type](y_plot, param, time), y_plot, color='b')
-
-                    mean_point_x = type_functions[type](mean_std[0], param, time)
-                    ax.plot(mean_point_x, mean_std[0], 'o', color='b')
-
-                    ax.annotate(str(count), xy=(time, mean_std[0]), xytext=(time, max(y_plot) + (max(y_plot)*.05)))
-                    count += 1
-
-                blue_line  = matplotlib.lines.Line2D([], [], color='blue', label='Distrubtion of Best Fit during Timestep')
-                blue_dot = matplotlib.lines.Line2D([], [], color='blue', marker = 'o', linestyle = 'None', label='Mean of Samples during Timestep')
-
-                ax.legend(handles = [blue_line, blue_dot])
-                ax.set_xlabel('Timesteps (' + self.timescale + ')')
-                ax.set_ylabel('Concentration of ' + chemical + ' in ' + fish + ' (ng/g)')
-                ax.set_title('Distrubtions of Best Fit over Time')
-                ax.set_xlim(0)
-                ax.set_ylim(0)
-                fig.tight_layout()
-                mng = plt.get_current_fig_manager()
+                ax.set_ylabel('(ng/g) of ' + chemical + ' in ' + fish, size='large')
+                ax.set_xlabel('Timestep')
+                ax.errorbar([i for i in range(len(self.graph_data))], mean, yerr=std, fmt='o', capsize=2, capthick=2)
                 plt.show()
+
+
+
 
             else:
                 
