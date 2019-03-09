@@ -492,15 +492,15 @@ def write_temporal_excel(array, output_name, stops, stat_flag, regional_areas, d
             for j in range(len(chem_list)):
                 sheet.write(0, len(chem_list) + 1 + (j + 1), chem_list[j])
 
-            print(lower_dists)
+        
             for i in range(len(chem_list)):
                 for j in range(len(lower_org_list)):
                     weight_avg = 0
                     total = 0 
                     for k in range(len(reg_list)):
                         weight_avg += normed_reg_areas[k]*lower_dists[reg_list[k]][lower_org_list[j]][chem_list[i]].v_mean_std[0]
-                        print(weight_avg)
-                        print(total,'area weight: ', normed_reg_areas[k], 'animal: ', lower_org_list[j], 'area concentration: ', lower_dists[reg_list[k]][lower_org_list[j]][chem_list[i]].v_mean_std[0])
+                        
+                        
 
                     sheet.write(2 + j, 2 + len(chem_list) + i, weight_avg)
 
