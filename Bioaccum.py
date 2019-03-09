@@ -567,13 +567,16 @@ def solve_zoop_phyto_invert_time_period(region, chemicals, phytos, zoops, invert
             phi = chemicals[j].phi
             Cwdo = chemicals[j].Cwdo
             Cwp = chemicals[j].Cwp
+            
 
             phyto_con = (new_chem_amounts[region.name][phyto.name][chemicals[j].name] +
                          prior_chem_amounts[region.name][phyto.name][chemicals[j].name])/2
 
-            new_chem_amounts[region.name][zoops[k].name][chemicals[j].name] =\
-                zoops[k].solve_next_time_step(phi, j, Cwp, Cwdo, phyto_con, prior_C)
+            res = zoops[k].solve_next_time_step(phi, j, Cwp, Cwdo, phyto_con, prior_C)
+            new_chem_amounts[region.name][zoops[k].name][chemicals[j].name] = res
+                
 
+        
 
         fishlog_new = new_chem_amounts[region.name]
         fishlog_old = prior_chem_amounts[region.name]
@@ -582,8 +585,10 @@ def solve_zoop_phyto_invert_time_period(region, chemicals, phytos, zoops, invert
             phi = chemicals[j].phi
             Cwdo = chemicals[j].Cwdo
             Cwp = chemicals[j].Cwp
-            new_chem_amounts[region.name][inverts[i].name][chemicals[j].name] =\
-                inverts[i].solve_next_time_step(phi, j, Cwp, Cwdo, fishlog_old, fishlog_new, chemicals[j], prior_C, 0) + prior_C
+            res = inverts[i].solve_next_time_step(phi, j, Cwp, Cwdo, fishlog_old, fishlog_new, chemicals[j], prior_C, 0) + prior_C
+            #print(res)
+            new_chem_amounts[region.name][inverts[i].name][chemicals[j].name] = res
+                
 
 
     return new_chem_amounts
@@ -750,9 +755,8 @@ def bio_monte_carlo_loop(model_para, all_data, t, time_per_step, fish_by_region,
                 days = (t+1) * time_per_step
                 for i in range(len(regions)):
                     new_concentrations_lower = solve_zoop_phyto_invert_time_period(regions[i], r_chems[i], r_phytos[i], r_zoops[i], r_inverts[i],
-                                                                             new_concentrations_lower, days)
-
-
+                                                                                new_concentrations_lower, days)
+                
                 p_dic[0][inner_count] = new_concentrations_lower
                 #################################### Bottom Feeds Done ######################################################
 
