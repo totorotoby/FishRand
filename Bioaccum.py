@@ -165,7 +165,9 @@ def init_phyto(phyto_data, chemicals, u_count, v_count, per_step=0):
     phyto = check_inst_non_st(phyto, u_count, v_count)
 
     toadd = obj.Pplank(phyto[0], phyto[1], len(chemicals), per_step)
-
+    
+    if phyto[1] == '':
+        toadd.set_kg(.08)
     if phyto[2] != '':
         toadd.set_vlp(phyto[2])
     if phyto[3] != '':
