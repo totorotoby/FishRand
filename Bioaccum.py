@@ -92,7 +92,7 @@ def init_region(reg_data, temp, u_count, v_count):
         if toadd.init_check():
             regions.append(toadd)
         else:
-            print("Something is wrong with your ", i, " Regional Entry")
+            print("Something is wrong with your ", i, " Regional Entry.\nRefer to page 12 section 3.5 and 3.6 of the user manual for help.")
     return regions
 
 # initiates chemicals for a specific single region in a single monte carlo sample in a time period
@@ -142,12 +142,12 @@ def init_chems(chem_data, r_con_data, region, region_index, u_count, v_count):
             toadd.calc_phi_and_cwdo(region)
             
         if toadd.Cwdo == -1 and (toadd.Cwto == -1 or region.adoc or region.apoc or region.Xdoc or region.Xpoc == ''):
-            print('Not enough parameters to solve for Cwdo in ' + chemical[0])
+            print('Not enough parameters to solve for Cwdo in' + chemical[0], '\nRefer to page 15 section 3.10 of the user manual for help.')
             exit(0)
         if toadd.Cwp == -1 and region.Ocs != '':
             toadd.calc_pore_water(region.Ocs)
         if toadd.Cwp == -1 and (region.Ocs == '' or toadd.Cs == ''):
-            print('Not enough parameters to solve for Cwp in' + chemical[0])
+            print('Not enough parameters to solve for Cwp in' + chemical[0], '\nRefer to page 15 section 3.10 of the user manual for help.')
             exit(0)
             
         chemicals.append(toadd)
@@ -186,7 +186,7 @@ def init_phyto(phyto_data, chemicals, u_count, v_count, per_step=0):
     if toadd.init_check():
         phytos.append(toadd)
     else:
-        print("Something is wrong with your ", 1,  "st Phyto Entry")
+        print("Something is wrong with your Phyto Entry.\nRefer to page 12 section 3.5 and 3.6 of the user manual for help."")
 
 
     return phytos

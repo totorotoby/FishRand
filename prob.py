@@ -39,7 +39,7 @@ class Var:
                 self.values = st.truncnorm(a=minum, loc=mean, scale= std, b=maxum).ppf(self.lhs)
             else:
                 self.values = st.norm(loc=mean, scale=std).ppf(self.lhs)
-                #print(mean,std, self.values, '\n\n\n')
+                
 
         elif self.dist == 'Uniform':
             a = self.param[0]
@@ -50,7 +50,6 @@ class Var:
             b = self.param[1] - self.param[0]
             c = (self.param[2] - a) / b
             self.values = st.triang(c, loc=a, scale=b).ppf(self.lhs)
-            #print(a, b, c, self.values, '\n\n')
         elif self.dist == 'Log-Normal':
             m_y = self.param[0]
             sig_y = self.param[1]
@@ -71,7 +70,7 @@ class Var:
             self.values = st.weibull_min(c=k, scale=lamb).ppf(self.lhs)
         else:
             print(self.dist)
-            print('There is a unknown distribution called ', '\'' + self.dist + '\'')
+            print('There is a unknown distribution called ', '\'' + self.dist + '\'.\nRefer to page 13 Table 1 for the usable distrubtions.')
 
     def plot_samples(self):
 
@@ -150,7 +149,7 @@ class ResultDist:
         try:
             gamma_k = (math.pow(M_y, 2))/(math.pow(Sig_y, 2))
         except ZeroDivisionError:
-            print("\n\nNot enough stastical parameters input. There are situations where some concentrations are determinstic and others are distrubtions. Hopefully FishRand will support this in future versions.\n\n")
+            print("\n\nNot enough stastical parameters input.\nThere are situations where some concentrations are determinstic and others are distrubtions.\nHopefully FishRand will support this in future versions.\n\n")
             exit(0)
         gamma_theta = (math.pow(Sig_y, 2))/M_y
         
@@ -162,7 +161,6 @@ class ResultDist:
         cdf_list = [[stats.norm.cdf], [my_log_normal_cdf], [stats.uniform.cdf], [my_gamma_cdf]]
 
         for i in range(len(cdf_list)):
-            #print("on index ", i, "of cdf list")
             param = optimize.curve_fit(cdf_list[i][0], self.values, self.y, p0=self.init_guess[i], maxfev=10000)[0]
             
             
