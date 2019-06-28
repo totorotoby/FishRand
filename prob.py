@@ -30,12 +30,13 @@ class Var:
             mean = self.param[0]
             std = self.param[1]
             if len(self.param) == 3:
-                min = self.param[2]
-                max = numpy.inf
-            if len(self.param) == 4:
-                min = self.param[2]
-                max = self.param[3]
-                self.values = st.truncnorm(a=min, loc=mean, scale= std, b=max).ppf(self.lhs)
+                minum = self.param[2]
+                maxum = numpy.inf
+                self.values = st.truncnorm(a=minum, loc=mean, scale= std, b=maxum).ppf(self.lhs)
+            elif len(self.param) == 4:
+                minum = self.param[2]
+                maxum = self.param[3]
+                self.values = st.truncnorm(a=minum, loc=mean, scale= std, b=maxum).ppf(self.lhs)
             else:
                 self.values = st.norm(loc=mean, scale=std).ppf(self.lhs)
                 #print(mean,std, self.values, '\n\n\n')
@@ -191,7 +192,7 @@ class ResultDist:
 
     def make_pdf_hist(self):
 
-        hist, bins = numpy.histogram(self.values, bins=self.num_bins, normed=True)
+        hist, bins = numpy.histogram(self.values, bins=self.num_bins) #normed=True)
         return [hist, bins]
      
     def plot_cdf(self):

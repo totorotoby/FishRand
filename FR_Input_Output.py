@@ -188,30 +188,31 @@ def data_get_helper(preentry, new_entry):
 
 def get_con_data(con_sheet, con_data, num_reg, num_chem, timesteps):
 
-    
-    for i in range (1, timesteps+1):
-        t_cons = []
-        column = con_sheet.col(1)
-        for j in range (num_reg):
-            r_cons = []
-            for k in range (0, num_chem):
-                c_cons = []
-                for p in range (1,5):
-                    
-                    # This is a mess so...
-                    # num_chem * 4 * j counts all red spaces in all of the  prior regional sections
-                    # 1 + j counts the number of yellow regional labels
-                    # k*4 counts the number of red spaces from this region to the partiular chemical
-                    # 2*j + 1 + k counts the number of green labels for chemicals
-                    # p counts the remaining red spaces down to the type of concentration to append
-                    
-                    
-                    data_get_helper(column[(1+j) + ((j * num_chem) + (1+k)) + ((j * num_chem * 4) + (k * 4) + p)], c_cons)
-                r_cons.append(c_cons)
-            t_cons.append(r_cons)
-        con_data.append(t_cons)
-
-    
+    try:
+        for i in range (1, timesteps+1):
+            t_cons = []
+            column = con_sheet.col(1)
+            for j in range (num_reg):
+                r_cons = []
+                for k in range (0, num_chem):
+                    c_cons = []
+                    for p in range (1,5):
+                        
+                        # This is a mess so...
+                        # num_chem * 4 * j counts all red spaces in all of the  prior regional sections
+                        # 1 + j counts the number of yellow regional labels
+                        # k*4 counts the number of red spaces from this region to the partiular chemical
+                        # 2*j + 1 + k counts the number of green labels for chemicals
+                        # p counts the remaining red spaces down to the type of concentration to append
+                        
+                        
+                        data_get_helper(column[(1+j) + ((j * num_chem) + (1+k)) + ((j * num_chem * 4) + (k * 4) + p)], c_cons)
+                    r_cons.append(c_cons)
+                t_cons.append(r_cons)
+            con_data.append(t_cons)
+    except:
+        print("Something is wrong with your chemical concentration entries.\nCheck the format on Page 13 section 3.7 of the user manual.")
+        exit(0)
             
 
 def get_diet_data(diet_sheet, diet_data, entrysize):
@@ -281,7 +282,7 @@ def get_sites_data(sites_sheet):
         try:
             site = (site_col_name[row].value, [float(i) for i in (site_col_coord[row].value.replace('', '').split(', '))])
         except ValueError:
-            print('Some coordinate entries are not formatted correctly in Sample Sites')
+            print('Some coordinate entries are not formatted correctly in Sample Sites.\nRefer to page 14 section 3.9 of the user manual for help.')
             exit(0)
         sites.append(site)
         row += 1

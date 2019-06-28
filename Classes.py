@@ -89,8 +89,12 @@ class Zooplank:
     # sets the Gill ventilation rate of zooplank
     def calc_gv(self, region_cox):
         
-        self.Gv = 1400 * (math.pow(self.Wb, .65) / region_cox)
-
+        try:
+            self.Gv = 1400 * (math.pow(self.Wb, .65) / region_cox)
+        except:
+            print(self.Wb)
+            print("The", self.name, "weight distrubtions producted a negative weight sample.\nIf one of your weight distrubtions is normal,\nthe best way to avoid a negative weight sample is to add a minimum cut off to you distrubtion.\nRefer to page 12 section 3.5.2 of the user manual for help.\nIf you weight distrubtion is not normal make sure the bounds of your distrubtion are completely positive.")
+            exit(0)
     # sets G_d for this zooplank
     def calc_gd_filter(self, css, sigma=1):
         
