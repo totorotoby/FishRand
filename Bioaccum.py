@@ -73,10 +73,20 @@ def check_inst_non_st(inst, u_count, v_count):
 def init_region(reg_data, temp, u_count, v_count):
 
     regions = []
+
     for i in range(len(reg_data)):
+
+        ###### bug found 7/18/19 the tempature must be set as a sample before region is intiated ####
+        if type(temp[i]) == pr.Var:
+            if temp[i].type == 'U':
+                tSamp = temp[i].values[u_count]
+            if temp[i].type == 'V':
+                tSamp = temp[i].values[v_count]
+        ########################
+
         region = reg_data[i]
         region = check_inst_non_st(region, u_count, v_count)
-        toadd = obj.Region(region[0], temp[i], region[1], region[2], region[3], region[4], region[5])
+        toadd = obj.Region(region[0], tSamp, region[1], region[2], region[3], region[4], region[5])
 
         # dealing with cox
         if region[6] != '':
@@ -124,6 +134,7 @@ def init_chems(chem_data, r_con_data, region, region_index, u_count, v_count):
         if chemical[8] != '':
             toadd.set_beta5(chemical[8])
         
+        #print(concentrations[2])
         # dealing with cwto and cwdo
         if concentrations[1] != '':
             toadd.set_cwto(concentrations[1])
@@ -132,6 +143,7 @@ def init_chems(chem_data, r_con_data, region, region_index, u_count, v_count):
         if concentrations[3] != '':
             toadd.set_cwp(concentrations[3])
 
+        print('hello???', toadd.Cwdo, concentrations)
         if toadd.Cwp != -1 and toadd.Cwdo != -1 and toadd.Cs == '' and region.Ocs != '':
             toadd.calc_cs(region)
             
@@ -140,14 +152,16 @@ def init_chems(chem_data, r_con_data, region, region_index, u_count, v_count):
             
         if toadd.Cwdo == -1 and toadd.Cwto != -1 and region.adoc and region.apoc and region.Xdoc and region.Xpoc != '':
             toadd.calc_phi_and_cwdo(region)
-            
+           
+
         if toadd.Cwdo == -1 and (toadd.Cwto == -1 or region.adoc or region.apoc or region.Xdoc or region.Xpoc == ''):
-            print('Not enough parameters to solve for Cwdo in' + chemical[0], '\nRefer to page 15 section 3.10 of the user manual for help.')
+            print('Not enough parameters to solve for Cwdo in ' + chemical[0], '\nRefer to page 13 section 3.7 and page 15 section 3.10 of the user manual for help.')
             exit(0)
+
         if toadd.Cwp == -1 and region.Ocs != '':
             toadd.calc_pore_water(region.Ocs)
         if toadd.Cwp == -1 and (region.Ocs == '' or toadd.Cs == ''):
-            print('Not enough parameters to solve for Cwp in' + chemical[0], '\nRefer to page 15 section 3.10 of the user manual for help.')
+            print('Not enough parameters to solve for Cwp in' + chemical[0], '\nRefer to page 13 section 3.7 and page 15 section 3.10 of the user manual for help.')
             exit(0)
             
         chemicals.append(toadd)
@@ -186,7 +200,7 @@ def init_phyto(phyto_data, chemicals, u_count, v_count, per_step=0):
     if toadd.init_check():
         phytos.append(toadd)
     else:
-        print("Something is wrong with your Phyto Entry.\nRefer to page 12 section 3.5 and 3.6 of the user manual for help."")
+        print("Something is wrong with your Phyto Entry.\nRefer to page 12 section 3.5 and 3.6 of the user manual for help.")
 
 
     return phytos
