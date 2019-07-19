@@ -97,7 +97,6 @@ class Zooplank:
             exit(0)
     # sets G_d for this zooplank
     def calc_gd_filter(self, css, sigma=1):
-        
         self.Gd = self.Gv * css * sigma
 
     def calc_gd_no_filter(self, T):
@@ -106,7 +105,6 @@ class Zooplank:
 
     def calc_kg(self, T):
 
-        print(T)
         if T <= 18:
             self.Kg = .000502 * math.pow(self.Wb, -.2)
         if T > 18:
@@ -599,7 +597,6 @@ class Region:
     def __init__(self, name, t, xdoc, xpoc, css, ocs, s, adoc=.08, apoc=.35):
 
         self.name = name
-        print(t)
         self.T = t   # mean water temperture
         self.Xdoc = xdoc  # Concentration Dissolved Organic Carbon Content
         self.Xpoc = xpoc  # Concentration Particulate Organic Carbon Content
@@ -618,11 +615,16 @@ class Region:
         self.apoc = apoc
 
     def set_cox(self, cox):
-            self.Cox = cox
+            try:
+                self.Cox = cox
+            except:
+                print("You are missing an entry for either dissolved oxygen saturation or concentration")
 
     def calc_cox(self):
-
-        self.Cox = (((-.24 * self.T) + 14.04) * self.S)
+        try:
+            self.Cox = (((-.24 * self.T) + 14.04) * self.S)
+        except:
+            print("You are missing an entry for either dissolved oxygen saturation or concentration")
 
     def init_check(self):
         atts = self.__dict__

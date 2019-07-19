@@ -143,7 +143,6 @@ def init_chems(chem_data, r_con_data, region, region_index, u_count, v_count):
         if concentrations[3] != '':
             toadd.set_cwp(concentrations[3])
 
-        print('hello???', toadd.Cwdo, concentrations)
         if toadd.Cwp != -1 and toadd.Cwdo != -1 and toadd.Cs == '' and region.Ocs != '':
             toadd.calc_cs(region)
             
