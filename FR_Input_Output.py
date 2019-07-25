@@ -366,7 +366,10 @@ def write_output_steady(total_cons, output_name, stop, dist_type, tofit):
     else:
         for i in range(org_len):
             for j in range(chem_len):
-                sheet.write(i+1,j+1, round(total_cons[region][org_list[i]][chem_list[j][0]],6))
+                if type(total_cons[region][org_list[i]][chem_list[j][0]]) == float:
+                    sheet.write(i+1,j+1, round(total_cons[region][org_list[i]][chem_list[j][0]],6))
+                else:
+                    sheet.write(i+1,j+1, round(total_cons[region][org_list[i]][chem_list[j][0]][0],6))
 
     workbook.close()
 

@@ -73,7 +73,6 @@ def check_inst_non_st(inst, u_count, v_count):
 def init_region(reg_data, temp, u_count, v_count):
 
     regions = []
-
     for i in range(len(reg_data)):
 
         ###### bug found 7/18/19 the tempature must be set as a sample before region is intiated ####
@@ -82,6 +81,8 @@ def init_region(reg_data, temp, u_count, v_count):
                 tSamp = temp[i].values[u_count]
             if temp[i].type == 'V':
                 tSamp = temp[i].values[v_count]
+        else:
+            tSamp = temp
         ########################
 
         region = reg_data[i]
@@ -847,8 +848,7 @@ def bio_monte_carlo_loop(model_para, all_data, t, time_per_step, fish_by_region,
 
             if model_para[8] == 'YES':
 
-                temp = all_data[1][0]
-                regions = init_region(region_data, temp, u_count, v_count)
+                regions = init_region(region_data, temperatures, u_count, v_count)
                 chemicals = init_chems(chem_data, r_con_data, regions[0], 0, u_count, v_count)
                 
                 phytos = init_phyto(all_data[3], chemicals, u_count, v_count)
@@ -868,7 +868,7 @@ def bio_monte_carlo_loop(model_para, all_data, t, time_per_step, fish_by_region,
 
     if model_para[8] == 'YES':
         
-        
+        print("Done.")
         return steady_state
 
     return uv_results

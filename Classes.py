@@ -311,7 +311,7 @@ class Fish(Zooplank):
     def solve_steady_state(self, phi, chem_index, Cwp, Cwdo, log, chemical):
 
 
-        denom = self.k_2[chem_index] + self.k_e[chem_index]
+        denom = self.k_2[chem_index] + self.k_e[chem_index] + self.Kg
         f_num = (self.k_1[chem_index] * self.Mo * Cwdo) + (self.k_1[chem_index] * self.Mp * Cwp)
 
 
@@ -618,14 +618,14 @@ class Region:
             try:
                 self.Cox = cox
             except:
-                print("You are missing an entry for either dissolved oxygen saturation or concentration")
-
+                print("You are missing an entry for either dissolved oxygen saturation or concentration.")
+                exit(0)
     def calc_cox(self):
         try:
             self.Cox = (((-.24 * self.T) + 14.04) * self.S)
         except:
-            print("You are missing an entry for either dissolved oxygen saturation or concentration")
-
+            print("You are missing an entry for either dissolved oxygen saturation or concentration.")
+            exit(0)
     def init_check(self):
         atts = self.__dict__
         count = 0
