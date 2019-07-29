@@ -136,7 +136,7 @@ class app(tk.Frame):
 
         if self.output[0] == 'NO':
 
-            temporal_output(self.stat_check, self.to_write, self.savepath, self.time_entry, self.region_areas, dist_type, self.tofit)
+            temporal_output(self.stat_check, self.to_write, self.savepath, self.time_entry, self.region_info, dist_type, self.tofit)
 
     def loading(self):
 
@@ -346,7 +346,7 @@ class app(tk.Frame):
                     ax.annotate(region_info[2][count].name, xy=(hotspot_point[count][0][0], hotspot_point[count][0][1]), xytext=(hotspot_point[count][0][0], hotspot_point[count][0][1]), ha='center')
                     count += 1
 
-                self.print_calc_regions(reg_xys, [reg[0] for reg in region_info[1]])
+                self.print_calc_regions(reg_xys, [reg[0] for reg in region_info[1]], [reg[1].area for reg in region_info[1]])
 
                 fig.tight_layout()
                 plt.show()
@@ -358,7 +358,8 @@ class app(tk.Frame):
                 print('Steady state can not be run with regions.')
 
 
-    def print_calc_regions(self, reg_xys, names):
+    def print_calc_regions(self, reg_xys, names, areas):
+        
         print('\n')
         max_points = max([len(reg[0]) for reg in reg_xys])
 
@@ -377,6 +378,12 @@ class app(tk.Frame):
                 except:
                     print(f'{" ":^14}|', end='')
 
+            print()
+
+        print("Polygon Areas:")
+        for i in range(len(names)):
+            area = round(areas[i], 2)
+            print(f'|{names[i]:^10}|' + f'{str(area):^10}|', end='')
             print()
 
 

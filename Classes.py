@@ -92,7 +92,6 @@ class Zooplank:
         try:
             self.Gv = 1400 * (math.pow(self.Wb, .65) / region_cox)
         except:
-            print(self.Wb)
             print("The", self.name, "weight distrubtions producted a negative weight sample.\nIf one of your weight distrubtions is normal,\nthe best way to avoid a negative weight sample is to add a minimum cut off to you distrubtion.\nRefer to page 12 section 3.5.2 of the user manual for help.\nIf you weight distrubtion is not normal make sure the bounds of your distrubtion are completely positive.")
             exit(0)
     # sets G_d for this zooplank
@@ -117,12 +116,7 @@ class Zooplank:
     # returns k_2 of chemical for this zooplank
     def calc_k2(self, chem_kow, chem_index, beta1, beta5, density_lip=.9, density_w=1):
 
-
-
-
         k_bw = (self.Vlb * beta1 * chem_kow)/density_lip + (self.Vnb * beta5 * chem_kow) + (self.Vwb/density_w)
-
-
 
         self.k_2[chem_index] = self.k_1[chem_index] / k_bw
 
@@ -213,6 +207,7 @@ class Zooplank:
 
     def solve_next_time_step(self, phi, chem_index, Cwp, Cwdo, phyto_con, pre_step):
 
+      
         f_num = (self.k_1[chem_index] * self.Mo * Cwdo) + (self.k_1[chem_index] * self.Mp * Cwp)
 
         l_num = phyto_con * self.k_d[chem_index]
@@ -312,6 +307,7 @@ class Fish(Zooplank):
 
 
         denom = self.k_2[chem_index] + self.k_e[chem_index] + self.Kg
+
         f_num = (self.k_1[chem_index] * self.Mo * Cwdo) + (self.k_1[chem_index] * self.Mp * Cwp)
 
 
@@ -485,10 +481,7 @@ class Pplank:
 
 
         analytic = (q/k) + math.exp(-k*t) * (0-(q/k))
-
-        top = (pre_step * ((1/self.days_per_step)-(k/2))+ q)
-        bottom = (1/self.days_per_step) + (k/2)
-
+        
         return analytic
 
 

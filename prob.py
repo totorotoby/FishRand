@@ -190,7 +190,11 @@ class ResultDist:
 
     def make_pdf_hist(self):
 
-        hist, bins = numpy.histogram(self.values, bins=self.num_bins) #normed=True)
+        try:
+            hist, bins = numpy.histogram(self.values, bins=self.num_bins) #normed=True)
+        except:
+            print("If you have not input any distrubtions, go back and set uncertainty and inner loop iterations to 1.")
+            exit(0)
         return [hist, bins]
      
     def plot_cdf(self):

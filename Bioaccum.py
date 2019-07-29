@@ -82,7 +82,7 @@ def init_region(reg_data, temp, u_count, v_count):
             if temp[i].type == 'V':
                 tSamp = temp[i].values[v_count]
         else:
-            tSamp = temp
+            tSamp = temp[i]
         ########################
 
         region = reg_data[i]
@@ -835,8 +835,7 @@ def bio_monte_carlo_loop(model_para, all_data, t, time_per_step, fish_by_region,
                          else:
                              reg_index = np.random.randint(0, len(regions))
                              this_fish_prior_con = prior_conc_fishs[i][j]
-                             calc_cons = solve_single_fish_single_region(regions[reg_index], r_chems[reg_index], r_fish[reg_index][i], time_per_step,
-                                                             None, None, this_fish_prior_con, 1)
+                             calc_cons = solve_single_fish_single_region(regions[reg_index], r_chems[reg_index], r_fish[reg_index][i], time_per_step, None, None, this_fish_prior_con, 1)
 
                          new_conc_fishs[i][j] = calc_cons
 

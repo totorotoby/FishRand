@@ -48,9 +48,12 @@ def get_locs_matrix(loc_setups, draws, mig_data, timestep):
 
 def get_fish_dic(fish_cons, lower_cons, chem_name, fish_name, region_areas, tofit):
 
+    
     fish_dic = {}
     lower_avg_dic = copy.deepcopy(list(lower_cons[0].items())[0][1])
+    
     if len(fish_cons) == 1:
+        
         fish_cons = fish_cons[0]
         for i in range(len(fish_cons)):
             single_fish_avg_cons = []
@@ -58,7 +61,8 @@ def get_fish_dic(fish_cons, lower_cons, chem_name, fish_name, region_areas, tofi
             for k in range(len(chem_name)):
                 chem_con_over_pops = [pop_con[k] for pop_con in fish_cons[i]]
                 avg_chem_over_pops = np.mean(chem_con_over_pops)
-                fish_dic[fish_name[i]][chem_name[k]] = avg_chem_over_pops
+                std_chem_over_pops = np.std(chem_con_over_pops)
+                fish_dic[fish_name[i]][chem_name[k]] = [avg_chem_over_pops, std_chem_over_pops]
 
         for regions in lower_cons[0].values():
             for animal, chemicals in regions.items():
@@ -72,7 +76,7 @@ def get_fish_dic(fish_cons, lower_cons, chem_name, fish_name, region_areas, tofi
         for animal, chemicals in lower_avg_dic.items():
             for chem_name, chem in chemicals.items():
 
-                lower_avg_dic[animal][chem_name] = np.average(chem, weights = region_areas)
+                lower_avg_dic[animal][chem_name] = np.average(chem, weights=region_areas)
 
         return lower_avg_dic, fish_dic
 
@@ -93,10 +97,12 @@ def get_fish_dic(fish_cons, lower_cons, chem_name, fish_name, region_areas, tofi
                     for p in range(len(fish_cons[i][j][k])):
                         chem_values[j][p].append(fish_cons[i][j][k][p])
 
+
         for i in range(len(chem_values)):
             for j in range(len(chem_values[i])):
                 turn_result = np.unique(chem_values[i][j])
                 upper_result[fish_name[i]][chem_name[j]] = pr.ResultDist(turn_result, chem_name[j], fish_name[i], tofit)
+                
         return lower_result, upper_result
 
 
@@ -110,7 +116,7 @@ def graph_by_time(data, fish_name, chem_name, time_interval):
     values = []
     times = [i for i in range(1, time_steps+1)]
     for i in range(len(data)):
-        con_at_t = data[i][fish_name][chem_name]
+        con_at_t = data[i][fish_name][chem_name][0]
         values.append(con_at_t)
 
     ax.plot(times, values, 'ro', )
@@ -231,7 +237,7 @@ def filter_cases(data, stops, tofit):
         # turns all_data that is distributions into array of samples which can be iterated through with u_count or v_count
         # Will return true if there is at least one distrubtion input
         stat_check = Bioaccum.set_all_h_and_s(model_para, all_data)
-
+        
         #Setup for how concentrations will be returned
         # - None Fish (prestat processed:
         # { Region { animal { chemical { concentration: x }}}
@@ -264,8 +270,9 @@ def filter_cases(data, stops, tofit):
             
             total_cons = uv_single
 
-            
             lower_cons, fish_dic = get_fish_dic(total_cons[1], total_cons[0], [chem[0] for chem in all_data[2]], [fish[0] for fish in all_data[6]], region_areas, tofit)
+            
+            
             graph_data.append(fish_dic)
             
             if t in stops:
@@ -277,7 +284,7 @@ def filter_cases(data, stops, tofit):
             t += 1
         print('100% done')
     else:
-
+        
         print('Need to set steady state in the Sample and Time Input tab to YES or NO.')
 
 

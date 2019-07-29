@@ -3,6 +3,7 @@ import networkx as nx
 import prob as pr
 import Time_parser
 import numpy as np
+import math
 from spatial import HotSpot
 
 
@@ -371,12 +372,115 @@ def write_output_steady(total_cons, output_name, stop, dist_type, tofit):
                 else:
                     sheet.write(i+1,j+1, round(total_cons[region][org_list[i]][chem_list[j][0]][0],6))
 
+    print('Output written to: '+ output_name)
+
+
+# returns the weighted standard devations over animals, weighted by area of regions.
+def get_weighted_stds(v_dic, means, areas):
+
+    weights = [areas[i]/sum(areas) for i in range(len(areas))]
+    
+    valuesArray = []
+    meansArray = []
+    Arrayify(v_dic, valuesArray)
+    Arrayify(means, meansArray)
+    stds = []
+    for j in range(len(valuesArray[0])):
+        animal = []
+        for k in range(len(valuesArray[0][0])):
+            for i in range(len(valuesArray)):
+                std = round(math.sqrt(weights[i] *(valuesArray[i][j][k] - meansArray[j][k])**2), 6)
+            animal.append(std)
+        stds.append(animal)
+        
+    return stds
+
+# Function takes in a nested dictonary of arbitrary depth, drops all the keys
+# and turns the values into a nested dictonary.
+def Arrayify(D, L):
+
+    if type(list(D.items())[0][1]) == float or  type(list(D.items())[0][1]) == np.float64:
+        
+        v = list(D.items())
+        for pair in v:
+            L.append(pair[1])   
+    else:
+        count = 0
+        for subD in list(D.values()):
+            L.append([])
+            Arrayify(subD, L[count])
+            count += 1
+
+
+
+
+
+def makeRegionTab(workbook, rAreas, rInfo):
+
+    rSheet = workbook.add_worksheet('Regional Info')
+    big = workbook.add_format({'font_size': 14, 'bold': True})
+
+    # list of coordnites of interior regions
+    rCoords = [list(r[1].exterior.coords) for r in rInfo[1]]
+    rAreas =  [r[1].area for r in rInfo[1]]
+    intNames = [r[0] for r in rInfo[1]]
+    # max number of sides of interior regions
+    maxNCoor = max([len(rCoord) for rCoord in rCoords])
+    # list of boundry coordinates
+    bCoords = list(rInfo[0].exterior.coords)
+    bArea = rInfo[0].area
+    # max number of sides over boundary and interior
+    maxLen = max([len(bCoords), maxNCoor])
+    
+    rSheet.write(0,0, 'Coordinates and Area of Thessian Polygon Generated Regions (x,y)', big)
+
+    # Labels
+    for i in range(maxLen):
+        rSheet.write(1, i+1, "Coord " + str(i))
+
+    rSheet.write(1, maxLen + 1, "Area")
+
+    # Writing Boundary
+    rSheet.write(2, 0, 'Boundary')
+    for j in range(len(bCoords)):
+        rSheet.write(2, j + 1, str(bCoords[j]).replace('(', '').replace(')', ''))
+        
+    rSheet.write(2, maxLen + 1, bArea)
+
+    # Writing Interior regions
+    for i in range(len(intNames)):
+        rSheet.write(3 + i, 0, str(intNames[i]))
+        for j in range(len(rCoords[i])):
+            rSheet.write(3 + i, j + 1, str(rCoords[i][j]).replace('(', '').replace(')', ''))
+        rSheet.write(3+i, maxLen + 1, rAreas[i])
+            
+    
+    
+    
+    
+        
+
     workbook.close()
 
 
 
-def write_temporal_excel(array, output_name, stops, stat_flag, regional_areas, dist_type, tofit=None):
 
+
+
+
+
+
+
+
+
+
+
+
+            
+
+def write_temporal_excel(array, output_name, stops, stat_flag, regional_info, dist_type, tofit=None):
+
+    
     types = ["Normal", 'Lognormal', 'Uniform', 'Gamma', "KS Best"]
     index = types.index(dist_type)
 
@@ -384,7 +488,8 @@ def write_temporal_excel(array, output_name, stops, stat_flag, regional_areas, d
     workbook = xlsxwriter.Workbook(output_name)
     bold = workbook.add_format({'bold': True})
     big = workbook.add_format({'font_size': 14, 'bold': True})
-
+    regional_areas = [region[1].area for region in regional_info[1]]
+    
     if stat_flag == 0:
 
         lower_org_list = []
@@ -425,19 +530,20 @@ def write_temporal_excel(array, output_name, stops, stat_flag, regional_areas, d
                         sheet.write((1 + i * (1 + len(lower_org_list))) + (1+j) , k+1, round(lower_non_avg[reg_list[i]][lower_org_list[j]][chem_list[k]],6))
 
 
-
-            sheet.write(0, len(chem_list) + 1, 'Lower Food Web Concentrations Average Concentrations Weighted by Regional Area (ng/g ww)', big)
+            stds_lower = get_weighted_stds(lower_non_avg, lower_avg, regional_areas)
+            sheet.write(0, len(chem_list) + 1, 'Lower Food Web Mean Concentrations and Standard Deviations Weighted by Regional Area (ng/g ww)', big)
             for j in range(len(chem_list)):
                 sheet.write(0, len(chem_list) + 1 + (j + 1), chem_list[j])
             for i in range(len(lower_org_list)):
                 for j in range(len(chem_list)):
-                    sheet.write(2 + i, 2 + len(chem_list) + j, round(lower_avg[lower_org_list[i]][chem_list[j]],6))
+                    sheet.write(2 + i, 2 + len(chem_list) + j, str(round(lower_avg[lower_org_list[i]][chem_list[j]],6)) + ', ' + str(stds_lower[i][j]) )
+
 
             sheet.write(count + 1, 0, 'Upper Food Web Concentrations Averaged over Populations (ng/g ww)', big)
             for i in range(len(upper_org_list)):
                 sheet.write(count + 2 + i, 0, upper_org_list[i])
                 for j in range (len(chem_list)):
-                    sheet.write(count + 2 + i, j+1, round(upper_avg[upper_org_list[i]][chem_list[j]],6))
+                    sheet.write(count + 2 + i, j+1, str(round(upper_avg[upper_org_list[i]][chem_list[j]][0],6)) + ', ' + str(round(upper_avg[upper_org_list[i]][chem_list[j]][1],6)))
 
 
     if stat_flag == 1:
@@ -490,23 +596,21 @@ def write_temporal_excel(array, output_name, stops, stat_flag, regional_areas, d
                             sheet.write((1 + i * (1 + len(lower_org_list))) + (1+j), k + 1, toprint)
 
 
-            sheet.write(0, len(chem_list) + 1, 'Lower Food Web Mean Concentrations Weighted by Regional Area (ng/g ww)', big)
+            sheet.write(0, len(chem_list) + 1, 'Lower Food Web Mean Concentrations and Standard Deviations Weighted by Regional Area (ng/g ww)', big)
             sheet.write(1, len(chem_list) + 1, 'All Regions', bold)
 
             for j in range(len(chem_list)):
                 sheet.write(0, len(chem_list) + 1 + (j + 1), chem_list[j])
 
-        
+
             for i in range(len(chem_list)):
                 for j in range(len(lower_org_list)):
                     weight_avg = 0
-                    total = 0 
+                    weight_std = 0
                     for k in range(len(reg_list)):
                         weight_avg += normed_reg_areas[k]*lower_dists[reg_list[k]][lower_org_list[j]][chem_list[i]].v_mean_std[0]
-                        
-                        
-
-                    sheet.write(2 + j, 2 + len(chem_list) + i, weight_avg)
+                        weight_std += normed_reg_areas[k]*lower_dists[reg_list[k]][lower_org_list[j]][chem_list[i]].v_mean_std[1]
+                    sheet.write(2 + j, 2 + len(chem_list) + i, str(round(weight_avg, 6)) + ', ' + str(round(weight_std, 6)))
 
 
 
@@ -538,4 +642,9 @@ def write_temporal_excel(array, output_name, stops, stat_flag, regional_areas, d
                         sheet.write(count + 1 + i, j+ len(chem_list) + 2, str(upper_dists[upper_org_list[i]][chem_list[j]].v_mean_std))
 
 
-    workbook.close()
+    makeRegionTab(workbook, regional_areas, regional_info)
+    
+        
+
+    print('Output written to: '+ output_name)
+   
