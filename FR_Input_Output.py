@@ -470,7 +470,7 @@ def writeInputsTab(workbook, inputs, data):
     regions = data[0]
     chemicals = data[2]
     phyto = data[3][0]
-    zoops = data[4]
+    zoop = data[4][0]
     nonMove = data[5]
     move = data[6]
     chemCon = data[len(data)-1]
@@ -481,12 +481,12 @@ def writeInputsTab(workbook, inputs, data):
     big = workbook.add_format({'font_size': 14, 'bold': True})
     rCount = 1
     sheet.write(0, 0, 'Regional inputs', big)
-    sheet.write(1, 0, 'Dissolved Organic Carbon Content')
-    sheet.write(2, 0, 'Particulate Organic Carbon Content')
-    sheet.write(3, 0, 'Concentration Suspended Solids')
-    sheet.write(4, 0, 'Sediment Organic Carbon Content')
+    sheet.write(1, 0, 'Dissolved Organic Carbon Content (kg/L)')
+    sheet.write(2, 0, 'Particulate Organic Carbon Content (kg/L)')
+    sheet.write(3, 0, 'Concentration Suspended Solids (g/L)')
+    sheet.write(4, 0, 'Fraction Organic Carbon Content in Sediment')
     sheet.write(5, 0, 'Disolved Oxygen Saturation')
-    sheet.write(6, 0, 'Disolved Oxygen Concentration')
+    sheet.write(6, 0, 'Disolved Oxygen Concentration (mg O2/L)')
     sheet.write(7, 0, 'DOC octanol Proportionality Constant')
     sheet.write(8, 0, 'POC octanol Proportionality Constant')
     
@@ -537,23 +537,142 @@ def writeInputsTab(workbook, inputs, data):
 
         
     sheet.write(18, 0, 'Phyto Inputs', big)
-    sheet.write(19, 0, 'Growth Rate')
-    sheet.write(20, 0, 'Lipid Content')
-    sheet.write(21, 0, 'Non-Lipid Content')
-    sheet.write(22, 0, 'Constant A (see equation 10 Arnot 2004)')
-    sheet.write(23, 0, 'Constant B (see equation 10 Arnot 2004)')
+    sheet.write(19, 0, 'Growth Rate (1/days)')
+    sheet.write(20, 0, 'Lipid Content (kg/kg)')
+    sheet.write(21, 0, 'Non-Lipid Content (kg/kg)')
+    sheet.write(22, 0, 'Constant A (see equation 10 Arnot 2004) (Time)')
+    sheet.write(23, 0, 'Constant B (see equation 10 Arnot 2004) (Time)')
 
-    start = 18
+    RClen = 18
+    
     for i in range(len(phyto)):
         if i == 1 and phyto[i] == '':
-            sheet.write(start + i, 1, .08)
+            sheet.write(RClen + i, 1, .08)
         if i == 2 and phyto[i] == '':    
-            sheet.write(start + i, 1, .005)
+            sheet.write(RClen + i, 1, .005)
         if i == 3 and phyto[i] == '':
-            sheet.write(start + i, 1, .065)
-        sheet.write(start + i, 1, str(phyto[i]))
+            sheet.write(RClen + i, 1, .065)
+        sheet.write(RClen + i, 1, str(phyto[i]))
     sheet.write(22, 1, phytoA)
     sheet.write(23, 1, phytoB)
+
+    sheet.write(24, 0, 'Zoops Inputs', big)
+    sheet.write(25, 0, 'Weight (Kg)')
+    sheet.write(26, 0, 'Lipid Content (Kg/Kg)')
+    sheet.write(27, 0, 'Non-Lipid Content (Kg/Kg)')
+    sheet.write(28, 0, 'Fraction Pore Water Ventilated')
+    sheet.write(29, 0, 'Dietary absorption efficency of lipid OM')
+    sheet.write(30, 0, 'Dietary absorption efficency of non-lipid OM')
+    sheet.write(31, 0, 'Dietary absorption efficency of water')
+    sheet.write(32, 0, 'Feeding Rate (Kg/day)')
+    sheet.write(33, 0, 'Growth Rate (1/Day)')
+    sheet.write(34, 0, 'Filter Feeder')
+
+    RCPlen = 24
+    
+    for i in range(len(zoop)):
+        if i == 3 and zoop[i] == '':
+            sheet.write(RCPlen + i, 1, .2)
+        if i == 4 and zoop[i] == '':
+            sheet.write(RCPlen + i, 1, 0)
+        if i == 5 and zoop[i] == '':
+            sheet.write(RCPlen + i, 1, .72)
+        if i == 6 and zoop[i] == '':
+            sheet.write(RCPlen + i, 1, .72)
+        if i == 7 and zoop[i] == '':    
+            sheet.write(RCPlen + i, 1, .25)
+        if i in [8,9] and zoop[i] == '':
+            sheet.write(i+RCPlen, cCount, 'DNE')
+        sheet.write(i+RCPlen, 1, str(zoop[i]))
+        
+        if i == 10:
+            if zoop[i] == 1:
+                sheet.write(RCPlen + i, 1, 'Yes')
+            else:
+                sheet.write(RCPlen + i, 1, 'No')
+
+
+            
+    sheet.write(35, 0, 'Non-moving Organisms Inputs', big)
+    sheet.write(36, 0, 'Weight (Kg)')
+    sheet.write(37, 0, 'Lipid Content (Kg/Kg)')
+    sheet.write(38, 0, 'Non-Lipid Content (Kg/Kg)')
+    sheet.write(39, 0, 'Fraction Pore Water Ventilated')
+    sheet.write(40, 0, 'Dietary absorption efficency of lipid OM')
+    sheet.write(41, 0, 'Dietary absorption efficency of non-lipid OM')
+    sheet.write(42, 0, 'Dietary absorption efficency of water')
+    sheet.write(43, 0, 'Feeding Rate (Kg/day)')
+    sheet.write(44, 0, 'Growth Rate (1/day)')
+    sheet.write(45, 0, 'Filter Feeder')
+
+    s = 35
+    nmCount = 1
+    
+    for nonmove in nonMove:
+        for i in range(len(nonmove)):
+            if i == 3 and nonmove[i] == '':
+                sheet.write(s + i, nmCount, .2)
+            if i == 4 and nonmove[i] == '':
+                sheet.write(s + i, nmCount, 0)
+            if i == 5 and nonmove[i] == '':
+                sheet.write(s + i, nmCount, .72)
+            if i == 6 and nonmove[i] == '':
+                sheet.write(s + i, nmCount, .72)
+            if i == 7 and nonmove[i] == '':    
+                sheet.write(s + i, nmCount, .25)
+            if i in [8,9] and nonmove[i] == '':
+                sheet.write(i+s, nmCount, 'DNE')
+                
+            sheet.write(i+s, nmCount, str(nonmove[i]))
+            
+            if i == 10:
+                if nonmove[i] == 1:
+                    sheet.write(s + i, nmCount, 'Yes')
+                else:
+                    sheet.write(s + i, nmCount, 'No')
+                
+        nmCount = nmCount + 2
+
+
+    sheet.write(46, 0, 'Moving Organisms Inputs', big)
+    sheet.write(47, 0, 'Weight (Kg)')
+    sheet.write(48, 0, 'Lipid Content (Kg/Kg)')
+    sheet.write(49, 0, 'Non-Lipid Content (Kg/Kg)')
+    sheet.write(50, 0, 'Fraction Pore Water Ventilated')
+    sheet.write(51, 0, 'Dietary absorption efficency of lipid OM')
+    sheet.write(52, 0, 'Dietary absorption efficency of non-lipid OM')
+    sheet.write(53, 0, 'Dietary absorption efficency of water')
+    sheet.write(54, 0, 'Feeding Rate (Kg/Day)')
+    sheet.write(55, 0, 'Growth Rate (1/Day)')
+    sheet.write(56, 0, 'Filter Feeder')
+
+    st = 46
+    
+    mCount = 1
+    for m in move:
+        for i in range(len(m)):
+            if i == 3 and m[i] == '':
+                sheet.write(st + i, mCount, .2)
+            if i == 4 and m[i] == '':
+                sheet.write(st + i, mCount, 0)
+            if i == 5 and m[i] == '':
+                sheet.write(st + i, mCount, .75)
+            if i == 6 and m[i] == '':
+                sheet.write(st + i, mCount, .75)
+            if i == 7 and m[i] == '':    
+                sheet.write(st + i, mCount, .5)
+            if i in [8,9] and m[i] == '':
+                sheet.write(i + st, mCount, 'DNE')
+                
+            sheet.write(i + st, mCount, str(m[i]))
+
+            if i == 10:
+                if m[i] == 1:
+                    sheet.write(st + i, mCount, 'Yes')
+                else:
+                    sheet.write(st + i, mCount, 'No')
+        mCount = mCount + 2
+        
                      
     workbook.close()
     
