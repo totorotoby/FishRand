@@ -211,10 +211,10 @@ def filter_cases(data, stops, tofit):
         locations = None
 
         stat_check = Bioaccum.set_all_h_and_s(model_para, all_data)
-        total_cons = Bioaccum.bio_monte_carlo_loop(model_para, all_data, 0, time_per_step ,fish_by_region, prior_locations, locations , u_iter, v_iter)
+        total_cons, inputs = Bioaccum.bio_monte_carlo_loop(model_para, all_data, 0, time_per_step ,fish_by_region, prior_locations, locations , u_iter, v_iter)
 
         if stat_check == True:
-            total_cons = pr.make_result_dist(total_cons)
+            total_cons = pr.make_result_dist(total_cons, tofit)
 
 
     elif model_para[8] == 'NO':
@@ -264,9 +264,8 @@ def filter_cases(data, stops, tofit):
             # fish_by loc is for each region there is list of names of fish that are in that region at this time step
             old_fish_by_region = fish_by_region
             fish_by_region = get_fish_in_region(locations, f_names, len(all_data[0]))
-
             # do entire simulation for a time step, and return concentration dictionaries
-            uv_single = Bioaccum.bio_monte_carlo_loop(model_para, all_data, t, time_per_step, fish_by_region, prior_locations, locations, u_iter, v_iter, p_dic=total_cons)
+            uv_single, inputs = Bioaccum.bio_monte_carlo_loop(model_para, all_data, t, time_per_step, fish_by_region, prior_locations, locations, u_iter, v_iter, p_dic=total_cons)
             
             total_cons = uv_single
 
@@ -290,26 +289,26 @@ def filter_cases(data, stops, tofit):
 
     if model_para[8] == 'YES':
         
-        return [model_para[8], total_cons, stat_check, foodweb_graph]
+        return [model_para[8], total_cons, stat_check, foodweb_graph], inputs
 
     if model_para[8] == 'NO':
 
-        return [model_para[8], writing_info, stat_check, region_areas, graph_data, model_para[6], [boundary, regions, hotspots], foodweb_graph]
+        return [model_para[8], writing_info, stat_check, region_areas, graph_data, model_para[6], [boundary, regions, hotspots], foodweb_graph], inputs
 
 
     #################### STEADY STATE EXCEL WRITING ########################
 
 
-def steady_state_output(total_cons, stat_check, output_name, dist_type, tofit):
+def steady_state_output(total_cons, stat_check, output_name, dist_type, inputs, data, tofit):
     if stat_check == False:
         total_cons = total_cons[0]
-    FR_Input_Output.write_output_steady(total_cons, output_name, 'Steady State Simulation', dist_type, tofit)
+    FR_Input_Output.write_output_steady(total_cons, output_name, 'Steady State Simulation', dist_type, inputs, data, tofit)
 
-def temporal_output(stat_check, to_write, output_name, stops, region_areas, dist_type, tofit):
+def temporal_output(stat_check, to_write, output_name, stops, region_areas, dist_type, inputs, data, tofit):
 
         #Non-statistical
         if stat_check == False:
-            FR_Input_Output.write_temporal_excel(to_write, output_name, stops, 0, region_areas, dist_type, tofit)
+            FR_Input_Output.write_temporal_excel(to_write, output_name, stops, 0, region_areas, dist_type, inputs, data, tofit)
         #statistical
         else:
-            FR_Input_Output.write_temporal_excel(to_write, output_name, stops, 1, region_areas, dist_type, tofit)
+            FR_Input_Output.write_temporal_excel(to_write, output_name, stops, 1, region_areas, dist_type, inputs, data, tofit)

@@ -297,9 +297,12 @@ def get_sites_data(sites_sheet):
         row = sites_sheet.row(row_num)
         defin = []
         while row[col].value != '':
+            if row[col].value == 'END':
+                break
             defin.append(sites_sheet.row(row_num)[col].value)
             col += 1
-        hotspot = HotSpot(sites_sheet.row(row_num)[0].value,deftype,
+
+        hotspot = HotSpot(sites_sheet.row(row_num)[0].value, deftype,
                           sites_sheet.row(row_num)[1].value, sites_sheet.row(row_num)[2].value, defin)
         if len(hotspot.definition) != 0:
             hotspots.append(hotspot)
@@ -309,7 +312,7 @@ def get_sites_data(sites_sheet):
     return [boundary, sites, hotspots, draws]
 
 
-def write_output_steady(total_cons, output_name, stop, dist_type, tofit):
+def write_output_steady(total_cons, output_name, stop, dist_type, inputs, data, tofit):
 
 
     types = ["Normal", 'Lognormal', 'Uniform', 'Gamma', "KS Best"]
@@ -372,6 +375,7 @@ def write_output_steady(total_cons, output_name, stop, dist_type, tofit):
                 else:
                     sheet.write(i+1,j+1, round(total_cons[region][org_list[i]][chem_list[j][0]][0],6))
 
+    workbook.close()
     print('Output written to: '+ output_name)
 
 
@@ -460,25 +464,100 @@ def makeRegionTab(workbook, rAreas, rInfo):
     
         
 
-    workbook.close()
+def writeInputsTab(workbook, inputs, data):
 
+    print(data)
+    regions = data[0]
+    chemicals = data[2]
+    phyto = data[3][0]
+    zoops = data[4]
+    nonMove = data[5]
+    move = data[6]
+    chemCon = data[len(data)-1]
+    phytoA = inputs[2][0][0].A
+    phytoB = inputs[2][0][0].B
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+    sheet = workbook.add_worksheet("Chemical and Biological Inputs")
+    big = workbook.add_format({'font_size': 14, 'bold': True})
+    rCount = 1
+    sheet.write(0, 0, 'Regional inputs', big)
+    sheet.write(1, 0, 'Dissolved Organic Carbon Content')
+    sheet.write(2, 0, 'Particulate Organic Carbon Content')
+    sheet.write(3, 0, 'Concentration Suspended Solids')
+    sheet.write(4, 0, 'Sediment Organic Carbon Content')
+    sheet.write(5, 0, 'Disolved Oxygen Saturation')
+    sheet.write(6, 0, 'Disolved Oxygen Concentration')
+    sheet.write(7, 0, 'DOC octanol Proportionality Constant')
+    sheet.write(8, 0, 'POC octanol Proportionality Constant')
+    
+    for region in regions:
+        for i in range(len(region)):
+            if i in [1, 2, 3, 4, 6]:
+                if region[i] == '':
+                  sheet.write(i, rCount, 'DNE')
+            if i == 7 and region[i] == '':
+                sheet.write(i, rCount, .08)
+            if i == 8 and region[i] == '':
+                sheet.write(i, rCount, .35)
+                  
+            sheet.write(i, rCount, str(region[i]))
             
+        rCount = rCount + 2
 
-def write_temporal_excel(array, output_name, stops, stat_flag, regional_info, dist_type, tofit=None):
+    lenR = 9
+    
+    sheet.write(9, 0, 'Chemical Inputs', big)
+    sheet.write(10, 0, 'Kow')    
+    sheet.write(11, 0, 'Disequilibrium factor of Disolved Organic Carbon')
+    sheet.write(12, 0, 'Disequilibrium factor of Particualte Organic Carbon')
+    sheet.write(13, 0, 'Beta Lipid Omn')
+    sheet.write(14, 0, 'Beta Non-Lipid Om')
+    sheet.write(15, 0, 'Beta Lipid digesta')
+    sheet.write(16, 0, 'Beta Sediment OC')
+    sheet.write(17, 0, 'Beta Non-lipid digesta')
+
+    cCount = 1
+
+    for chemical in chemicals:
+        for i in range(len(chemical)):
+            if i in [2,3] and chemical[i] == '':
+                sheet.write(i+lenR, cCount, 'DNE')
+            if i == 4 and chemical[i] == '':
+                sheet.write(i+lenR, cCount, 1)
+            if i == 5 and chemical[i] == '':
+                sheet.write(i+lenR, cCount, .035)
+            if i == 6 and chemical[i] == '':
+                sheet.write(i+lenR, cCount, 1)
+            if i == 7 and chemical[i] == '':
+                sheet.write(i+lenR, cCount, .35)
+            if i == 8 and chemical[i] == '':
+                sheet.write(i+lenR, cCount, .035)
+            sheet.write(i+lenR, cCount, str(chemical[i]))
+        cCount = cCount + 2
+
+        
+    sheet.write(18, 0, 'Phyto Inputs', big)
+    sheet.write(19, 0, 'Growth Rate')
+    sheet.write(20, 0, 'Lipid Content')
+    sheet.write(21, 0, 'Non-Lipid Content')
+    sheet.write(22, 0, 'Constant A (see equation 10 Arnot 2004)')
+    sheet.write(23, 0, 'Constant B (see equation 10 Arnot 2004)')
+
+    start = 18
+    for i in range(len(phyto)):
+        if i == 1 and phyto[i] == '':
+            sheet.write(start + i, 1, .08)
+        if i == 2 and phyto[i] == '':    
+            sheet.write(start + i, 1, .005)
+        if i == 3 and phyto[i] == '':
+            sheet.write(start + i, 1, .065)
+        sheet.write(start + i, 1, str(phyto[i]))
+    sheet.write(22, 1, phytoA)
+    sheet.write(23, 1, phytoB)
+                     
+    workbook.close()
+    
+def write_temporal_excel(array, output_name, stops, stat_flag, regional_info, dist_type, inputs, data, tofit=None):
 
     
     types = ["Normal", 'Lognormal', 'Uniform', 'Gamma', "KS Best"]
@@ -643,6 +722,7 @@ def write_temporal_excel(array, output_name, stops, stat_flag, regional_info, di
 
 
     makeRegionTab(workbook, regional_areas, regional_info)
+    writeInputsTab(workbook, inputs, data)
     
         
 

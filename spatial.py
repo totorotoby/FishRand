@@ -245,7 +245,9 @@ def setup(site_data):
 def hotspot_prob(boundary, attraction_polys, regions):
 
     probs = []
-
+    if len(attraction_polys) == 0:
+        print('At the bottom of the sample_sites tab, you are either missing a hotspot for a fish,\nor the assosited fish name doesn\'t exist.')
+        exit(0)   
     if attraction_polys[0].deftype == 'Polygon':
         outside = boundary
         for poly in attraction_polys:

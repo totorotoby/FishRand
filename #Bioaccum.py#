@@ -856,10 +856,10 @@ def bio_monte_carlo_loop(model_para, all_data, t, time_per_step, fish_by_region,
                                                             diet_data, u_count, v_count)
 
                 inverts = init_fish_post_region(inverts, tempinverts, regions[0], chemicals)
-                fishs, tempfishs = init_fish_pre_region(fish_data, regions[0], chemicals, phytos[0], zoops,
+                fishs_pre, tempfishs = init_fish_pre_region(fish_data, regions[0], chemicals, phytos[0], zoops,
                                                         diet_data, u_count, v_count)
                 tempfishs = tempinverts + tempfishs[2:]
-                fishs = init_fish_post_region(fishs, tempfishs, regions[0], chemicals)
+                fishs = init_fish_post_region(fishs_pre, tempfishs, regions[0], chemicals)
                 conc_log = solve_steady(regions[0], chemicals, phytos, zoops, inverts, fishs)
                 steady_state.append(conc_log)
                 v_count += 1
@@ -868,7 +868,7 @@ def bio_monte_carlo_loop(model_para, all_data, t, time_per_step, fish_by_region,
     if model_para[8] == 'YES':
         
         print("Done.")
-        return steady_state, [regions, chemicals, phytos, zoops, inverts, fishs]
+        return steady_state, [regions, chemicals, phytos, zoops, inverts, fishs_pre]
 
     return uv_results, [regions, r_chems, r_phytos, r_zoops, r_inverts, r_fish]
 

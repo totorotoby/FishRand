@@ -21,7 +21,7 @@ class Var:
 
     def __str__(self):
 
-        to_print = '\ntype | ' + self.type + '\ndistribution | ' + self.dist + '\nparameters | ' + str(self.param)
+        to_print = self.type + ', ' + self.dist + '(' + str(self.param) + ')'
         return to_print
 
     def take_samples(self):

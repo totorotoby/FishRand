@@ -132,11 +132,11 @@ class app(tk.Frame):
 
         if self.output[0] == 'YES':
 
-            steady_state_output(self.to_write, self.stat_check, self.savepath, dist_type, self.tofit)
+            steady_state_output(self.to_write, self.stat_check, self.savepath, dist_type, self.inputs, self.data[1], self.tofit)
 
         if self.output[0] == 'NO':
 
-            temporal_output(self.stat_check, self.to_write, self.savepath, self.time_entry, self.region_info, dist_type, self.tofit)
+            temporal_output(self.stat_check, self.to_write, self.savepath, self.time_entry, self.region_info, dist_type, self.inputs, self.data[1], self.tofit)
 
     def loading(self):
 
@@ -172,8 +172,8 @@ class app(tk.Frame):
                 self.time_entry = [0]
 
             # run the code
-            data = convert_to_lists(self.filename)
-            self.output = filter_cases(data, self.time_entry, self.tofit)
+            self.data = convert_to_lists(self.filename)
+            self.output, self.inputs = filter_cases(self.data, self.time_entry, self.tofit)
 
             if self.output[0] == 'YES':
 
