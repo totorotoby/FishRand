@@ -26,8 +26,7 @@ def compRegions(pRegion, pT, aRegion):
     for i in range(len(aquaValues)):
         if pythonValues[i] != aquaValues[i]:
             print(names[i] + ' is miss-matched')
-            if type(pythonValues[i]) == str:
-                print( 'with ' + pythonValues[i])
+            print( 'with ' + 'p: ' + str(pythonValues[i]) + ' and a: ' + str(aquaValues[i]))
             if pythonValues[i] == '':
                 print('and  is not entered in python sheet')
             if aquaValues[i] == '':
@@ -87,7 +86,7 @@ def get_con_data(con_sheet, con_data, num_reg, num_chem, timesteps):
 
 def compChems(pythonChemProp, pythonChemCon, aquaChems):
 
-    print('\n')
+    
     print('CHEMICALS')
     names = ['Name', 'Log Octanol-Water Partition Coefficent', 'Disequilbrium factor of Disolved Organic Carbon', 'Disequilbrium factor of Particulate Organic Carbon', 'Beta Lipid Omn', 'Beta Non-lipid OM', 'Beta Lipid digesta', 'Beta Sediment OC', 'Beta Non-lipid digesta', 'Concentration in Sediment', 'Total Concentration in Water', 'Dissolved Concentration in Water', 'Concentration in Pore Water']
     pythonChemPropL = []
@@ -111,7 +110,7 @@ def compChems(pythonChemProp, pythonChemCon, aquaChems):
                 if allPython[i][j] != awChems[i][0]:
                     print('In ' + allPython[i][0]+ ' ' + names[j] + ' is miss-matched')
                     if type(allPython[i][j]) == str:
-                        print('with ' + allPython[i][j])
+                        print('with p: ' + allPython[i][j] + ' and a: ' + str(awChems[i][0]))
                 print()
             
             if j in [2, 3, 4, 6] and allPython[i][j] != 1 and allPython[i][j] != '':
@@ -126,15 +125,15 @@ def compChems(pythonChemProp, pythonChemCon, aquaChems):
                 print()
 
             if j == 9 and allPython[i][j] != awChems[i][2]:
-                print('In ' + allPython[i][0]+ ' ' + names[j] + ' is miss-matched')
+                print('In ' + allPython[i][0] + ' ' + names[j] + ' is miss-matched')
                 if type(allPython[i][j]) == str and allPython[i][j] != '':
-                    print('with ' + allPython[i][j])
+                    print('with p: ' + allPython[i][j] + ' and a: ' + str(awChems[i][2]))
                 print()
                         
             if j == 10 and allPython[i][j] != awChems[i][1]/1000:
-                print('In ' + allPython[i][0]+ ' ' + names[j] + ' is miss-matched')
+                print('In ' + allPython[i][0] + ' ' + names[j] + ' is miss-matched')
                 if type(allPython[i][j])  and allPython[i][j] != '':
-                    print('with ' + allPython[i][j])
+                     print('with p: ' + allPython[i][j] + ' and a: ' + str(awChems[i][1]))
                 print()
 
 
@@ -155,7 +154,7 @@ def compLowerOrgs(pythonOrgs, aquaOrgs):
             else:
                 print(pNames[i] + ' is miss-matched')
                 if type(pPhyto[i]) == str:
-                    print('with ' + pPhyto[i])
+                    print('with p: ' + pPhyto[i] + ' and a: ' + str(aPhyto[i]))
                 print()
 
     print('---------------------------------------------------')
@@ -173,7 +172,7 @@ def compLowerOrgs(pythonOrgs, aquaOrgs):
             else:
                 print(zNames[i] + ' is miss-matched')
                 if type(pZoop[i]) == str:
-                    print('with ' + pZoop[i])
+                    print('with p: ' + pZoop[i] + ' and a: ' + str(aZoop[i]))
                 print()
 
 
@@ -226,7 +225,7 @@ def fishPrint(aInvert, pInvert, numInvert, flag):
                 else:
                     print('In '+ pInvert[i][0] +' ' + zNames[j] + ' is miss-matched')
                     if type(pInvert[i][j+1]) == str:
-                        print('with ' + pInvert[i][j+1])
+                        print('with p: ' + pInvert[i][j+1] + ' and a: ' + str(aInvert[i][j]))
                     print()
 
     

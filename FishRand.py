@@ -335,6 +335,7 @@ class app(tk.Frame):
                 ax = fig.add_subplot(111)
                 ax.plot(b_xy[0], b_xy[1],color='#6699cc', alpha=0.7, linewidth=3, solid_capstyle='round', zorder=2)
                 count = 0
+                
                 for pair in reg_xys:
                     ax.plot(pair[0], pair[1],color='#6699cc', alpha=0.7, linewidth=3, solid_capstyle='round', zorder=2)
                     ax.annotate(region_info[1][count][0],  xy=(rep_point[count][0][0],rep_point[count][0][1]), xytext=(rep_point[count][0][0],rep_point[count][0][1]), ha='center')
@@ -342,8 +343,9 @@ class app(tk.Frame):
 
                 count = 0
                 for pair in hotspot_xys:
-                    ax.plot(pair[0], pair[1], color='green', alpha=0.7, linewidth=3, solid_capstyle='round', zorder=2)
-                    ax.annotate(region_info[2][count].name, xy=(hotspot_point[count][0][0], hotspot_point[count][0][1]), xytext=(hotspot_point[count][0][0], hotspot_point[count][0][1]), ha='center')
+                    if pair != b_xy:
+                        ax.plot(pair[0], pair[1], color='green', alpha=0.7, linewidth=3, solid_capstyle='round', zorder=2)
+                        ax.annotate(region_info[2][count].name, xy=(hotspot_point[count][0][0], hotspot_point[count][0][1]), xytext=(hotspot_point[count][0][0], hotspot_point[count][0][1]), ha='center')
                     count += 1
 
                 self.print_calc_regions(reg_xys, [reg[0] for reg in region_info[1]], [reg[1].area for reg in region_info[1]])
