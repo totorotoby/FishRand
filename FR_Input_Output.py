@@ -380,24 +380,34 @@ def write_output_steady(total_cons, output_name, stop, dist_type, inputs, data, 
 
 
 # returns the weighted standard devations over animals, weighted by area of regions.
-def get_weighted_stds(v_dic, means, areas):
+def get_weighted_stds(v_dic, areas):
 
     weights = [areas[i]/sum(areas) for i in range(len(areas))]
     
     valuesArray = []
     meansArray = []
     Arrayify(v_dic, valuesArray)
-    Arrayify(means, meansArray)
+
+    for j in range(len(valuesArray[0])):
+        animal = []
+        for k in range(len(valuesArray[0][0])):
+            mean = 0
+            for i in range(len(valuesArray)):
+                mean += valuesArray[i][j][k] * weights[i]
+            animal.append(round(mean,6))
+        meansArray.append(animal)
+    
     stds = []
     for j in range(len(valuesArray[0])):
         animal = []
         for k in range(len(valuesArray[0][0])):
+            std = 0
             for i in range(len(valuesArray)):
-                std = round(math.sqrt(weights[i] *(valuesArray[i][j][k] - meansArray[j][k])**2), 6)
+                std += round(math.sqrt(weights[i] *(valuesArray[i][j][k] - meansArray[j][k])**2), 6)
             animal.append(std)
         stds.append(animal)
         
-    return stds
+    return stds, meansArray
 
 # Function takes in a nested dictonary of arbitrary depth, drops all the keys
 # and turns the values into a nested dictonary.
@@ -466,7 +476,7 @@ def makeRegionTab(workbook, rAreas, rInfo):
 
 def writeInputsTab(workbook, inputs, data):
 
-    print(data)
+   
     regions = data[0]
     chemicals = data[2]
     phyto = data[3][0]
@@ -703,10 +713,9 @@ def write_temporal_excel(array, output_name, stops, stat_flag, regional_info, di
         #write down region which is dic
 
         for i in range(len(stops)):
-            sheet = workbook.add_worksheet('Timestep ' + str(stops[i]))
+            sheet = workbook.add_worksheet('Timestep ' + str(stops[i]+1))
             data_at_time = array[i]
             lower_non_avg = data_at_time[0][0]
-            lower_avg = data_at_time[1]
             upper_avg = data_at_time[2]
             sheet.write(0,0, 'Lower Food Web Concentrations by Region (ng/g ww)', big)
             # write chemicals at the top
@@ -727,14 +736,13 @@ def write_temporal_excel(array, output_name, stops, stat_flag, regional_info, di
                         # row first term everything before, then over organisms
                         sheet.write((1 + i * (1 + len(lower_org_list))) + (1+j) , k+1, round(lower_non_avg[reg_list[i]][lower_org_list[j]][chem_list[k]],6))
 
-
-            stds_lower = get_weighted_stds(lower_non_avg, lower_avg, regional_areas)
+            stds_lower, mean_lower = get_weighted_stds(lower_non_avg, regional_areas)
             sheet.write(0, len(chem_list) + 1, 'Lower Food Web Mean Concentrations and Standard Deviations Weighted by Regional Area (ng/g ww)', big)
             for j in range(len(chem_list)):
                 sheet.write(0, len(chem_list) + 1 + (j + 1), chem_list[j])
             for i in range(len(lower_org_list)):
                 for j in range(len(chem_list)):
-                    sheet.write(2 + i, 2 + len(chem_list) + j, str(round(lower_avg[lower_org_list[i]][chem_list[j]],6)) + ', ' + str(stds_lower[i][j]) )
+                    sheet.write(2 + i, 2 + len(chem_list) + j, str(mean_lower[i][j]) + ', ' + str(stds_lower[i][j]) )
 
 
             sheet.write(count + 1, 0, 'Upper Food Web Concentrations Averaged over Populations (ng/g ww)', big)
