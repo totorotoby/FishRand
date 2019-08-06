@@ -28,10 +28,10 @@ def compRegions(pRegion, pT, aRegion):
             print(names[i] + ' is miss-matched')
             if type(pythonValues[i]) == str:
                 print( 'with ' + pythonValues[i])
-        if pythonValues[i] == '':
-            print('and  is not entered in python sheet')
-        if aquaValues[i] == '':
-            print('and is not entered in aquaweb sheet')
+            if pythonValues[i] == '':
+                print('and  is not entered in python sheet')
+            if aquaValues[i] == '':
+                print('and is not entered in aquaweb sheet')
     
     print('--------------------------------------------')
 
@@ -220,7 +220,7 @@ def fishPrint(aInvert, pInvert, numInvert, flag):
     
     for i in range(numInvert):
         for j in range(innerloop):
-            if aInvert[i][j] != pInvert[i][j+1]: 
+            if round(aInvert[i][j], 6) != pInvert[i][j+1]: 
                 if j in range(2,9) and pInvert[i][j+1] == '':
                     pass
                 else:

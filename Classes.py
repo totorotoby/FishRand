@@ -590,7 +590,7 @@ class Region:
     def __init__(self, name, t, xdoc, xpoc, css, ocs, s, adoc=.08, apoc=.35):
 
         self.name = name
-        self.T = t   # mean water temperture
+        self.T = float(t)   # mean water temperture
         self.Xdoc = xdoc  # Concentration Dissolved Organic Carbon Content
         self.Xpoc = xpoc  # Concentration Particulate Organic Carbon Content
         self.Css = css  # Concentration of suspended solids in water
@@ -608,17 +608,17 @@ class Region:
         self.apoc = apoc
 
     def set_cox(self, cox):
-            try:
-                self.Cox = cox
-            except:
-                print("You are missing an entry for either dissolved oxygen saturation or concentration.")
-                exit(0)
+            
+        self.Cox = cox
+            
     def calc_cox(self):
+        
         try:
             self.Cox = (((-.24 * self.T) + 14.04) * self.S)
         except:
             print("You are missing an entry for either dissolved oxygen saturation or concentration.")
             exit(0)
+            
     def init_check(self):
         atts = self.__dict__
         count = 0
