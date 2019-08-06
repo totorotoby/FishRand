@@ -45,14 +45,16 @@ class Zooplank:
         string = '\n'
         string += str(self.name)
         string += '\n'
-        string += '|         K_1         |         K_D         |         K_2         |         K_E       |         K_GB       |         K_g       |'
+        string += '|         K_1         |         K_D         |         K_2         |         K_E       |         Top       |         Bottom       |         K_GB       |         K_g       |'
         string += '\n'
-        string += '|  ' + str(round(self.k_1[0],16)) + '  |'
-        string += '  ' + str(round(self.k_d[0],16)) + '  |'
-        string += '  ' + str(round(self.k_2[0],16)) + '  |'
-        string += '  ' + str(round(self.k_e[0],16)) + '  |'
-        string += '  ' + str(round(self.k_gb[0], 16)) + '  |'
-        string += '  ' + str(round(self.Kg, 16)) + '  |'
+        string += '|  ' + str(round(self.k_1[0],13)) + '  |'
+        string += '  ' + str(round(self.k_d[0],13)) + '  |'
+        string += '  ' + str(round(self.k_2[0],13)) + '  |'
+        string += '  ' + str(round(self.k_e[0],13)) + '  |'
+        string += '  ' + str(round(self.top, 13)) + '  |'
+        string += '  ' + str(round(self.bottom, 13)) + '  |'
+        string += '  ' + str(round(self.k_gb[0], 13)) + '  |'
+        string += '  ' + str(round(self.Kg, 13)) + '  |'
         string += '\n\n'
         string += 'm_o :  ' + str(self.Mo) + '\n'
         string += 'm_p :  ' + str(self.Mp) + '\n\n\n'
@@ -64,6 +66,7 @@ class Zooplank:
         return string
 
     def set_el_en_ew(self, el, en, ew):
+       
         self.e_l = el
         self.e_n = en
         self.e_w = ew
@@ -97,11 +100,11 @@ class Zooplank:
     # sets G_d for this zooplank
     def calc_gd_filter(self, css, sigma=1):
         self.Gd = self.Gv * css * sigma
-
+        
     def calc_gd_no_filter(self, T):
 
         self.Gd = .022 * math.pow(self.Wb, .85) * math.exp((.06 * T))
-
+        
     def calc_kg(self, T):
 
         if T <= 18:
@@ -145,19 +148,19 @@ class Zooplank:
     def calc_gf(self):
 
         self.Gf = (((1-self.e_l)*self.Vld) + ((1-self.e_n)*self.Vnd)+((1-self.e_w)*self.Vwd))*self.Gd
-
+        
     # returns K_gb for certian chemical
 
     def calc_kgb(self, chem_kow, chem_index, beta3, beta4 ,beta5, density_lip=.9, density_w=1, z_water=.05):
 
 
-        top = ((self.Vlg * (z_water*beta3*chem_kow))/density_lip) + (self.Vng * beta4 * (z_water*chem_kow)) +\
+        self.top = ((self.Vlg * (z_water*beta3*chem_kow))/density_lip) + (self.Vng * beta4 * (z_water*chem_kow)) +\
               (z_water*self.Vwg/density_w)
 
-        bottom = ((self.Vlb * (z_water*beta3*chem_kow))/density_lip) + (self.Vnb * beta5 * z_water * chem_kow) +\
+        self.bottom = ((self.Vlb * (z_water*beta3*chem_kow))/density_lip) + (self.Vnb * beta5 * z_water * chem_kow) +\
                  (z_water*self.Vwb/density_w)
 
-        k_gb = top/bottom
+        k_gb = self.top/self.bottom
 
 
         self.k_gb[chem_index] = k_gb
@@ -269,7 +272,7 @@ class Fish(Zooplank):
 
     # sets the percentages of the gut
     def calc_gut_per(self):
-
+        
         self.Vlg = ((1 - self.e_l) * self.Vld) / (((1 - self.e_l) * self.Vld) + ((1 - self.e_n) * self.Vndc) +
                                                   ((1 - self.e_n) * self.Vndm) + ((1 - self.e_w) * self.Vwd))
         self.Vngc = ((1 - self.e_n) * self.Vndc) / (((1 - self.e_l) * self.Vld) + ((1 - self.e_n) * self.Vndc) +
@@ -281,22 +284,22 @@ class Fish(Zooplank):
 
     # sets Gf for this zooplank
     def calc_gf(self):
-
+        
         self.Gf = (((1-self.e_l) * self.Vld) + ((1-self.e_n) * self.Vndc) + ((1-self.e_n) * self.Vndm) +
                    ((1-self.e_w) * self.Vwd)) * self.Gd
 
     # returns K_gb for certian chemical
     def calc_kgb(self, chem_kow, chem_index, beta3, beta4, beta5, density_lip=.9, density_w=1, z_water=.05):
-        
-        top = ((self.Vlg * (z_water*beta3*chem_kow))/density_lip) + (self.Vngc * beta4 * (z_water*chem_kow)) +\
+              
+        self.top = ((self.Vlg * (z_water*beta3*chem_kow))/density_lip) + (self.Vngc * beta4 * (z_water*chem_kow)) +\
               (self.Vngm * beta5 * (z_water*chem_kow)) + (z_water*self.Vwg/density_w)
 
         
         
-        bottom = ((self.Vlb * (z_water*beta3*chem_kow))/density_lip) + (self.Vnb * beta5 * z_water * chem_kow) +\
+        self.bottom = ((self.Vlb * (z_water*beta3*chem_kow))/density_lip) + (self.Vnb * beta5 * z_water * chem_kow) +\
                  (z_water*self.Vwb/density_w)
         
-        k_gb = top/bottom
+        k_gb = self.top/self.bottom
 
         
         self.k_gb[chem_index] = k_gb

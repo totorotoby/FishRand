@@ -329,8 +329,9 @@ def init_fish_pre_region(fish_data, region, chemicals, phyto, zoops, diet_data, 
         tempfishs.append(tempadd)
 
         # inital param
-        if fish[6] != '' and fish[7] != '' and fish[8] != '':
-            toadd.set_el_en_ew(fish[6], fish[7], fish[8])
+       
+        if fish[5] != '' and fish[6] != '' and fish[7] != '':
+            toadd.set_el_en_ew(fish[5], fish[6], fish[7])
         if fish[8] != '':
             toadd.set_gd(fish[8])
         if fish[9] != '':
@@ -860,6 +861,7 @@ def bio_monte_carlo_loop(model_para, all_data, t, time_per_step, fish_by_region,
                                                         diet_data, u_count, v_count)
                 tempfishs = tempinverts + tempfishs[2:]
                 fishs = init_fish_post_region(fishs, tempfishs, regions[0], chemicals)
+
                 conc_log = solve_steady(regions[0], chemicals, phytos, zoops, inverts, fishs)
                 steady_state.append(conc_log)
                 v_count += 1
