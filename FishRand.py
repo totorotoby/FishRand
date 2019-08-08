@@ -208,7 +208,11 @@ class app(tk.Frame):
                     exit(0)
                 count = 1
             elif self.stat_check == False and self.output[0] == 'NO':
-                fishs = list(self.to_write[0][2].keys())
+                try:
+                    fishs = list(self.to_write[0][2].keys())
+                except:
+                    print('Not enough data in either tempatures, chemical concenrations, or abundance for the number of timesteps input')
+                    exit(0)
                 chemicals = list(list(self.to_write[0][1].values())[0].keys())
                 count = 1
             elif self.stat_check == True and self.output[0] == 'YES':

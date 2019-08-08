@@ -278,10 +278,10 @@ def init_single_fish_pre_region(fish_data, region, chemicals, diet, u_count, v_c
 
     tempadd.calc_vwb()
     toadd.calc_vwb()
-
+   
     # inital param
-    if fish[6] != '' and fish[7] != '' and fish[8] != '':
-        toadd.set_el_en_ew(fish[6], fish[7], fish[8])
+    if fish[5] != '' and fish[6] != '' and fish[7] != '':
+        toadd.set_el_en_ew(fish[5], fish[6], fish[7])
     if fish[8] != '':
         toadd.set_gd(fish[8])
     if fish[9] != '':
@@ -313,7 +313,7 @@ def init_fish_pre_region(fish_data, region, chemicals, phyto, zoops, diet_data, 
 
     fishs = []
     for fish in fish_data:
-
+        
         fish = check_inst_non_st(fish, u_count, v_count)
         # setting up diets
         diet = diet_data[fish[0]]
@@ -815,7 +815,7 @@ def bio_monte_carlo_loop(model_para, all_data, t, time_per_step, fish_by_region,
                     for j in range(len(r_fish[i])):
                         r_fish[i][j] = init_single_fish_post_region(r_fish[i][j], r_tempfish[i], regions[i], r_chems[i])
 
-
+                        
                 prior_conc_fishs = p_dic[1][inner_count]
                 new_concentrations_lower = p_dic[0][inner_count]
                 new_conc_fishs = deepcopy(prior_conc_fishs)

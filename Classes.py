@@ -211,13 +211,10 @@ class Zooplank:
     def solve_next_time_step(self, phi, chem_index, Cwp, Cwdo, phyto_con, pre_step):
 
       
-        f_num = (self.k_1[chem_index] * self.Mo * Cwdo) + (self.k_1[chem_index] * self.Mp * Cwp)
+        q = ((self.k_1[chem_index] * self.Mo * Cwdo) + (self.k_1[chem_index] * self.Mp * Cwp)) + (phyto_con * self.k_d[chem_index])
 
-        l_num = phyto_con * self.k_d[chem_index]
-
-        q = f_num + l_num
-        k = self.k_2[chem_index] + self.k_e[chem_index]
-
+        k = self.k_2[chem_index] + self.k_e[chem_index] + self.Kg
+        
         top = (pre_step * ((1 / self.days_per_step) - (k / 2)) + q)
         bottom = (1 / self.days_per_step) + (k / 2)
 
@@ -339,7 +336,7 @@ class Fish(Zooplank):
         if out_check == 0:
 
 
-            k = self.k_2[chem_index] + self.k_e[chem_index]
+            k = self.k_2[chem_index] + self.k_e[chem_index] + self.Kg
 
             q1 = (self.k_1[chem_index] * self.Mo * Cwdo) + (self.k_1[chem_index] * self.Mp * Cwp)
 
@@ -385,8 +382,9 @@ class Fish(Zooplank):
                             q2 += (self.diet_frac[j][1]*concentration)
 
             q2 = q2 * self.k_d[chem_index]
-
-
+            
+            #print(self.name, ' eating term: ', q2)
+            
             q = q1 + q2
 
             top = (pre_step * ((1 / self.days_per_step) - (k / 2)) + q)
@@ -407,7 +405,7 @@ class Fish(Zooplank):
 class Pplank:
 
     def __init__(self, name, kg, len_chem, per_step, a=.00006, b=5.5, vlb=.005, vnb=.065):
-        self.name = name
+        self.name = 'Phytoplankton'
         self.Vlb = vlb
         self.Vnb = vnb
         self.Vwb = 0
