@@ -291,7 +291,6 @@ def get_sites_data(sites_sheet):
     hotspots = []
     row_num = 40
     row = sites_sheet.row(row_num)
-    deftype = sites_sheet.row(38)[3].value
     while row[0].value != '':
         col = 3
         row = sites_sheet.row(row_num)
@@ -302,13 +301,14 @@ def get_sites_data(sites_sheet):
             defin.append(sites_sheet.row(row_num)[col].value)
             col += 1
 
-        hotspot = HotSpot(sites_sheet.row(row_num)[0].value, deftype,
+        hotspot = HotSpot(sites_sheet.row(row_num)[0].value, 'Polygon',
                           sites_sheet.row(row_num)[1].value, sites_sheet.row(row_num)[2].value, defin)
         if len(hotspot.definition) != 0:
             hotspots.append(hotspot)
         row_num += 1
 
     draws = int(sites_sheet.row(38)[1].value)
+    print(draws)
     return [boundary, sites, hotspots, draws]
 
 
@@ -813,9 +813,12 @@ def write_temporal_excel(array, output_name, stops, stat_flag, regional_info, di
                 for j in range(len(lower_org_list)):
                     weight_avg = 0
                     weight_std = 0
+                    rStds = [lower_dists[reg_list[k]][lower_org_list[j]][chem_list[i]].v_mean_std[1] for k in range(len(reg_list))]
                     for k in range(len(reg_list)):
                         weight_avg += normed_reg_areas[k]*lower_dists[reg_list[k]][lower_org_list[j]][chem_list[i]].v_mean_std[0]
-                        weight_std += normed_reg_areas[k]*lower_dists[reg_list[k]][lower_org_list[j]][chem_list[i]].v_mean_std[1]
+                       #weight_std += normed_reg_areas[k]*lower_dists[reg_list[k]][lower_org_list[j]][chem_list[i]].v_mean_std[1]
+                    stdAllRegions(rStds, weight_avg, weights) 
+                       
                     sheet.write(2 + j, 2 + len(chem_list) + i, str(round(weight_avg, 6)) + ', ' + str(round(weight_std, 6)))
 
 
@@ -855,3 +858,17 @@ def write_temporal_excel(array, output_name, stops, stat_flag, regional_info, di
 
     print('Output written to: '+ output_name)
    
+
+def stdAllRegions(rStds, wMeanGroup, weights):
+
+    print(rStds)
+    print(wMeanGroup)
+    print(weigths)
+
+
+
+
+
+
+
+    

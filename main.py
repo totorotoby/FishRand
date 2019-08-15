@@ -28,8 +28,7 @@ def get_locs_matrix(loc_setups, draws, mig_data, timestep):
         loc = spatial.new_draw(info[0], info[1], info[2], info[3], draws)
         locations.append(loc)
     locations = np.asarray(locations)
-
-
+    
     #going back and adding in probabilities of migrating out of the pond
     indices = [k for k in range(draws)]
     for i in range(len(locations)):
@@ -41,7 +40,6 @@ def get_locs_matrix(loc_setups, draws, mig_data, timestep):
         out_indices = np.random.choice(indices, size=number_out, replace=False)
         for j in range(len(out_indices)):
             locations[i][out_indices[j]] = 1000
-
 
     return locations
 

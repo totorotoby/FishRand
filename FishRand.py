@@ -260,7 +260,10 @@ class app(tk.Frame):
                 where.append(opt.get())
 
             if self.output[0] == 'NO':
-                dist_to_show = self.graph_data[int(where[0])-1][where[1]][where[2]]
+                try:
+                    dist_to_show = self.graph_data[int(where[0])-1][where[1]][where[2]]
+                except:
+                    print('You are missing a graphing argument from the time, fish, chemical selection.')
             else:
                 dist_to_show = list(self.to_write.values())[0][where[1]][where[2]]
             dist_to_show.display = dist_type

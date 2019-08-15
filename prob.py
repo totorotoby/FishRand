@@ -39,8 +39,6 @@ class Var:
                 self.values = st.truncnorm(a=minum, loc=mean, scale= std, b=maxum).ppf(self.lhs)
             else:
                 self.values = st.norm(loc=mean, scale=std).ppf(self.lhs)
-                
-
         elif self.dist == 'Uniform':
             a = self.param[0]
             b = self.param[1]
@@ -79,6 +77,7 @@ class Var:
         hist, bins = numpy.histogram(self.values, num_bins, normed=True)
 
         plt.scatter(bins[:-1], hist, s=16)
+        plt.plot(sorted(self.values),numpy.linspace(0,1,len(self.values)))
         plt.show()
 
 
@@ -111,7 +110,7 @@ class ResultDist:
         self.v_mean_stdString = ', '.join([str(i) for i in self.v_mean_std])
         self.display = 4
         self.values.sort()
-        self.num_bins = len(self.values)//50
+        self.num_bins = len(self.values)//10
         self.hist = self.make_pdf_hist()
         self.y = self.getCDFX()
 
@@ -139,6 +138,8 @@ class ResultDist:
         M_y = numpy.mean(self.values)
         Sig_y = numpy.std(self.values)
 
+        #print(math.log(M_y), M_y, Sig_y)
+        #exit(0)
         # guess for lognormal
         s, scale = lognorm_to_scipyinput(M_y, Sig_y)
         m_x = math.log(scale)
@@ -193,7 +194,7 @@ class ResultDist:
         try:
             hist, bins = numpy.histogram(self.values, bins=self.num_bins) #normed=True)
         except:
-            print("If you have not input any distrubtions, go back and set uncertainty and inner loop iterations to 1.")
+            print("If you have not input any distrubtions, go back and set uncertainty and inner loop iterations to 1. If you do have distrubtions, the minumum number of total variable samples is 10.")
             exit(0)
         return [hist, bins]
      
@@ -391,25 +392,24 @@ def my_gamma_cdf(x, alpha, beta):
 
 def lognorm_to_scipyinput(M_y,Sig_y):
 
-    m_x = (2 * math.log(M_y)) - (.5) * (math.log(math.pow(Sig_y, 2) + math.pow(M_y, 2)))
+    m_x = math.exp(M_y + (math.pow(Sig_y,2)/2))
 
-    scale = math.exp(m_x)
-
-    sigma2 = -2 * math.log(M_y) + math.log(math.pow(Sig_y, 2) + math.pow(M_y, 2))
-
+    scale = m_x
+    
+    sigma2 = math.exp((2*M_y) + math.pow(Sig_y,2)) * (math.exp(math.pow(Sig_y,2))-1)
+    
     s = math.sqrt(sigma2)
 
     return s, scale
 
 
 def scipyinput_to_lognormal(s, loc, scale):
+    print(s, scale)
+    M_y = math.log(scale)
 
-    mu = math.log(scale)
-
-    M_y = math.exp(mu + (math.pow(s,2)/2))
-    V_y = math.exp((2*mu) + math.pow(s,2)) * (math.exp(math.pow(s,2))-1)
-    Sig_y = math.sqrt(V_y)
-
+    #M_y = math.exp(mu + (math.pow(s,2)/2))
+    #V_y = math.exp((2*mu) + math.pow(s,2)) * (math.exp(math.pow(s,2))-1)
+    Sig_y = s
 
     return M_y, Sig_y
 
@@ -426,11 +426,16 @@ def set_hyper_samp_cube(model_para, Var):
         #the +1 makes sure that we have enough samples everytime, but not all of the are used
         hype_sample = u_iter//bin_num + 1
 
-    lhs = pyDOE.lhs(bin_num, samples=hype_sample)
+    try:
+        lhs = pyDOE.lhs(bin_num, samples=hype_sample)
+    except:
+        print('Makes sure you have less latin hypercube bins than total variable samples, or that you have changed samples to greater than 1 at all.')
+        exit(0)
     lhs = lhs.ravel()
     Var.lhs = lhs
     Var.take_samples()
-    #Var.plot_samples()
+    #if Var.dist == 'Log-Normal':
+    #    Var.plot_samples()
 
 def make_result_dist(dicts, tofit):
 

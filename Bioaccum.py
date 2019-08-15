@@ -563,8 +563,8 @@ def init_prior_con_dic(monte_carlo_length,regions, chems, phyto, zoops, inverts,
 
         prior_con_dic_nonfish_list.append(prior_con_dic_nonfish)
 
-    prior_con_dic_fish_list = [[[[0 for _ in range(len(chems))] for _ in range(draws)] for _ in range(len(fishs))] for _ in range(monte_carlo_length)]
-    
+    prior_con_dic_fish_list = [[[[0 for _ in range(len(chems))] for _ in range(draws)] for i in range(len(fishs))] for _ in range(monte_carlo_length)]
+
     return prior_con_dic_nonfish_list, prior_con_dic_fish_list
 
 
