@@ -436,8 +436,8 @@ def set_hyper_samp_cube(model_para, Var):
     lhs = lhs.ravel()
     Var.lhs = lhs
     Var.take_samples()
-    if Var.dist == 'Log-Normal':
-        Var.plot_samples()
+    #if Var.dist == 'Log-Normal':
+    #    Var.plot_samples()
 
 def make_result_dist(dicts, tofit):
 

@@ -869,7 +869,7 @@ def stdAllRegions(rMeans, rStds, wMeanGroup, weights):
 
     sig2Tot = 0
     for i in range(len(weights)):
-        sig2Tot += (weights[i]**2)*((rStds[i]**2) + ((wMeanGroup - rMeans[i])**2))
+        sig2Tot += (weights[i])*((rStds[i]**2) + ((wMeanGroup - rMeans[i])**2))
     
     return math.sqrt(sig2Tot)
     
