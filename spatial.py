@@ -257,23 +257,25 @@ def hotspot_prob(boundary, attraction_polys, regions):
 
         probs.append(outside.area)
 
-    else:
-        outside = 'Out'
-        bound_area = boundary.area
-        for poly in attraction_polys:
-            area = poly.area
-            probs.append(area * poly.attraction)
+   # else:
+   #     outside = 'Out'
+   #     bound_area = boundary.area
+   #     for poly in attraction_polys:
+   #         area = poly.area
+   #         probs.append(area * poly.attraction)
 
-        prob_outside = bound_area - sum(probs)
-        if prob_outside > 0:
-            probs.append(bound_area - sum(probs))
-        else:
-            probs.append(0)
+   #         prob_outside = bound_area - sum(probs)
+   #     if prob_outside > 0:
+   #         probs.append(bound_area - sum(probs))
+   #     else:
+   #         probs.append(0)
 
     total_probs = sum(probs)
     probs[:] = [i / total_probs for i in probs]
 
-
+    probs = [poly.attraction for poly in attraction_polys]
+    probs.append(1 - sum(probs))
+    
     return probs, outside
 
 # trims regional polygons so they don't include any overlap with hotspots
@@ -329,6 +331,7 @@ def location_step(boundary, reg_poly, attraction_polys, fish, draw_num):
         if poly.fish == fish:
             fish_spec_polys.append(poly)
 
+   
     probs, outside = hotspot_prob(boundary, fish_spec_polys, reg_poly)
 
     outside_reg_prob = trim_regpoly(reg_poly, attraction_polys)

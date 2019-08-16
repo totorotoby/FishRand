@@ -334,10 +334,13 @@ class app(tk.Frame):
                 
                 hotspot_xys=[]
                 hotspot_point = []
+                attractions = []
+                
                 for hotspot in region_info[2]:
                     hotspot_point.append(hotspot.polygon.centroid.coords)
                     hotspot_xys.append(hotspot.polygon.exterior.xy)
-
+                    attractions.append(hotspot.attraction)
+                    
                 fig = plt.figure(1)
                 ax = fig.add_subplot(111)
                 ax.plot(b_xy[0], b_xy[1],color='#6699cc', alpha=0.7, linewidth=3, solid_capstyle='round', zorder=2)
@@ -352,7 +355,7 @@ class app(tk.Frame):
                 for pair in hotspot_xys:
                     if pair != b_xy:
                         ax.plot(pair[0], pair[1], color='green', alpha=0.7, linewidth=3, solid_capstyle='round', zorder=2)
-                        ax.annotate(region_info[2][count].name, xy=(hotspot_point[count][0][0], hotspot_point[count][0][1]), xytext=(hotspot_point[count][0][0], hotspot_point[count][0][1]), ha='center')
+                        ax.annotate(region_info[2][count].name + ': ' + str(attractions[count]), xy=(hotspot_point[count][0][0], hotspot_point[count][0][1]), xytext=(hotspot_point[count][0][0], hotspot_point[count][0][1]), ha='center')
                     count += 1
 
                 self.print_calc_regions(reg_xys, [reg[0] for reg in region_info[1]], [reg[1].area for reg in region_info[1]])

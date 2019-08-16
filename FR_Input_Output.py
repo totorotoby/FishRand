@@ -125,7 +125,11 @@ def get_temp_data(temp_data, temp_sheet, reg_len, timesteps):
     #loop over regions by row
     for i in range (1, reg_len + 1):
         r_temps = []
-        row = temp_sheet.row(i)
+        try:
+            row = temp_sheet.row(i)
+        except:
+            print('You are missing tempature input for a region.')
+            exit(0)
         #loop over timesteps by column
         for j in range (1, timesteps + 1):
             try:
@@ -308,7 +312,7 @@ def get_sites_data(sites_sheet):
         row_num += 1
 
     draws = int(sites_sheet.row(38)[1].value)
-    print(draws)
+   
     return [boundary, sites, hotspots, draws]
 
 
@@ -396,6 +400,7 @@ def get_weighted_stds(v_dic, areas):
                 mean += valuesArray[i][j][k] * weights[i]
             animal.append(round(mean,6))
         meansArray.append(animal)
+
     
     stds = []
     for j in range(len(valuesArray[0])):
@@ -814,12 +819,13 @@ def write_temporal_excel(array, output_name, stops, stat_flag, regional_info, di
                     weight_avg = 0
                     weight_std = 0
                     rStds = [lower_dists[reg_list[k]][lower_org_list[j]][chem_list[i]].v_mean_std[1] for k in range(len(reg_list))]
+                    rMeans = [lower_dists[reg_list[k]][lower_org_list[j]][chem_list[i]].v_mean_std[0] for k in range(len(reg_list))]
                     for k in range(len(reg_list)):
                         weight_avg += normed_reg_areas[k]*lower_dists[reg_list[k]][lower_org_list[j]][chem_list[i]].v_mean_std[0]
-                       #weight_std += normed_reg_areas[k]*lower_dists[reg_list[k]][lower_org_list[j]][chem_list[i]].v_mean_std[1]
-                    stdAllRegions(rStds, weight_avg, weights) 
+                        weight_std += normed_reg_areas[k]*lower_dists[reg_list[k]][lower_org_list[j]][chem_list[i]].v_mean_std[1]
+                    sigTot = stdAllRegions(rMeans, rStds, weight_avg, normed_reg_areas) 
                        
-                    sheet.write(2 + j, 2 + len(chem_list) + i, str(round(weight_avg, 6)) + ', ' + str(round(weight_std, 6)))
+                    sheet.write(2 + j, 2 + len(chem_list) + i, str(round(weight_avg, 6)) + ', ' + str(round(sigTot, 6)))
 
 
 
@@ -859,13 +865,15 @@ def write_temporal_excel(array, output_name, stops, stat_flag, regional_info, di
     print('Output written to: '+ output_name)
    
 
-def stdAllRegions(rStds, wMeanGroup, weights):
+def stdAllRegions(rMeans, rStds, wMeanGroup, weights):
 
-    print(rStds)
-    print(wMeanGroup)
-    print(weigths)
-
-
+    sig2Tot = 0
+    for i in range(len(weights)):
+        sig2Tot += (weights[i]**2)*((rStds[i]**2) + ((wMeanGroup - rMeans[i])**2))
+    
+    return math.sqrt(sig2Tot)
+    
+        
 
 
 

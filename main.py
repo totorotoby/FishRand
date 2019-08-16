@@ -125,16 +125,21 @@ def graph_by_time(data, fish_name, chem_name, time_interval):
 
 
 def get_fish_in_region(locations, fish_names, reg_len):
-
+    
     f_by_region = [[] for _ in range(reg_len)]
-
+    
     for fish_index in range (len(locations)):
         for pop_index in range (len(locations[fish_index])):
             region_index = locations[fish_index][pop_index]
             if region_index != 1000:
-                if fish_names[fish_index] not in f_by_region[region_index]:
-                    f_by_region[region_index].append(fish_names[fish_index])
-
+                
+                try:
+                    if fish_names[fish_index] not in f_by_region[region_index]:
+                        f_by_region[region_index].append(fish_names[fish_index])
+                except:
+                    print('You have defined more regions/sites in the sample sites tab than you have in the regions tab. There must be matching regional info for each site.')
+                    exit(0)
+                        
     return f_by_region
 
 
