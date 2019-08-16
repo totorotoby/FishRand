@@ -392,24 +392,26 @@ def my_gamma_cdf(x, alpha, beta):
 
 def lognorm_to_scipyinput(M_y,Sig_y):
 
-    m_x = math.exp(M_y + (math.pow(Sig_y,2)/2))
-
-    scale = m_x
+    #scale = math.exp(M_y + (math.pow(Sig_y,2)/2))
+    scale = math.exp(M_y)
     
-    sigma2 = math.exp((2*M_y) + math.pow(Sig_y,2)) * (math.exp(math.pow(Sig_y,2))-1)
-    
-    s = math.sqrt(sigma2)
+    #sigma2 = math.exp((2*M_y) + math.pow(Sig_y,2)) * (math.exp(math.pow(Sig_y,2))-1)
 
+    
+    #s = math.sqrt(sigma2)
+    s = Sig_y
+    
     return s, scale
 
 
 def scipyinput_to_lognormal(s, loc, scale):
     print(s, scale)
-    M_y = math.log(scale)
+    #M_y = math.exp(scale)
 
-    #M_y = math.exp(mu + (math.pow(s,2)/2))
-    #V_y = math.exp((2*mu) + math.pow(s,2)) * (math.exp(math.pow(s,2))-1)
-    Sig_y = s
+    M_y = math.exp(mu + (math.pow(s,2)/2))
+    V_y = math.exp((2*mu) + math.pow(s,2)) * (math.exp(math.pow(s,2))-1)
+    Sig_y = math.sqrt(V_y)
+    #Sig_y = s
 
     return M_y, Sig_y
 
@@ -434,8 +436,8 @@ def set_hyper_samp_cube(model_para, Var):
     lhs = lhs.ravel()
     Var.lhs = lhs
     Var.take_samples()
-    #if Var.dist == 'Log-Normal':
-    #    Var.plot_samples()
+    if Var.dist == 'Log-Normal':
+        Var.plot_samples()
 
 def make_result_dist(dicts, tofit):
 
