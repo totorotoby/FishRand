@@ -331,6 +331,11 @@ def location_step(boundary, reg_poly, attraction_polys, fish, draw_num):
         if poly.fish == fish:
             fish_spec_polys.append(poly)
 
+    #check sum of attraction factors must == 1
+    aSum = sum([poly.attraction for poly in fish_spec_polys])
+    if aSum > 1:
+        print('Probabilities/levels of attraction of your attraction factors for ' + fish + ' sum to greater than 1. They should sum to or less.')
+        exit(0)
    
     probs, outside = hotspot_prob(boundary, fish_spec_polys, reg_poly)
 

@@ -401,7 +401,7 @@ def get_weighted_stds(v_dic, areas):
             animal.append(round(mean,6))
         meansArray.append(animal)
 
-    
+    print(valuesArray, meansArray, weights)
     stds = []
     for j in range(len(valuesArray[0])):
         animal = []
@@ -429,8 +429,6 @@ def Arrayify(D, L):
             L.append([])
             Arrayify(subD, L[count])
             count += 1
-
-
 
 
 
@@ -474,11 +472,6 @@ def makeRegionTab(workbook, rAreas, rInfo):
         rSheet.write(3+i, maxLen + 1, rAreas[i])
             
     
-    
-    
-    
-        
-
 def writeInputsTab(workbook, inputs, data):
 
    
