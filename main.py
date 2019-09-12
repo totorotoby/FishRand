@@ -259,7 +259,7 @@ def filter_cases(data, stops, tofit):
         fish_by_region = get_fish_in_region(locations, f_names, len(all_data[0]))
 
         while t <= lastStop:
-            print((t/lastStop)*100, "% done")
+            print((t/(lastStop + 1))*100, "% done")
             # get all locations for each fish... locations matrix is fish number by list of region numbers draws long
             prior_locations = locations
             locations = get_locs_matrix(loc_setups, draws, mig_data, t)

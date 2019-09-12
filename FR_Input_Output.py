@@ -131,7 +131,7 @@ def get_temp_data(temp_data, temp_sheet, reg_len, timesteps):
             print('You are missing tempature input for a region.')
             exit(0)
         #loop over timesteps by column
-        for j in range (1, timesteps + 1):
+        for j in range (1, timesteps + 2):
             try:
                 data_get_helper(row[j], r_temps)
             except IndexError:
@@ -194,7 +194,7 @@ def data_get_helper(preentry, new_entry):
 def get_con_data(con_sheet, con_data, num_reg, num_chem, timesteps):
 
     try:
-        for i in range (1, timesteps+1):
+        for i in range (1, timesteps + 2):
             t_cons = []
             column = con_sheet.col(1)
             for j in range (num_reg):
@@ -246,9 +246,10 @@ def get_mig_data(mig_data, mig_sheet, timesteps):
         
         row = mig_sheet.row(i)
         try:
-            mig_data[row[0].value] = [row[i].value for i in range(1, timesteps + 1)]
+            mig_data[row[0].value] = [row[i].value for i in range(1, timesteps + 2)]
         except:
             print('Not enough migration data.')
+            
 def foodweb_to_network_struc(foodweb):
 
     network_struc = {}
