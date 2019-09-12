@@ -196,7 +196,7 @@ def filter_cases(data, stops, tofit):
     time_per_step = data[3]
     site_data = data[4]
     foodweb_graph = data[5]
-    # set up for
+    lastStop = max(stops)
     u_iter = int(model_para[0])
     v_iter = int(model_para[1])
     writing_info = []
@@ -258,8 +258,8 @@ def filter_cases(data, stops, tofit):
         locations = get_locs_matrix(loc_setups, draws, mig_data, t)
         fish_by_region = get_fish_in_region(locations, f_names, len(all_data[0]))
 
-        while t < time_steps:
-            print((t/time_steps)*100, "% done")
+        while t <= lastStop:
+            print((t/lastStop)*100, "% done")
             # get all locations for each fish... locations matrix is fish number by list of region numbers draws long
             prior_locations = locations
             locations = get_locs_matrix(loc_setups, draws, mig_data, t)

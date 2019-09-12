@@ -117,9 +117,9 @@ class Zooplank:
         self.k_1[chem_index] = chem_ew * (self.Gv / self.Wb)
 
     # returns k_2 of chemical for this zooplank
-    def calc_k2(self, chem_kow, chem_index, beta1, beta5, density_lip=.9, density_w=1):
+    def calc_k2(self, chem_kow, chem_index, beta1, beta2, density_lip=.9, density_w=1):
 
-        k_bw = (self.Vlb * beta1 * chem_kow)/density_lip + (self.Vnb * beta5 * chem_kow) + (self.Vwb/density_w)
+        k_bw = (self.Vlb * beta1 * chem_kow)/density_lip + (self.Vnb * beta2 * chem_kow) + (self.Vwb/density_w)
 
         self.k_2[chem_index] = self.k_1[chem_index] / k_bw
 

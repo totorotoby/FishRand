@@ -10,7 +10,7 @@ from spatial import HotSpot
 # Reads in all data from spread sheets
 
 
-def convert_to_lists(filename):
+def convert_to_lists(filename, lastStop):
 
     all_sheets = xlrd.open_workbook(filename)
 
@@ -42,7 +42,7 @@ def convert_to_lists(filename):
 
     num_timestep, time_per_step = Time_parser.num_steps(model_para[4], model_para[5], model_para[6])
     
-    get_temp_data(temp_data, temp_sheet, len(region_data), num_timestep)
+    get_temp_data(temp_data, temp_sheet, len(region_data), lastStop)
 
     ## chemical properties from excel ##
     
@@ -59,7 +59,7 @@ def convert_to_lists(filename):
     con_sheet = all_sheets.sheet_by_index(4)
     con_data = []
     
-    get_con_data(con_sheet, con_data, len(region_data), len(chem_data), num_timestep)
+    get_con_data(con_sheet, con_data, len(region_data), len(chem_data), lastStop)
 
     
     ## organism properties from excel ##
@@ -99,7 +99,7 @@ def convert_to_lists(filename):
     
     mig_data = {}
     mig_sheet = all_sheets.sheet_by_index(7)
-    get_mig_data(mig_data, mig_sheet)
+    get_mig_data(mig_data, mig_sheet, lastStop)
 
     
     ## geometric site, and hotspot data from excel ##
@@ -240,20 +240,24 @@ def get_diet_data(diet_sheet, diet_data, entrysize):
             diet_data[new_name].append(new_prey_data)
 
 
-def get_mig_data(mig_data, mig_sheet):
+def get_mig_data(mig_data, mig_sheet, timesteps):
 
     for i in range(1, mig_sheet.nrows):
+        
         row = mig_sheet.row(i)
-        mig_data[row[0].value] = [row[i].value for i in range(1, len(row))]
-
-
+        try:
+            mig_data[row[0].value] = [row[i].value for i in range(1, timesteps + 1)]
+        except:
+            print('Not enough migration data.')
 def foodweb_to_network_struc(foodweb):
 
     network_struc = {}
     nodes = [entry for entry in list(foodweb.values())[0]]
-
+    
     for node in nodes:
             network_struc[node[0]] = []
+
+    
     
     no_eat = ['Sediment/Detritus', 'Zooplankton', 'Phytoplankton']
     network_struc['Zooplankton'].append('Phytoplankton')

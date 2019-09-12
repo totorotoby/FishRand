@@ -172,7 +172,7 @@ class app(tk.Frame):
                 self.time_entry = [0]
 
             # run the code
-            self.data = convert_to_lists(self.filename)
+            self.data = convert_to_lists(self.filename, max(self.time_entry))
             self.output, self.inputs = filter_cases(self.data, self.time_entry, self.tofit)
 
             if self.output[0] == 'YES':

@@ -135,7 +135,7 @@ def init_chems(chem_data, r_con_data, region, region_index, u_count, v_count):
         if chemical[8] != '':
             toadd.set_beta5(chemical[8])
         
-        #print(concentrations[2])
+       
         # dealing with cwto and cwdo
         if concentrations[1] != '':
             toadd.set_cwto(concentrations[1])
