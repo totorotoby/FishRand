@@ -250,6 +250,8 @@ def get_mig_data(mig_data, mig_sheet, timesteps):
         except:
             print('Not enough migration data.')
             exit(0)
+
+
 def foodweb_to_network_struc(foodweb):
 
     network_struc = {}

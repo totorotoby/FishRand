@@ -32,7 +32,6 @@ def get_locs_matrix(loc_setups, draws, mig_data, timestep):
     #going back and adding in probabilities of migrating out of the pond
     indices = [k for k in range(draws)]
     for i in range(len(locations)):
-
         fish_name = loc_setups[i][0][0].fish
         abund = mig_data[fish_name][timestep]
         percentage_fish_out = 1 - abund
