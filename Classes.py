@@ -202,7 +202,6 @@ class Zooplank:
 
         f_num = (self.k_1[chem_index] * self.Mo * Cwdo) + (self.k_1[chem_index] * self.Mp * Cwp)
 
-
         l_num = phyto_con * self.k_d[chem_index]
 
         return (f_num + l_num) / denom
@@ -214,12 +213,19 @@ class Zooplank:
         q = ((self.k_1[chem_index] * self.Mo * Cwdo) + (self.k_1[chem_index] * self.Mp * Cwp)) + (phyto_con * self.k_d[chem_index])
 
         k = self.k_2[chem_index] + self.k_e[chem_index] + self.Kg
+
+        #print(q, 1/q, k, 1/k, self.days_per_step)
+
         
-        top = (pre_step * ((1 / self.days_per_step) - (k / 2)) + q)
-        bottom = (1 / self.days_per_step) + (k / 2)
+        for i in range(self.days_per_step):
+            
+            top = (pre_step * ((1) - (k / 2)) + q)
+            bottom = (1) + (k / 2)
+        
+            pre_step = top/bottom
 
-        return top/bottom
 
+        return pre_step
 
 class Fish(Zooplank):
 
@@ -386,6 +392,8 @@ class Fish(Zooplank):
             #print(self.name, ' eating term: ', q2)
             
             q = q1 + q2
+
+           # print(q, 1/q, k, 1/k, 365//12, self.name)
 
             top = (pre_step * ((1 / self.days_per_step) - (k / 2)) + q)
             bottom = (1 / self.days_per_step) + (k / 2)

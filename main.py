@@ -111,11 +111,15 @@ def graph_by_time(data, fish_name, chem_name, time_interval):
     time_steps = len(data)
     values = []
     times = [i for i in range(1, time_steps+1)]
+    
     for i in range(len(data)):
-        con_at_t = data[i][fish_name][chem_name][0]
+        try:
+            con_at_t = data[i][fish_name][chem_name][0]
+        except:
+            con_at_t = data[i][fish_name][chem_name]
         values.append(con_at_t)
 
-    ax.plot(times, values, 'ro', )
+    ax.plot(times, values, 'ro')
     ax.set_xlabel('Timesteps (' + time_interval + ')')
     ax.set_ylabel('Concentration of ' + chem_name + ' in ' + fish_name + ' (ng/g)')
     ax.set_xlim(0)
@@ -234,7 +238,7 @@ def filter_cases(data, stops, tofit):
         loc_setups, f_names = loc_setup(all_data[6], boundary, regions, hotspots, site_data[3])
         draws = site_data[3]
         graph_data = []
-        
+        lower_graph_data = []
         # turns all_data that is distributions into array of samples which can be iterated through with u_count or v_count
         # Will return true if there is at least one distrubtion input
         stat_check = Bioaccum.set_all_h_and_s(model_para, all_data)
@@ -272,10 +276,11 @@ def filter_cases(data, stops, tofit):
 
             lower_cons, fish_dic = get_fish_dic(total_cons[1], total_cons[0], [chem[0] for chem in all_data[2]], [fish[0] for fish in all_data[6]], region_areas, tofit)
             
-            
+            lower_graph_data.append(lower_cons)
             graph_data.append(fish_dic)
             
             if t in stops:
+                
                 if stat_check == False:
                     writing_info.append([total_cons[0], lower_cons, fish_dic])
                 else:
@@ -290,11 +295,11 @@ def filter_cases(data, stops, tofit):
 
     if model_para[8] == 'YES':
         
-        return [model_para[8], total_cons, stat_check, foodweb_graph], inputs
+        return [model_para[8], total_cons, stat_check, foodweb_graph, ], inputs
 
     if model_para[8] == 'NO':
 
-        return [model_para[8], writing_info, stat_check, region_areas, graph_data, model_para[6], [boundary, regions, hotspots], foodweb_graph], inputs
+        return [model_para[8], writing_info, stat_check, region_areas, graph_data, model_para[6], [boundary, regions, hotspots], foodweb_graph, lower_graph_data], inputs
 
 
     #################### STEADY STATE EXCEL WRITING ########################

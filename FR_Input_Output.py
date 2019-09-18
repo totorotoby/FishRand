@@ -390,7 +390,8 @@ def write_output_steady(total_cons, output_name, stop, dist_type, inputs, data, 
 
 # returns the weighted standard devations over animals, weighted by area of regions.
 def get_weighted_stds(v_dic, areas):
-
+    
+    
     weights = [areas[i]/sum(areas) for i in range(len(areas))]
     
     valuesArray = []
@@ -405,8 +406,7 @@ def get_weighted_stds(v_dic, areas):
                 mean += valuesArray[i][j][k] * weights[i]
             animal.append(round(mean,6))
         meansArray.append(animal)
-
-    print(valuesArray, meansArray, weights)
+        
     stds = []
     for j in range(len(valuesArray[0])):
         animal = []
@@ -422,9 +422,8 @@ def get_weighted_stds(v_dic, areas):
 # Function takes in a nested dictonary of arbitrary depth, drops all the keys
 # and turns the values into a nested dictonary.
 def Arrayify(D, L):
-
-    if type(list(D.items())[0][1]) == float or  type(list(D.items())[0][1]) == np.float64:
-        
+    
+    if type(list(D.items())[0][1]) == float or type(list(D.items())[0][1]) == np.float64 or type(list(D.items())[0][1]) == pr.ResultDist:
         v = list(D.items())
         for pair in v:
             L.append(pair[1])   

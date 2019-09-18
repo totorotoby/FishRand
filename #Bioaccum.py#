@@ -135,7 +135,7 @@ def init_chems(chem_data, r_con_data, region, region_index, u_count, v_count):
         if chemical[8] != '':
             toadd.set_beta5(chemical[8])
         
-       
+        
         # dealing with cwto and cwdo
         if concentrations[1] != '':
             toadd.set_cwto(concentrations[1])
@@ -160,6 +160,7 @@ def init_chems(chem_data, r_con_data, region, region_index, u_count, v_count):
 
         if toadd.Cwp == -1 and region.Ocs != '':
             toadd.calc_pore_water(region.Ocs)
+            
         if toadd.Cwp == -1 and (region.Ocs == '' or toadd.Cs == ''):
             print('Not enough parameters to solve for Cwp in' + chemical[0], '\nRefer to page 13 section 3.7 and page 15 section 3.10 of the user manual for help.')
             exit(0)

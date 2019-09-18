@@ -7,7 +7,7 @@ from tkinter import filedialog
 from tkinter import messagebox
 import networkx as nx
 from main import *
-from FR_Input_Output import convert_to_lists
+from FR_Input_Output import *
 import subprocess
 import sys
 import os
@@ -191,6 +191,7 @@ class app(tk.Frame):
                 self.timescale = self.output[5]
                 self.region_info = self.output[6]
                 self.foodweb_graph = self.output[7]
+                self.lower_graph_data = self.output[8]
 
        
 
@@ -201,15 +202,20 @@ class app(tk.Frame):
             # get fish names
             if self.stat_check == True and self.output[0] == 'NO':
                 try:
+                    r = list(self.to_write[0][0])[0]
+                    lower = list(self.to_write[0][0][r].keys())
                     fishs = list(self.to_write[0][1].keys())
                     chemicals = list(list(self.to_write[0][1].values())[0].keys())
+                    total = lower + fishs
                 except:
                     print('You asked to display a timestep that is outside the range between 0, and ((End Time - Start Time) / step) - 1)')
                     exit(0)
                 count = 1
             elif self.stat_check == False and self.output[0] == 'NO':
                 try:
+                    lower = list(self.lower_graph_data[0].keys())
                     fishs = list(self.to_write[0][2].keys())
+                    total = lower + fishs
                 except:
                     print('Not enough data in either tempatures, chemical concenrations, or abundance for the number of timesteps input')
                     exit(0)
@@ -223,7 +229,7 @@ class app(tk.Frame):
 
             if count == 1:
 
-                reset_list  = [times, fishs, chemicals]
+                reset_list  = [times, total, chemicals]
 
 
                 ###refresh menus###
@@ -281,28 +287,50 @@ class app(tk.Frame):
 
             fish = self.dictvars[1].get()
             chemical = self.dictvars[2].get()
-
+            
             if self.stat_check == True:
 
               
                 mean = []
                 std = []
-                for dic in self.graph_data:
-                    mean.append(dic[fish][chemical].v_mean_std[0])
-                    std.append(dic[fish][chemical].v_mean_std[1])
+                try:
+                    for dic in self.graph_data:
+                        mean.append(dic[fish][chemical].v_mean_std[0])
+                        std.append(dic[fish][chemical].v_mean_std[1])
 
-                fig, ax = plt.subplots()
-                ax.set_ylabel('(ng/g) of ' + chemical + ' in ' + fish, size='large')
-                ax.set_xlabel('Timestep')
-                ax.errorbar([i for i in range(len(self.graph_data))], mean, yerr=std, fmt='o', capsize=2, capthick=2)
-                plt.show()
+                    fig, ax = plt.subplots()
+                    ax.set_ylabel('(ng/g) of ' + chemical + ' in ' + fish, size='large')
+                    ax.set_xlabel('Timestep')
+                    ax.errorbar([i for i in range(len(self.graph_data))], mean, yerr=std, fmt='o', capsize=2, capthick=2)
+                    plt.show()
+                    
+                except:
+                    
+                    regs = list(self.lower_graph_data[0].keys())
+                    for dic in self.lower_graph_data:
+                        m = []
+                        for reg in regs:
+                            m.append(dic[reg][fish][chemical].v_mean_std[0])
 
+                        mean.append(np.average(m, weights=self.region_areas))
 
+                    fig, ax = plt.subplots()
+                    times = list(range(1, len(mean)+1))
+                    ax.plot(times, mean, 'ro')
+                    ax.set_xlabel('Timesteps (' + self.timescale + ')')
+                    ax.set_ylabel('Concentration of ' + chemical+ ' in ' + fish + ' (ng/g)')
+                    ax.set_xlim(0)
+                    ax.set_ylim(0)
+                    plt.show()
+                       
 
 
             else:
                 
-                graph_by_time(self.graph_data, fish, chemical, self.timescale)
+                if fish in self.graph_data[0].keys():
+                    graph_by_time(self.graph_data, fish, chemical, self.timescale)
+                else:
+                    graph_by_time(self.lower_graph_data, fish, chemical, self.timescale)
 
         else:
             print('There is no time graph for steady state.')
