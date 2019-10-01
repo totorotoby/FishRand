@@ -345,7 +345,7 @@ class app(tk.Frame):
             
         else:
 
-            everything = convert_to_lists(self.filename)
+            everything = convert_to_lists(self.filename, 0)
             
             if everything[0][8] == 'NO':
                 
@@ -437,7 +437,7 @@ class app(tk.Frame):
             
         else:
 
-            foodweb_graph = convert_to_lists(filename)[5]
+            foodweb_graph = convert_to_lists(filename, 0)[5]
             
             
             pos = nx.spring_layout(foodweb_graph)

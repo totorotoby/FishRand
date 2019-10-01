@@ -354,6 +354,7 @@ class Fish(Zooplank):
 
 
             else:
+                
                 for j in range(len(self.diet_frac)):
 
                     if self.diet_frac[j][1] > 0:
@@ -361,6 +362,7 @@ class Fish(Zooplank):
                         if self.diet_frac[j][0] == 'Sediment/Detritus':
 
                             concentration = chemical.Cs
+                            print(concentration)
                             q2 += (self.diet_frac[j][1]*concentration)
 
                         else:
