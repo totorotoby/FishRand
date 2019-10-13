@@ -112,11 +112,13 @@ def init_chems(chem_data, r_con_data, region, region_index, u_count, v_count):
     r_concentrations = r_con_data[region_index]
     
     chemicals = []
+
     for i in range(len(chem_data)):
         
         concentrations = r_concentrations[i]
         chemical = chem_data[i]
-
+        #(chemical)
+        
         chemical = check_inst_non_st(chemical, u_count, v_count)
         concentrations = check_inst_non_st(concentrations, u_count, v_count)
         toadd = obj.Chemical(chemical[0], chemical[1], concentrations[0])
@@ -124,17 +126,18 @@ def init_chems(chem_data, r_con_data, region, region_index, u_count, v_count):
         # dealing with ddoc and dpoc
         if chemical[2] and chemical[3] != '':
             toadd.set_ddoc_dpoc(chemical[2], chemical[3])
-        if chemical[4] != '':
-            toadd.set_beta1(chemical[4])
-        if chemical[5] != '':
-            toadd.set_beta2(chemical[5])
-        if chemical[6] != '':
-            toadd.set_beta3(chemical[6])
-        if chemical[7] != '':
-            toadd.set_beta4(chemical[7])
-        if chemical[8] != '':
-            toadd.set_beta5(chemical[8])
-        
+
+        # dealing with betas
+        noBeta = []
+        for i in range(4,13,2):
+            if chemical[i] != '' and chemical[i+1] == '':
+                toadd.set_betas(chemical[i] , (i-4)//2)
+            if chemical[i+1] != '':
+                toadd.set_koc(chemical[i+1], (i-4)//2)
+            if chemical[i] == '' and chemical[i+1] == '':                
+                print("You are missing an entry in the chemcials tab  for a beta/*****")
+                exit(0)
+
         #print(concentrations[2])
         # dealing with cwto and cwdo
         if concentrations[1] != '':
@@ -191,11 +194,10 @@ def init_phyto(phyto_data, chemicals, u_count, v_count, per_step=0):
     for i in range(len(chemicals)):
 
         kow = chemicals[i].Kow
-        beta1 = chemicals[i].beta1
-        beta2 = chemicals[i].beta2
-        beta4 = chemicals[i].beta4
+        betas = chemicals[i].betas
+        kocs = chemicals[i].Kocs
         toadd.calc_k1(kow, i)
-        toadd.calc_k2(kow, i, beta1, beta4)
+        toadd.calc_k2(kow, i, betas, kocs)
 
     if toadd.init_check():
         phytos.append(toadd)
@@ -248,15 +250,12 @@ def init_zoop(zoo_data, region, chemicals, phyto, u_count, v_count, per_step=0):
             kow = chemicals[j].Kow
             ed = chemicals[j].Ed
             ew = chemicals[j].Ew
-            beta1 = chemicals[j].beta1
-            beta2 = chemicals[j].beta2
-            beta3 = chemicals[j].beta3
-            beta4 = chemicals[j].beta4
-            beta5 = chemicals[j].beta5
+            betas = chemicals[j].betas
+            kocs = chemicals[j].Kocs
 
             toadd.calc_k1(ew, j)
-            toadd.calc_k2(kow, j, beta1, beta2)
-            toadd.calc_kgb(kow, j, beta3, beta4 ,beta5)
+            toadd.calc_k2(kow, j, betas, kocs)
+            toadd.calc_kgb(kow, j, betas, kocs)
             toadd.calc_ke(ed, j)
             toadd.calc_kd(ed, j)
 
@@ -370,15 +369,12 @@ def init_fish_post_region(fishs, tempfishs, region, chemicals):
             kow = chemicals[j].Kow
             ed = chemicals[j].Ed
             ew = chemicals[j].Ew
-            beta1 = chemicals[j].beta1
-            beta2 = chemicals[j].beta2
-            beta3 = chemicals[j].beta3
-            beta4 = chemicals[j].beta4
-            beta5 = chemicals[j].beta5
+            betas = chemicals[j].betas
+            kocs = chemicals[j].Kocs
 
             fishs[i].calc_k1(ew, j)
-            fishs[i].calc_k2(kow, j, beta1, beta2)
-            fishs[i].calc_kgb(kow, j, beta3, beta4, beta5)
+            fishs[i].calc_k2(kow, j, betas, kocs)
+            fishs[i].calc_kgb(kow, j, betas, kocs)
             fishs[i].calc_ke(ed, j)
             fishs[i].calc_kd(ed, j)
 
@@ -393,19 +389,17 @@ def init_single_fish_post_region(fish, tempfishs, region, chemicals):
     fish.calc_gf()
 
     for j in range(len(chemicals)):
-        kow = chemicals[j].Kow
-        ed = chemicals[j].Ed
-        ew = chemicals[j].Ew
-        beta1 = chemicals[j].beta1
-        beta2 = chemicals[j].beta2
-        beta3 = chemicals[j].beta3
-        beta4 = chemicals[j].beta4
-        beta5 = chemicals[j].beta5
-        fish.calc_k1(ew, j)
-        fish.calc_k2(kow, j, beta1, beta2)
-        fish.calc_kgb(kow, j, beta3, beta4, beta5)
-        fish.calc_ke(ed, j)
-        fish.calc_kd(ed, j)
+            kow = chemicals[j].Kow
+            ed = chemicals[j].Ed
+            ew = chemicals[j].Ew
+            betas = chemicals[j].betas
+            kocs = chemicals[j].Kocs
+
+            fish.calc_k1(ew, j)
+            fish.calc_k2(kow, j, betas, kocs)
+            fish.calc_kgb(kow, j, betas, kocs)
+            fish.calc_ke(ed, j)
+            fish.calc_kd(ed, j)
 
     return fish
 

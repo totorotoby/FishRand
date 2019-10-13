@@ -47,12 +47,13 @@ def convert_to_lists(filename, lastStop):
     ## chemical properties from excel ##
     
 
-    chem_len = 9
+    chem_len = 14
     chem_sheet = all_sheets.sheet_by_index(3)
     chem_entry_col = chem_sheet.col(1)
     chem_data = []
     
     get_data(chem_entry_col, chem_len, chem_data)
+
 
     ## chemical concentrations from excel ##
     
@@ -84,6 +85,7 @@ def convert_to_lists(filename, lastStop):
     get_data(invert_entry_col, f_len, invert_data)
     get_data(zoop_entry_col, zo_len, zoop_data)
     get_data(phyto_entry_col, ph_len, phyto_data)
+
 
     ## organisms diets from excel ##
     
@@ -871,6 +873,8 @@ def stdAllRegions(rMeans, rStds, wMeanGroup, weights):
     return math.sqrt(sig2Tot)
     
         
+
+#convert_to_lists("tests/single region tests/SingleRegionTest.xlsx", 1)
 
 
 
