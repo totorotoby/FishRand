@@ -192,11 +192,9 @@ class ResultDist:
         if len(self.values) < 10:
             print("If you have not input any distrubtions, go back and set uncertainty and inner loop iterations to 1. If you do have distrubtions, the minumum number of total variable samples is 10.")
             exit(0)
-        try:
-            hist, bins = numpy.histogram(self.values, bins=self.num_bins, normed=True)
-        except ValueError:
-            print('9/12/19 problem')
-            exit(0)
+
+        hist, bins = numpy.histogram(self.values, bins=self.num_bins, normed=True)
+        
         return [hist, bins]
 
     def plot_cdf(self):
