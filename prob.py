@@ -13,7 +13,7 @@ class Var:
 
     def __init__(self, type, dist, param):
 
-        self.type = type   
+        self.type = type
         self.dist = dist   # distribution name
         self.param = param
         self.values = None
@@ -72,7 +72,7 @@ class Var:
     def plot_samples(self):
 
         num_bins = len(self.values)//20
-        
+
         hist, bins = numpy.histogram(self.values, num_bins, normed=True)
 
         plt.scatter(bins[:-1], hist, s=16)
@@ -152,7 +152,7 @@ class ResultDist:
             print("\n\nNot enough stastical parameters input.\nThere are situations where some concentrations are determinstic and others are distrubtions.\nHopefully FishRand will support this in future versions.\n\n")
             exit(0)
         gamma_theta = (math.pow(Sig_y, 2))/M_y
-        
+
         # returns guess array...order: [normal, lognormal, uniform, gamma]
         return [[M_y, Sig_y], [m_x, sig_x], [uni_a, uni_b], [gamma_k, gamma_theta]]
 
@@ -162,8 +162,8 @@ class ResultDist:
 
         for i in range(len(cdf_list)):
             param = optimize.curve_fit(cdf_list[i][0], self.values, self.y, p0=self.init_guess[i], maxfev=10000)[0]
-            
-            
+
+
             cdf_list[i].append(param)
 
         cdf_list[1][1] = [cdf_list[1][1][1], 0, math.exp(cdf_list[1][1][0])]
@@ -198,7 +198,7 @@ class ResultDist:
             print('9/12/19 problem')
             exit(0)
         return [hist, bins]
-     
+
     def plot_cdf(self):
 
 
@@ -210,7 +210,7 @@ class ResultDist:
 
             # CDF x-axis
             x1 = self.x1
-           
+
             # CDF parameters
             lognorm_param = self.cdfs[1][1]
             normal_param = self.cdfs[0][1]
@@ -218,7 +218,7 @@ class ResultDist:
             gamma_param = self.cdfs[3][1]
 
             for i in range(len(ax)):
-                
+
                 # CDF axis labels
                 ax[i].set_xlabel('(ng/g) of ' + self.chem + ' in ' + self.animal, size='large')
                 ax[i].set_ylabel('P(X < x)')
@@ -245,7 +245,7 @@ class ResultDist:
             ax.plot(self.values, self.y, 'ro', color='r')
             fig.tight_layout()
 
-        
+
     def plot_pdf(self):
 
         if self.tofit == 1:
@@ -269,22 +269,22 @@ class ResultDist:
                 ax1[i].title.set_text(titles[i])
                 ax1[i].scatter(self.hist[1][:-1], self.hist[0], s=16)
                 ax1[i].set_ylim(min(self.hist[0]))
-        
+
             ax1[0].plot(x1, stats.norm.pdf(x1, scale=normal_param[1], loc=normal_param[0]), linewidth=2.0, color='g')
             ax1[1].plot(x1, stats.lognorm.pdf(x1, s=lognorm_param[0], scale=lognorm_param[2]), linewidth=2.0, color='g')
             ax1[2].plot(x1, stats.uniform.pdf(x1, scale=uniform_param[1], loc=uniform_param[0]), linewidth=2.0, color='g')
             ax1[3].plot(x1, stats.gamma.pdf(x1, a=gamma_param[0], loc=gamma_param[1], scale=gamma_param[2]),
                         linewidth=2.0, color='g')
-            
+
             fig1.tight_layout()
 
         else:
 
             fig1, ax1 = plt.subplots(1, 1, figsize=(12, 12))
             ax1.set_xlabel('(ng/g) of ' + self.chem + ' in ' + self.animal, size='large')
-            ax1.set_ylabel('P(x)') 
+            ax1.set_ylabel('P(x)')
             ax1.scatter(self.hist[1][:-1], self.hist[0], s=16)
-            ax1.set_ylim(min(self.hist[0]))        
+            ax1.set_ylim(min(self.hist[0]))
 
     def plot_single(self, temp_index):
 
@@ -295,12 +295,12 @@ class ResultDist:
             fig, ax = plt.subplots(1, 2, figsize=(24, 12))
 
             x1 = self.x1
-            
+
             temp_param = self.cdfs[temp_index][1]
 
             for i in range(len(ax)):
                 ax[i].set_xlabel('(ng/g) of ' + self.chem + ' in ' + self.animal, size='large')
-                
+
             ax[0].title.set_text(titles1[temp_index])
             ax[0].set_ylabel('P(x)')
             ax[0].scatter(self.hist[1][:-1], self.hist[0], s=16)
@@ -334,7 +334,7 @@ class ResultDist:
 
     def show(self, temp_index):
 
-        
+
         if self.display == 0:
             self.plot_cdf()
         elif self.display == 1:
@@ -349,7 +349,7 @@ class ResultDist:
 
 
     def bestparam(self):
- 
+
         params = []
         self.count += 1
         string = ''
@@ -370,7 +370,7 @@ def make_x1(values):
 
     mean = numpy.mean(values)
     std = numpy.std(values)
-    
+
     x1 = numpy.linspace(mean - (4*std), mean + (6*std), num=200)
 
     return x1
@@ -395,13 +395,13 @@ def lognorm_to_scipyinput(M_y,Sig_y):
 
     #scale = math.exp(M_y + (math.pow(Sig_y,2)/2))
     scale = math.exp(M_y)
-    
+
     #sigma2 = math.exp((2*M_y) + math.pow(Sig_y,2)) * (math.exp(math.pow(Sig_y,2))-1)
 
-    
+
     #s = math.sqrt(sigma2)
-    s = Sig_y
-    
+    s = math.exp(Sig_y)
+
     return s, scale
 
 
