@@ -319,7 +319,7 @@ def get_sites_data(sites_sheet):
         row_num += 1
 
     draws = int(sites_sheet.row(38)[1].value)
-   
+    
     return [boundary, sites, hotspots, draws]
 
 
@@ -342,6 +342,7 @@ def write_output_steady(total_cons, output_name, stop, dist_type, inputs, data, 
     chem_list = list(list(list(total_cons.values())[0].values())[0].items())
     chem_len = len(chem_list)
     #write down region which is dictionaries first key
+    print(org_list)
     if tofit == 1:
         sheet.write(0,0, 'Region: ' + str(list(total_cons.keys())[0]) + ' Concentrations (ng/g ww)', bold)
 
@@ -707,7 +708,9 @@ def write_temporal_excel(array, output_name, stops, stat_flag, regional_info, di
         lower_org_list = []
         for animal, chems in array[0][1].items():
                 lower_org_list.append(animal)
-
+                
+        lower_org_list = [lower_org_list[len(lower_org_list) - 1]] + lower_org_list[:len(lower_org_list)-1]
+        print(lower_org_list)
         upper_org_list = []
         for animal, chems in array[0][2].items():
             upper_org_list.append(animal)
@@ -715,7 +718,6 @@ def write_temporal_excel(array, output_name, stops, stat_flag, regional_info, di
 
         reg_list =list(array[0][0][0].keys())
         #write down region which is dic
-
         for i in range(len(stops)):
             sheet = workbook.add_worksheet('Timestep ' + str(stops[i]+1))
             data_at_time = array[i]
@@ -730,9 +732,12 @@ def write_temporal_excel(array, output_name, stops, stat_flag, regional_info, di
             for pair in lower_non_avg.items():
                 sheet.write(count + 1, 0, pair[0], bold)
                 count += 1
-                for animal in pair[1].keys():
+                ordered_list = list(pair[1].keys())
+                ordered_list = [ordered_list[len(ordered_list) - 1]] + ordered_list[:len(ordered_list)-1]
+                for animal in ordered_list:
                     sheet.write(count + 1, 0, animal)
                     count +=1
+
 
             for i in range(len(reg_list)):
                 for j in range(len(lower_org_list)):
@@ -769,6 +774,8 @@ def write_temporal_excel(array, output_name, stops, stat_flag, regional_info, di
 
             reg_list = list(lower_dists.keys())
             lower_org_list = list(list(lower_dists.values())[0].keys())
+            lower_org_list = [lower_org_list[len(lower_org_list) - 1]] + lower_org_list[:len(lower_org_list)-1]
+            
             upper_org_list = list(upper_dists.keys())
             chem_list = list(list(upper_dists.values())[0].keys())
 
@@ -779,9 +786,13 @@ def write_temporal_excel(array, output_name, stops, stat_flag, regional_info, di
 
             for j in range(len(chem_list)):
 
-                sheet.write(0, j + 1, chem_list[j])
+                sheet.write(0, 2*j + 1, chem_list[j])
 
             count = 1
+            for w in range(len(chem_list)):
+                sheet.write(1, 2 * w + 1, 'mean')
+                sheet.write(1, 2 * w + 2, 'std')
+               
             for reg in reg_list:
                 sheet.write(count, 0, reg, bold)
                 count += 1
@@ -801,16 +812,22 @@ def write_temporal_excel(array, output_name, stops, stat_flag, regional_info, di
                                 sheet.write((1 + i * (1 + len(lower_org_list))) + (1+j), k + 1,
                                             lower_dists[reg_list[i]][lower_org_list[j]][chem_list[k]].best_para[0])
                         else:
-                            toprint = lower_dists[reg_list[i]][lower_org_list[j]][chem_list[k]].v_mean_stdString
+                            toprint_mean = str(lower_dists[reg_list[i]][lower_org_list[j]][chem_list[k]].v_mean_std[0])
+                            toprint_std = str(lower_dists[reg_list[i]][lower_org_list[j]][chem_list[k]].v_mean_std[1])
                             
-                            sheet.write((1 + i * (1 + len(lower_org_list))) + (1+j), k + 1, toprint)
+                            sheet.write((1 + i * (1 + len(lower_org_list))) + (1+j), 2 * k + 1, toprint_mean)
+                            sheet.write((1 + i * (1 + len(lower_org_list))) + (1+j), 2 * k + 2, toprint_std)
+                            
 
 
-            sheet.write(0, len(chem_list) + 1, 'Lower Food Web Mean Concentrations and Standard Deviations Weighted by Regional Area (ng/g ww)', big)
-            sheet.write(1, len(chem_list) + 1, 'All Regions', bold)
+            sheet.write(0, 2 * len(chem_list) + 1, 'Lower Food Web Mean Concentrations and Standard Deviations Weighted by Regional Area (ng/g ww)', big)
+            sheet.write(1, 2 * len(chem_list) + 1, 'All Regions', bold)
 
+            for w in range(len(chem_list)):
+                sheet.write(1, 2 * len(chem_list) + 1 + 2 * w + 1, 'mean')
+                sheet.write(1, 2 * len(chem_list) + 1 + 2 * w + 2, 'std')
             for j in range(len(chem_list)):
-                sheet.write(0, len(chem_list) + 1 + (j + 1), chem_list[j])
+                sheet.write(0, 2 * len(chem_list) + 1 + (2*j + 1), chem_list[j])
 
 
             for i in range(len(chem_list)):
@@ -824,7 +841,8 @@ def write_temporal_excel(array, output_name, stops, stat_flag, regional_info, di
                         weight_std += normed_reg_areas[k]*lower_dists[reg_list[k]][lower_org_list[j]][chem_list[i]].v_mean_std[1]
                     sigTot = stdAllRegions(rMeans, rStds, weight_avg, normed_reg_areas) 
                        
-                    sheet.write(2 + j, 2 + len(chem_list) + i, str(round(weight_avg, 6)) + ', ' + str(round(sigTot, 6)))
+                    sheet.write(2 + j, 2 + 2 * len(chem_list) + 2 * i, str(round(weight_avg, 6)))
+                    sheet.write(2 + j, 2 + 2 * len(chem_list) + 2 * i + 1, str(round(sigTot, 6)))
 
 
 
@@ -832,10 +850,15 @@ def write_temporal_excel(array, output_name, stops, stat_flag, regional_info, di
                 sheet.write(count + 1, 0, 'Upper Food Web Concentrations (ng/g ww)', big)
             else:
                 sheet.write(count + 1, 0, 'Upper Food Web Concentrations (ng/g ww) (Mean, Standard Deviation)', big)
+                for w in range(len(chem_list)):
+                    sheet.write(count + 2, 2 * w + 1, chem_list[w])
+                    sheet.write(count + 3, 2 * w + 1, 'mean')
+                    sheet.write(count + 3, 2 * w + 2, 'std')
+            
             count += 1
 
             for i in range(len(upper_org_list)):
-                sheet.write(count + 1 + i, 0,upper_org_list[i])
+                sheet.write(count + 3 + i, 0,upper_org_list[i])                    
                 for j in range(len(chem_list)):
                     if tofit == 1:
                         if index != 4:
@@ -845,12 +868,12 @@ def write_temporal_excel(array, output_name, stops, stat_flag, regional_info, di
                         else:
                             sheet.write(count + 1 + i, j + 1, upper_dists[upper_org_list[i]][chem_list[j]].best_para[0])
                     else:
-                        toprint = upper_dists[upper_org_list[i]][chem_list[j]].v_mean_stdString
-                        sheet.write(count + 1 + i, j+1, toprint)
-
+                        toprint_mean = str(upper_dists[upper_org_list[i]][chem_list[j]].v_mean_std[0])
+                        toprint_std = str(upper_dists[upper_org_list[i]][chem_list[j]].v_mean_std[1])
+                        sheet.write(count + 3 + i, 2 * j + 1, toprint_mean)
+                        sheet.write(count + 3 + i, 2 * j + 2, toprint_std)
             if tofit == 1:
                 sheet.write(count, 1 + len(chem_list), 'Upper Food Web Concentrations (ng/g ww) (Mean and Standard Deviation of Samples)', big)
-
                 for i in range(len(upper_org_list)):
                     for j in range(len(chem_list)):
                         sheet.write(count + 1 + i, j+ len(chem_list) + 2, str(upper_dists[upper_org_list[i]][chem_list[j]].v_mean_std))
