@@ -41,7 +41,7 @@ class app(tk.Frame):
 
         ###getting reference to region animal chemical###
 
-        ident = ["Time:", 0, "Fish:", 0, "Chemical:"]
+        ident = ["Time:", 0, "Species:", 0, "Chemical:"]
         #To be replaced
         time = ["None"]
         fishs = ["None"]
@@ -62,7 +62,7 @@ class app(tk.Frame):
         ###choosing what graphs to view###
         
         
-        options = [("Cumaltive Distrubtion Function(s)", 0), ("Probability Density Function(s)", 1),
+        options = [("Cumulative Distribution Function(s)", 0), ("Probability Density Function(s)", 1),
                    ("Both CDF(s) and PDF(s)", 2), ("CDF and PDF of selected fit:", 3)
                    ]
         count = 6
@@ -82,7 +82,7 @@ class app(tk.Frame):
         ttk.Separator(self,orient=tk.VERTICAL).grid(row=3, column=1 , rowspan=10, sticky='ns')
         ttk.Separator(self, orient=tk.VERTICAL).grid(row=3, column=4 , rowspan=10, sticky='ns')
 
-        tk.Label(self, text='Type of Distrubtion to save: ').grid(column=5, row=7)
+        tk.Label(self, text='Type of Distribution to save: ').grid(column=5, row=7)
         self.save_dist_type  = tk.StringVar(self)
         self.save_dist_type.set('Normal')
         tk.OptionMenu(self, self.save_dist_type, "Normal", 'Lognormal', 'Uniform', 'Gamma', "KS Best").grid(column=5, row=8, sticky=tk.E)
