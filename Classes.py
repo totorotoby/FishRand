@@ -58,10 +58,7 @@ class Zooplank:
         string += '\n\n'
         string += 'm_o :  ' + str(self.Mo) + '\n'
         string += 'm_p :  ' + str(self.Mp) + '\n\n\n'
-        
-        
-        
-
+    
 
         return string
 
@@ -548,13 +545,15 @@ class Pplank:
         return (self.k_1[i] * Cwd) / (self.k_2[i] + self.Kg)
 
     def solve_next_time_step(self, Cwd, chem_index, pre_step, t):
+
         q = self.k_1[chem_index] * Cwd
         k = (self.k_2[chem_index]) + self.Kg
 
-
-        analytic = (q/k) + math.exp(-k*t) * (0-(q/k))
         
-        return analytic
+        conc = (q/k) - (q/k) * math.exp(-k*t)
+
+        
+        return conc
 
 
 class Chemical:
