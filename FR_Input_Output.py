@@ -111,6 +111,8 @@ def convert_to_lists(filename, lastStop):
 
     ## pass to program ##
 
+    #print(con_data)
+    
     total = [region_data, temp_data, chem_data, phyto_data, zoop_data, invert_data, fish_data, diet_data, mig_data, con_data]
 
     return model_para, total, num_timestep, time_per_step, sites_data, foodweb_graph
@@ -160,9 +162,12 @@ def get_data(entry_col, instance_len, new_list):
                 if entry_col[i].value == '':
                     break
                 else:
+                    print(i)
+                    print(entry_col[i].value)
                     new_entry.append(entry_col[i].value)
             else:
                 data_get_helper(entry_col[i], new_entry)
+
     if len(new_entry) != 0:
         new_list.append(new_entry)
 
@@ -170,10 +175,11 @@ def get_data(entry_col, instance_len, new_list):
 def data_get_helper(preentry, new_entry):
 
     entry = preentry.value
-    
+    print(entry)
     if type(entry) == float:
         new_entry.append(entry)
     elif type(entry) == str and entry != '':
+        print(entry)
         split = entry.split(" ", 2)
         ty = split[0].replace(',', '')
         name = split[1]
@@ -198,7 +204,7 @@ def get_con_data(con_sheet, con_data, num_reg, num_chem, timesteps):
     try:
         for i in range (1, timesteps + 2):
             t_cons = []
-            column = con_sheet.col(1)
+            column = con_sheet.col(i)
             for j in range (num_reg):
                 r_cons = []
                 for k in range (0, num_chem):
@@ -217,6 +223,8 @@ def get_con_data(con_sheet, con_data, num_reg, num_chem, timesteps):
                     r_cons.append(c_cons)
                 t_cons.append(r_cons)
             con_data.append(t_cons)
+
+        print(con_data)
     except:
         print("Something is wrong with your chemical concentration entries.\nCheck the format on Page 13 section 3.7 of the user manual.")
         exit(0)
