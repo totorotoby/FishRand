@@ -86,16 +86,17 @@ def convert_to_lists(filename, lastStop):
     get_data(zoop_entry_col, zo_len, zoop_data)
     get_data(phyto_entry_col, ph_len, phyto_data)
 
-
+    
+    
     ## organisms diets from excel ##
     
     diet_data = {}
-    entrysize = len(fish_data) + len(invert_data) + 5
+    entrysize = len(fish_data) + len(invert_data) + len(zoop_data) + 5
     diet_sheet = all_sheets.sheet_by_index(6)
     get_diet_data(diet_sheet, diet_data, entrysize)
-
+    
     #Used to visualize foodweb
-    foodweb_graph = foodweb_to_network_struc(diet_data)
+    foodweb_graph = foodweb_to_network_struc(diet_data, phyto_data)
 
     ## Fish migration data from excel ##
     
@@ -162,8 +163,6 @@ def get_data(entry_col, instance_len, new_list):
                 if entry_col[i].value == '':
                     break
                 else:
-                    print(i)
-                    print(entry_col[i].value)
                     new_entry.append(entry_col[i].value)
             else:
                 data_get_helper(entry_col[i], new_entry)
@@ -175,11 +174,11 @@ def get_data(entry_col, instance_len, new_list):
 def data_get_helper(preentry, new_entry):
 
     entry = preentry.value
-    print(entry)
+    
     if type(entry) == float:
         new_entry.append(entry)
     elif type(entry) == str and entry != '':
-        print(entry)
+        
         split = entry.split(" ", 2)
         ty = split[0].replace(',', '')
         name = split[1]
@@ -224,7 +223,7 @@ def get_con_data(con_sheet, con_data, num_reg, num_chem, timesteps):
                 t_cons.append(r_cons)
             con_data.append(t_cons)
 
-        print(con_data)
+        
     except:
         print("Something is wrong with your chemical concentration entries.\nCheck the format on Page 13 section 3.7 of the user manual.")
         exit(0)
@@ -260,7 +259,7 @@ def get_mig_data(mig_data, mig_sheet, timesteps):
         except:
             print('Not enough migration data.')
             exit(0)
-def foodweb_to_network_struc(foodweb):
+def foodweb_to_network_struc(foodweb, phyto_data):
 
     network_struc = {}
     nodes = [entry for entry in list(foodweb.values())[0]]
@@ -268,10 +267,14 @@ def foodweb_to_network_struc(foodweb):
     for node in nodes:
             network_struc[node[0]] = []
 
+
     
+    no_eat = ['Sediment/Detritus']
+
+
     
-    no_eat = ['Sediment/Detritus', 'Zooplankton', 'Phytoplankton']
-    network_struc['Zooplankton'].append('Phytoplankton')
+    for phyto in phyto_data:
+        no_eat.append(phyto[0])
     for predator, prey in network_struc.items():
         if predator not in no_eat:
             lookup = foodweb[predator]
@@ -279,7 +282,7 @@ def foodweb_to_network_struc(foodweb):
                 if entry[1] != 0:
                     prey.append(entry[0])
 
-
+    
     foodweb_graph = nx.DiGraph(network_struc)
 
     return foodweb_graph
@@ -350,7 +353,7 @@ def write_output_steady(total_cons, output_name, stop, dist_type, inputs, data, 
     chem_list = list(list(list(total_cons.values())[0].values())[0].items())
     chem_len = len(chem_list)
     #write down region which is dictionaries first key
-    print(org_list)
+   
     if tofit == 1:
         sheet.write(0,0, 'Region: ' + str(list(total_cons.keys())[0]) + ' Concentrations (ng/g ww)', bold)
 
@@ -718,7 +721,7 @@ def write_temporal_excel(array, output_name, stops, stat_flag, regional_info, di
                 lower_org_list.append(animal)
                 
         lower_org_list = [lower_org_list[len(lower_org_list) - 1]] + lower_org_list[:len(lower_org_list)-1]
-        print(lower_org_list)
+        
         upper_org_list = []
         for animal, chems in array[0][2].items():
             upper_org_list.append(animal)

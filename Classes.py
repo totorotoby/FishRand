@@ -3,8 +3,9 @@ import Bioaccum
 
 class Zooplank:
 
-    def __init__(self, name, weight, vlb, flag, num_chemicals, per_step, vnb=.2, e_l=.72, e_n=.72, e_w=.25):
+    def __init__(self, name, diet_data, weight, vlb, flag, num_chemicals, per_step, vnb=.2, e_l=.72, e_n=.72, e_w=.25):
         self.name = name
+        self.diet_data = diet_data
         self.Wb = weight  # wet weight
         self.Vlb = vlb  # Percent Lipid Content
         self.Vnb = vnb  # percent Nonlipid organic matter
@@ -38,7 +39,7 @@ class Zooplank:
         self.k_d = [0 for _ in range(num_chemicals)]  # (clearance rate constant via ingestion of food)
 
         self.days_per_step = per_step
-
+        
     # a display but only for the first chemical
     def __str__(self):
 
@@ -136,11 +137,14 @@ class Zooplank:
         self.k_d[chem_index] = chem_ed * (self.Gd / self.Wb)
         
     # sets the percentages of zooplank diet that are lipid, non-lipid and water
-    def calc_diet_per(self, phyto):
-
-        self.Vld = phyto.Vlb
-        self.Vnd = phyto.Vnb
+    def calc_diet_per(self, prey_list):
+        for prey in prey_list:
+            for name, frac in self.diet_data:
+                if prey.name == name:
+                    self.Vld = prey.Vlb * frac
+                    self.Vnd = prey.Vnb * frac
         self.Vwd = 1 - (self.Vld + self.Vnd)
+        
 
     # sets the percentages of the gut
     def calc_gut_per(self):
@@ -231,11 +235,25 @@ class Zooplank:
         return (f_num + l_num) / denom
 
 
-    def solve_next_time_step(self, phi, chem_index, Cwp, Cwdo, phyto_con, pre_step):
+    def solve_next_time_step(self, phi, chem_index, Cwp, Cwdo, prey_con, pre_step):
 
-      
-        q = ((self.k_1[chem_index] * self.Mo * Cwdo) + (self.k_1[chem_index] * self.Mp * Cwp)) + (phyto_con * self.k_d[chem_index])
+        
+        q = ((self.k_1[chem_index] * self.Mo * Cwdo) + (self.k_1[chem_index] * self.Mp * Cwp)) 
 
+        q_from_prey = 0
+        
+        for diet in self.diet_data:
+            prey_name2 = diet[0]
+            frac = diet[1]
+            for prey_name, con in prey_con.items():
+                if prey_name == prey_name2:
+                    
+                    q_from_prey += frac * con
+            
+
+        q += q_from_prey
+        
+        
         k = self.k_2[chem_index] + self.k_e[chem_index] + self.Kg
 
         #print(q, 1/q, k, 1/k, self.days_per_step)
@@ -250,6 +268,7 @@ class Zooplank:
 
 
         return pre_step
+    
 
 class Fish(Zooplank):
 
@@ -264,15 +283,15 @@ class Fish(Zooplank):
         total_nonlip_m = 0
         total_lip = 0
         count = 0
-
+    
         # loop through possible types of fishes
         for i in range(len(fishlog)):
             # loop through fish names in diet
             for j in range(len(self.diet_frac)):
                 # finding right fish
 
-                if fishlog[i].name == self.diet_frac[j][0] and self.diet_frac[j][0] == 'Phytoplankton':
-
+                if fishlog[i].name == self.diet_frac[j][0] and isinstance(fishlog[i], Pplank):
+                   
                     l_toadd = self.diet_frac[j][1] * fishlog[i].Vlb
                     nl_toadd = self.diet_frac[j][1] * fishlog[i].Vnb
 
@@ -463,7 +482,7 @@ class Fish(Zooplank):
 class Pplank:
 
     def __init__(self, name, kg, len_chem, per_step, a=.00006, b=5.5, vlb=.005, vnb=.065):
-        self.name = 'Phytoplankton'
+        self.name = name
         self.Vlb = vlb
         self.Vnb = vnb
         self.Vwb = 0
@@ -473,7 +492,7 @@ class Pplank:
         self.k_1 = [0 for _ in range(len_chem)]  # List of k_1 (clearance rate constant) for each chemical.
         self.k_2 = [0 for _ in range(len_chem)]  # Same as k_1 but for k_2
         #  (rate constant chemical elem via respiratory)
-
+        self.conc = 0
         self.days_per_step = per_step
 
     def __str__(self):
@@ -551,7 +570,7 @@ class Pplank:
 
         
         conc = (q/k) - (q/k) * math.exp(-k*t)
-
+        self.conc = conc
         
         return conc
 
