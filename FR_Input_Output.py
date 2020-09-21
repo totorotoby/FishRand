@@ -7,9 +7,15 @@ import math
 from spatial import HotSpot
 
 
+def get_site_data(filename):
+    
+    all_sheets = xlrd.open_workbook(filename)
+    sites_sheet = all_sheets.sheet_by_index(8)
+    sites_data = get_sites_data(sites_sheet)
+
+    return sites_data
+
 # Reads in all data from spread sheets
-
-
 def convert_to_lists(filename, lastStop):
 
     all_sheets = xlrd.open_workbook(filename)
@@ -86,14 +92,15 @@ def convert_to_lists(filename, lastStop):
     get_data(zoop_entry_col, zo_len, zoop_data)
     get_data(phyto_entry_col, ph_len, phyto_data)
 
-    
-    
+
     ## organisms diets from excel ##
     
     diet_data = {}
-    entrysize = len(fish_data) + len(invert_data) + len(zoop_data) + 5
+    entrysize = len(fish_data) + len(invert_data) + len(zoop_data) + len(phyto_data) + 3
     diet_sheet = all_sheets.sheet_by_index(6)
     get_diet_data(diet_sheet, diet_data, entrysize)
+
+
     
     #Used to visualize foodweb
     foodweb_graph = foodweb_to_network_struc(diet_data, phyto_data)
@@ -148,7 +155,7 @@ def get_temp_data(temp_data, temp_sheet, reg_len, timesteps):
     return temp_data
     
 def get_data(entry_col, instance_len, new_list):
-
+    print(instance_len)
     new_entry = []
     for i in range(len(entry_col)):
         if i % (instance_len + 1) == 0:
@@ -163,6 +170,7 @@ def get_data(entry_col, instance_len, new_list):
                 if entry_col[i].value == '':
                     break
                 else:
+                    #print(entry_col[i].value)
                     new_entry.append(entry_col[i].value)
             else:
                 data_get_helper(entry_col[i], new_entry)
@@ -178,7 +186,7 @@ def data_get_helper(preentry, new_entry):
     if type(entry) == float:
         new_entry.append(entry)
     elif type(entry) == str and entry != '':
-        
+        print(entry)
         split = entry.split(" ", 2)
         ty = split[0].replace(',', '')
         name = split[1]
@@ -233,7 +241,7 @@ def get_diet_data(diet_sheet, diet_data, entrysize):
 
     new_name = 0
     rows = diet_sheet.nrows
-    
+    print(entrysize)
     for i in range(rows):
         if i % entrysize == 0:
             continue
@@ -241,6 +249,8 @@ def get_diet_data(diet_sheet, diet_data, entrysize):
             new_name = diet_sheet.row(i)[0].value
             diet_data[new_name] = []
         else:
+            print(i)
+            print(diet_sheet.row(i)[0].value, float(diet_sheet.row(i)[1].value))
             try:
                 new_prey_data = [diet_sheet.row(i)[0].value, float(diet_sheet.row(i)[1].value)]
             except ValueError:
