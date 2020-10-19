@@ -203,10 +203,11 @@ def setup(site_data):
 
     # get boundary polygon
     boundary = Polygon(site_data[0])
-
+    print(site_data)
     reg_polygons = []
     if len(site_data[1]) > 1:
         # get regional polygons...takes some messing around with Voronoi function...
+        
         points = np.array([row[1] for row in site_data[1]])
         vor = Voronoi(points)
         regions, vertices = voronoi_finite_polygons_2d(vor, radius=boundary.length * 1.2)

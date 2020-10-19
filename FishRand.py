@@ -201,11 +201,12 @@ class app(tk.Frame):
             count = 0
             # get fish names
             if self.stat_check == True and self.output[0] == 'NO':
+                
                 try:
                     r = list(self.to_write[0][0])[0]
                     lower = list(self.to_write[0][0][r].keys())
                     fishs = list(self.to_write[0][1].keys())
-                    chemicals = list(list(self.to_write[0][1].values())[0].keys())
+                    chemicals =  list(list(list(self.to_write[0][0].values())[0].values())[0].keys())
                     total = lower + fishs
                 except:
                     print('You asked to display a timestep that is outside the range between 0, and ((End Time - Start Time) / step) - 1)')
@@ -217,7 +218,7 @@ class app(tk.Frame):
                     fishs = list(self.to_write[0][2].keys())
                     total = lower + fishs
                 except:
-                    print('Not enough data in either tempatures, chemical concenrations, or abundance for the number of timesteps input')
+                    print('Not enough data in either temperature, chemical concentrations, or abundance for the number of timesteps input')
                     exit(0)
                 chemicals = list(list(self.to_write[0][1].values())[0].keys())
                 count = 1
@@ -243,6 +244,7 @@ class app(tk.Frame):
                     for entry in reset_list[i]:
                         menu['menu'].add_command(label=entry, command=tk._setit(var, entry))
 
+            
             ##################################################################
         
     def parse_filename(self):
@@ -345,11 +347,12 @@ class app(tk.Frame):
             
         else:
 
-            everything = convert_to_lists(self.filename, 0)
             
-            if everything[0][8] == 'NO':
+            spatial_data = get_site_data(self.filename)
+            
+            
+            if len(spatial_data) != 0:
                 
-                spatial_data = everything[4]
                 region_info = pre_run_loc_data(spatial_data)
                 b_xy = region_info[0].exterior.xy
 

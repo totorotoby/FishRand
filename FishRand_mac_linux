@@ -10,5 +10,4 @@ done
 DIR="$( cd -P "$( dirname "$SOURCE" )" >/dev/null && pwd )"
 FILE="$DIR/FishRand.py"
 
-
 python3 $FILE
