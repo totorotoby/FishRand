@@ -6,4 +6,4 @@ FishRand can be downloaded or cloned from this repository (see the green button 
 
 ## Questions
 
-If you have questions about this FishRand code, please email Toby Harvey (tharvey@cs.uoregon.edu).
+If you have questions about this FishRand code, please email Toby Harvey (tharvey2@uoregon.edu).
