@@ -1,2 +1,0 @@
-data = convert_to_lists("phytos_test.xlsx", 9)
-output, inputs = filter_cases(self.data, self.time_entry, self.tofit)
