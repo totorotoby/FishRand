@@ -114,11 +114,11 @@ class app(tk.Frame):
 
         ###Loading window###
         
-        self.Loading = tk.Toplevel(self)
-        tk.Label(self.Loading, text="Running Simulations...").pack()
-        self.bar = tk.ttk.Progressbar(self.Loading, orient='horizontal')
-        self.bar.pack()
-        self.Loading.withdraw()
+        #self.Loading = tk.Toplevel(self)
+        #tk.Label(self.Loading, text="Running Simulations...").pack()
+        #self.bar = tk.ttk.Progressbar(self.Loading, orient='horizontal')
+        #self.bar.pack()
+        #self.Loading.withdraw()
 
     def askfile(self):
         self.filebox.delete(0, tk.END)
@@ -147,12 +147,12 @@ class app(tk.Frame):
 
     def run_func(self, func):
 
-        self.Loading.update()
-        self.Loading.deiconify()
-        self.bar.start()
+        #self.Loading.update()
+        #self.Loading.deiconify()
+        #self.bar.start()
         self.run_model()
-        self.bar.stop()
-        self.Loading.withdraw()
+        #self.bar.stop()
+        #self.Loading.withdraw()
         
     def run_model(self):
 
@@ -267,17 +267,19 @@ class app(tk.Frame):
             for opt in self.dictvars:
                 where.append(opt.get())
 
-            if self.output[0] == 'NO':
-                try:
+
+            try:
+                if self.output[0] == 'NO':
                     dist_to_show = self.graph_data[int(where[0])-1][where[1]][where[2]]
-                except:
-                    print('You are missing a graphing argument from the time, fish, chemical selection.')
-            else:
-                dist_to_show = list(self.to_write.values())[0][where[1]][where[2]]
-            dist_to_show.display = dist_type
+                else:
+                    dist_to_show = list(self.to_write.values())[0][where[1]][where[2]]
 
-            dist_to_show.show(type_index_list.index(type_index))
-
+                dist_to_show.display = dist_type
+                dist_to_show.show(type_index_list.index(type_index))
+            except:
+                    print("Either you a missing a graphing argument in the Time, Species, and Chemical drop down menus,",
+                          "\nor you are trying to plot the distribution of a non-mover which is not supported.")
+                    
         if self.stat_check == False:
 
             print('Concentration is deterministic. No Distrubtion to Plot.')

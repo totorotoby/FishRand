@@ -339,6 +339,7 @@ def init_fish_pre_region(fish_data, region, chemicals, phytos, zoops, diet_data,
         if fish[5] != '' and fish[6] != '' and fish[7] != '':
             toadd.set_el_en_ew(fish[5], fish[6], fish[7])
         if fish[8] != '':
+
             toadd.set_gd(fish[8])
         if fish[9] != '':
             toadd.set_kg(fish[9])

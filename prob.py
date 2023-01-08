@@ -73,7 +73,7 @@ class Var:
 
         num_bins = len(self.values)//20
 
-        hist, bins = numpy.histogram(self.values, num_bins, normed=True)
+        hist, bins = numpy.histogram(self.values, num_bins, density=True)
 
         plt.scatter(bins[:-1], hist, s=16)
         plt.plot(sorted(self.values),numpy.linspace(0,1,len(self.values)))
@@ -189,12 +189,12 @@ class ResultDist:
         return index
 
     def make_pdf_hist(self):
-        print(self.values, self.chem, self.animal)
+
         if len(self.values) < 10:
             print("If you have not input any distrubtions, go back and set uncertainty and inner loop iterations to 1. If you do have distrubtions, the minumum number of total variable samples is 10.")
             exit(0)
 
-        hist, bins = numpy.histogram(self.values, bins=self.num_bins, normed=True)
+        hist, bins = numpy.histogram(self.values, bins=self.num_bins, density=True)
         
         return [hist, bins]
 
@@ -329,7 +329,7 @@ class ResultDist:
             fig.tight_layout()
 
         else:
-            print("There is no fit to be graphed if you did not choose \"Curve Fit Output Samples\".")
+            printo("There is no fit to be graphed if you did not choose \"Curve Fit Output Samples\".")
 
     def show(self, temp_index):
 

@@ -155,7 +155,7 @@ def get_temp_data(temp_data, temp_sheet, reg_len, timesteps):
     return temp_data
     
 def get_data(entry_col, instance_len, new_list):
-    print(instance_len)
+
     new_entry = []
     for i in range(len(entry_col)):
         if i % (instance_len + 1) == 0:
@@ -186,7 +186,7 @@ def data_get_helper(preentry, new_entry):
     if type(entry) == float:
         new_entry.append(entry)
     elif type(entry) == str and entry != '':
-        print(entry)
+
         split = entry.split(" ", 2)
         ty = split[0].replace(',', '')
         name = split[1]
@@ -241,7 +241,6 @@ def get_diet_data(diet_sheet, diet_data, entrysize):
 
     new_name = 0
     rows = diet_sheet.nrows
-    print(entrysize)
     for i in range(rows):
         if i % entrysize == 0:
             continue
@@ -249,8 +248,6 @@ def get_diet_data(diet_sheet, diet_data, entrysize):
             new_name = diet_sheet.row(i)[0].value
             diet_data[new_name] = []
         else:
-            print(i)
-            print(diet_sheet.row(i)[0].value, float(diet_sheet.row(i)[1].value))
             try:
                 new_prey_data = [diet_sheet.row(i)[0].value, float(diet_sheet.row(i)[1].value)]
             except ValueError:
@@ -276,7 +273,6 @@ def foodweb_to_network_struc(foodweb, phyto_data):
     
     for node in nodes:
             network_struc[node[0]] = []
-
 
     
     no_eat = ['Sediment/Detritus']
